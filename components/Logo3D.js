@@ -1,5 +1,13 @@
 import * as THREE from 'three';
 
+/**
+ * Renders a high-fidelity 3D animated logo using Three.js.
+ * The logo features an atomic structure with rotating loops, a glowing core, and a particle system.
+ * It includes interactive hover effects that increase rotation speed and glow intensity.
+ *
+ * @param {string} containerId - The ID of the HTML element to host the 3D scene.
+ * @param {number} [colorHex=0x00D2A6] - The primary color of the logo in hex format.
+ */
 export function renderLogo3D(containerId, colorHex = 0x00D2A6) {
   const container = document.getElementById(containerId);
   if (!container) return;

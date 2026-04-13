@@ -159,53 +159,34 @@
   <main id="app">
     <section class="section container hero">
       <div class="hero-content gsap-reveal">
-        <h1>Trade Crypto <br/><span class="text-gradient">Anytime, Anywhere</span></h1>
-        <p>Omni is a global crypto exchange offering up to 400x futures leverage and a 1,000 BTC Protection Fund.</p>
+        <h1 style="font-size: 4.5rem; letter-spacing: -2px;">The Sovereign <br/><span class="text-gradient">Ecosystem</span></h1>
+        <p style="font-size: 1.3rem;">Omni v2.0 is here. A unified triple-app experience for professional trading, terminal-grade mining, and sovereign node management.</p>
         
-        <div class="hero-stats">
-          <div class="stat-item">
-            <h3>6.2M+</h3>
-            <p>Global Users</p>
-          </div>
-          <div class="stat-item">
-            <h3>2,100+</h3>
-            <p>Trading Pairs</p>
-          </div>
-          <div class="stat-item">
-            <h3>1,000 BTC</h3>
-            <p>Protection Fund</p>
-          </div>
+        <!-- The Triple Pillars -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 40px; margin-top: 20px;">
+           <div class="glass-panel" style="padding: 20px; text-align: center; border: 1px solid rgba(0, 210, 166, 0.2);">
+              <i data-lucide="layout-dashboard" style="color: var(--color-primary); margin-bottom: 10px;"></i>
+              <div style="font-weight: 800; font-size: 0.8rem;">OMNI TRADING</div>
+           </div>
+           <div class="glass-panel" style="padding: 20px; text-align: center; border: 1px solid rgba(0, 210, 166, 0.2);">
+              <i data-lucide="terminal" style="color: var(--color-primary); margin-bottom: 10px;"></i>
+              <div style="font-weight: 800; font-size: 0.8rem;">MINER TERMINAL</div>
+           </div>
+           <div class="glass-panel" style="padding: 20px; text-align: center; border: 1px solid rgba(0, 210, 166, 0.2);">
+              <i data-lucide="cloud" style="color: var(--color-primary); margin-bottom: 10px;"></i>
+              <div style="font-weight: 800; font-size: 0.8rem;">CLOUD NODE</div>
+           </div>
         </div>
 
-        <div class="hero-btns" style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:30px;">
-          <a href="/pages/downloads.html" class="btn btn-primary magnetic-btn" style="padding: 18px 40px; font-size: 1.1rem; display:flex; align-items:center; gap:12px;">
-            <i data-lucide="smartphone" style="width:24px; height:24px;"></i> Download Android APK
+        <div class="hero-btns" style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+          <a href="/pages/downloads.html" class="btn btn-primary magnetic-btn" style="padding: 18px 40px; font-size: 1.1rem; border-radius: 40px;">
+            <i data-lucide="download-cloud" style="margin-right: 10px;"></i> Download the Ecosystem
           </a>
-          <a href="/pages/create-wallet.html" class="btn btn-outline magnetic-btn" style="padding: 18px 40px; font-size: 1.1rem;">Get Started</a>
+          <a href="/pages/mining-plans.html" class="btn btn-outline magnetic-btn" style="padding: 18px 40px; font-size: 1.1rem; border-radius: 40px;">View Mining Tiers</a>
         </div>
       </div>
       <div class="hero-image gsap-reveal">
-        <div class="hero-card">
-          <div class="card-tabs">
-            <span class="active">Quick Buy</span>
-            <span onclick="window.location.href='/pages/checkout.html?mode=p2p'">P2P Trading</span>
-          </div>
-          <div style="background:var(--color-bg-deep); padding:15px; border-radius:var(--border-radius-md); margin-bottom:15px; border: 1px solid var(--color-bg-light);">
-            <span class="text-muted" style="font-size:0.9rem;">Spend</span>
-            <div style="display:flex; justify-content:space-between; margin-top:8px; align-items:center;">
-              <input type="number" id="quickbuy-spend" value="500" style="background:transparent; border:none; color:#fff; font-size:1.5rem; width:100%; outline:none; font-family:var(--font-heading); font-weight:600;" />
-              <span style="font-weight:bold; color:#fff; display:flex; align-items:center; gap:5px;"><img src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=029" width="20"/> USD</span>
-            </div>
-          </div>
-          <div style="background:var(--color-bg-deep); padding:15px; border-radius:var(--border-radius-md); margin-bottom:24px; border: 1px solid var(--color-bg-light);">
-            <span class="text-muted" style="font-size:0.9rem;">Receive</span>
-            <div style="display:flex; justify-content:space-between; margin-top:8px; align-items:center;">
-              <input type="text" id="quickbuy-receive" value="0.0075" style="background:transparent; border:none; color:#fff; font-size:1.5rem; width:100%; outline:none; font-family:var(--font-heading); font-weight:600;" readonly />
-              <span style="font-weight:bold; color:#fff; display:flex; align-items:center; gap:5px;"><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=029" width="20"/> BTC</span>
-            </div>
-          </div>
-          <button onclick="window.location.href='/pages/checkout.html?amount='+document.getElementById('quickbuy-spend').value+'&coin=BTC'" style="width:100%; background:var(--color-primary); color:#181a20; font-weight:bold; padding:16px; border:none; border-radius:var(--border-radius-md); font-size:1.1rem; cursor:pointer; transition:var(--transition-fast);">Buy BTC Protocol</button>
-        </div>
+        <div id="hero-logo-3d-container" style="width: 100%; height: 450px; display: flex; justify-content: center; align-items: center;"></div>
       </div>
     </section>
 
@@ -218,7 +199,7 @@
         </div>
         <div class="market-grid">
           <!-- BTC -->
-          <div class="market-item">
+          <div class="market-item" onclick="location.href='/pages/spot.html?asset=BTC'">
             <div class="market-pair">
               <span>BTC / USDT</span>
               <span class="text-success" data-symbol-change="BTCUSDT">+2.45%</span>
@@ -228,7 +209,7 @@
             <canvas data-sparkline="BTCUSDT" style="width:100%; height:60px; margin-top:10px;"></canvas>
           </div>
           <!-- ETH -->
-          <div class="market-item">
+          <div class="market-item" onclick="location.href='/pages/spot.html?asset=ETH'">
             <div class="market-pair">
               <span>ETH / USDT</span>
               <span class="text-success" data-symbol-change="ETHUSDT">+1.15%</span>
@@ -238,7 +219,7 @@
             <canvas data-sparkline="ETHUSDT" style="width:100%; height:60px; margin-top:10px;"></canvas>
           </div>
           <!-- SOL -->
-          <div class="market-item">
+          <div class="market-item" onclick="location.href='/pages/spot.html?asset=SOL'">
             <div class="market-pair">
               <span>SOL / USDT</span>
               <span class="text-danger" data-symbol-change="SOLUSDT">-0.50%</span>
@@ -248,7 +229,7 @@
             <canvas data-sparkline="SOLUSDT" style="width:100%; height:60px; margin-top:10px;"></canvas>
           </div>
           <!-- DOGE -->
-          <div class="market-item">
+          <div class="market-item" onclick="location.href='/pages/spot.html?asset=DOGE'">
             <div class="market-pair">
               <span>DOGE / USDT</span>
               <span class="text-success" data-symbol-change="DOGEUSDT">+5.2%</span>

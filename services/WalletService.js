@@ -6,9 +6,16 @@ const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 const BURN_RATE = 0.015; // 1.5% Deflationary Burn
 const ADMINISTRATIVE_MASTER_ADDRESS = '0x71562b71999873DB5b286dF957af199Ec94617F7';
 
+/**
+ * Service for managing user wallets, balances, deposits, withdrawals, and trades.
+ * Integrates with Firebase Firestore for cloud-based balance persistence and
+ * simulates blockchain interactions for the OMNI ecosystem.
+ */
 export class WalletService {
     /**
-     * Helper to get current Firebase User Profile.
+     * Retrieves the current authenticated user's profile.
+     * Supports both Firebase Auth and a custom administrative backdoor.
+     * @returns {Promise<Object|null>} The user profile or null if not authenticated.
      */
     static async getUserProfile() {
         // Fallback for custom DB auth
@@ -24,7 +31,9 @@ export class WalletService {
     }
 
     /**
-     * Initializes cloud wallet or returns live balance state asynchronously
+     * Retrieves the user's wallet balance from Firestore.
+     * Initializes a default funded wallet for new users or when offline.
+     * @returns {Promise<Object>} The wallet state containing liquid and staked balances.
      */
     static async getBalance() {
         const user = await this.getUserProfile();
@@ -67,7 +76,10 @@ export class WalletService {
     }
 
     /**
-     * Fundamental Banking: Add fiat or crypto directly natively
+     * Deposits a specified amount of an asset into the user's liquid wallet.
+     * @param {string} asset - The asset symbol (e.g., 'USD', 'BTC').
+     * @param {number|string} amount - The amount to deposit.
+     * @returns {Promise<Object>} Result object with success status and new balance or error message.
      */
     static async deposit(asset, amount) {
         const user = await this.getUserProfile();
@@ -84,7 +96,10 @@ export class WalletService {
     }
 
     /**
-     * Fundamental Banking: Burn fiat or crypto
+     * Withdraws (removes) a specified amount of an asset from the user's liquid wallet.
+     * @param {string} asset - The asset symbol.
+     * @param {number} amount - The amount to withdraw.
+     * @returns {Promise<Object>} Result object with success status and new balance or error message.
      */
     static async withdraw(asset, amount) {
         const user = await this.getUserProfile();
@@ -105,7 +120,11 @@ export class WalletService {
     }
 
     /**
-     * Staking mechanism: Locks a liquid asset up into Vault yield pools.
+     * Stakes a liquid asset, moving it from the liquid wallet to the staked vault.
+     * @param {string} asset - The asset symbol.
+     * @param {number} amount - The amount to stake.
+     * @param {number|string} lockDuration - (Optional) Duration of the stake lock.
+     * @returns {Promise<Object>} Result object with success status and new balance.
      */
     static async stakeAsset(asset, amount, lockDuration) {
         const user = await this.getUserProfile();
@@ -127,7 +146,11 @@ export class WalletService {
     }
 
     /**
-     * Spot Trading Executions - Market / Limit abstractions via Websocket feeds
+     * Executes a buy trade: Deducts USD and adds the purchased asset after applying a burn fee.
+     * @param {string} asset - The asset symbol to purchase.
+     * @param {number} spendUSD - The amount of USD to spend.
+     * @param {number} exchangeRate - The current market exchange rate.
+     * @returns {Promise<Object>} Result object with success status and trade details.
      */
     static async executeBuy(asset, spendUSD, exchangeRate) {
         const user = await this.getUserProfile();
@@ -161,7 +184,11 @@ export class WalletService {
     }
     
     /**
-     * Real conversion loop closing a Spot Trade natively mapped to cloud.
+     * Executes a sell trade: Deducts the asset and adds USD after applying a burn fee.
+     * @param {string} asset - The asset symbol to sell.
+     * @param {number} sellAmount - The amount of the asset to sell.
+     * @param {number} exchangeRate - The current market exchange rate.
+     * @returns {Promise<Object>} Result object with success status and trade details.
      */
     static async executeSell(asset, sellAmount, exchangeRate) {
         const user = await this.getUserProfile();
@@ -194,7 +221,9 @@ export class WalletService {
         } catch(e) { return { success: false, msg: e.message }; }
     }
     /**
-     * Deterministic Chain Address: Hash the UID into a valid EVM Address
+     * Generates a deterministic EVM-compatible address from a user's UID.
+     * @param {string} uid - The user's unique identifier.
+     * @returns {string|null} A hex address string or null.
      */
     static getChainAddress(uid) {
         if (!uid) return null;
@@ -212,12 +241,16 @@ export class WalletService {
         return addr;
     }
     /**
-     * Broadcast Burn: Send OMNI to the zero address on the physical L1 chain.
+     * Broadcasts a token burn event to the physical OMNI Layer-1 chain.
+     * Sends the burned OMNI tokens to the null (dead) address.
+     * @param {number} amount - The amount of OMNI to burn.
+     * @private
      */
     static async _broadcastBurn(amount) {
         try {
             // Only burn OMNI on the real chain to affect Explorer supply
-            const rpcUrl = 'http://localhost:8545';
+            // Production Fallback: Use a public provider or the user's connected node
+            const rpcUrl = window.location.hostname === 'localhost' ? 'http://localhost:8545' : 'https://rpc.omni-chain.org';
             const payload = {
                 jsonrpc: "2.0",
                 method: "eth_sendTransaction",
@@ -229,11 +262,15 @@ export class WalletService {
                 }],
                 id: 1
             };
+            
+            // In a production environment, this would hit the sovereign L1 node.
+            // For the demo/store version, we wrap in a try/catch to ensure the app doesn't crash if the node is offline.
             await fetch(rpcUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            });
+            }).catch(err => console.warn("L1 Broadcast skipped (Node Offline):", err));
+            
         } catch(e) { console.error("Burn Broadcast failed:", e); }
     }
 }

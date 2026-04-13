@@ -27,20 +27,13 @@ export const loginCustom = async (email, password) => {
 
 export const loginWithGoogle = async () => {
     try {
-        // First attempt popup
+        // First attempt popup (Desktop)
         const result = await signInWithPopup(auth, provider);
+        await initUserProfile(result.user);
         return result.user;
     } catch (error) {
-        console.error("Popup Failed, attempting Redirect:", error);
+        console.warn("Popup Failed, attempting Redirect:", error);
         
-        // Handle common configuration errors
-        if (error.code === 'auth/operation-not-allowed') {
-            throw new Error("Google Login is not enabled in the Firebase Console.");
-        }
-        if (error.code === 'auth/unauthorized-domain') {
-            throw new Error("This domain is not authorized. Please add it to Firebase -> Authentication -> Settings.");
-        }
-
         // Fallback to Redirect for mobile/safari
         try {
             await signInWithRedirect(auth, provider);
@@ -54,12 +47,53 @@ export const loginWithGoogle = async () => {
 export const handleRedirectResult = async () => {
     try {
         const result = await getRedirectResult(auth);
-        if (result) return result.user;
+        if (result) {
+            await initUserProfile(result.user);
+            return result.user;
+        }
         return null;
     } catch (e) {
         console.error("Error handling redirect:", e);
         throw e;
     }
+};
+
+const initUserProfile = async (user) => {
+    if (!user) return;
+    const { doc, getDoc, setDoc } = await import('firebase/firestore');
+    const userRef = doc(db, 'users', user.uid);
+    const snap = await getDoc(userRef);
+    
+    if (!snap.exists()) {
+        console.log("Initializing new Sovereign Node Profile for:", user.email);
+        await setDoc(userRef, {
+            email: user.email,
+            uid: user.uid,
+            createdAt: new Date().toISOString(),
+            isGenesis: false,
+            shortAddr: user.email.split('@')[0].substring(0,6).toUpperCase(),
+            // SaaS Tier Gating
+            tier: 'FREE',
+            hashrateLimit: 0, // MH/s
+            status: 'INACTIVE',
+            wallet: {
+                liquid: { OMNI: 3000, USD: 75000, BTC: 0.5, ETH: 5.0 },
+                staked: {}
+            },
+            miningState: {
+                cloudBalance: 0,
+                lastSyncAt: Date.now(),
+                totalMined: 0
+            }
+        });
+    }
+};
+
+export const getUserProfile = async (uid) => {
+    const { doc, getDoc } = await import('firebase/firestore');
+    const userRef = doc(db, 'users', uid);
+    const snap = await getDoc(userRef);
+    return snap.exists() ? snap.data() : null;
 };
 
 export const logoutUser = async () => {

@@ -84,40 +84,43 @@
 
     <div class="download-grid">
       
-      <!-- Android -->
-      <div class="platform-card">
-        <div class="platform-icon"><i data-lucide="smartphone" style="width: 40px; height: 40px;"></i></div>
-        <h2 class="platform-title">Android APK</h2>
-        <p class="platform-desc">Direct install package for Android 10+ devices.</p>
+      <!-- Omni Trading (The Hub) -->
+      <div class="platform-card gsap-reveal">
+        <div class="platform-icon"><i data-lucide="layout-dashboard" style="width: 40px; height: 40px;"></i></div>
+        <h2 class="platform-title">Omni Trading</h2>
+        <p class="platform-desc">Advanced spot & futures exchange hub. Android 10+.</p>
         <a href="https://drive.google.com/uc?export=download&id=13F_iMq4Zz-5ulG3HIQzu0vTb-C8Z9DRE" class="btn-download" download>
-          <i data-lucide="download"></i> Download APK
+          <i data-lucide="download"></i> Get Hub APK
         </a>
         <div class="qr-box">
-           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${window.location.origin}/downloads/omni-trading.apk" alt="QR Code" width="100" id="qr-android"/>
+           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://omni-trading.com/downloads/hub.apk" alt="Hub QR" width="100"/>
         </div>
       </div>
 
-      <!-- iOS -->
-      <div class="platform-card">
-        <div class="platform-icon"><i data-lucide="apple" style="width: 40px; height: 40px;"></i></div>
-        <h2 class="platform-title">iOS TestFlight</h2>
-        <p class="platform-desc">Join the beta testing pool for iPhone & iPad.</p>
-        <a href="#" class="btn-download" style="background:#fff;">
-          <i data-lucide="external-link"></i> Open TestFlight
+      <!-- Omni Terminal (The Miner) -->
+      <div class="platform-card gsap-reveal">
+        <div class="platform-icon"><i data-lucide="terminal" style="width: 40px; height: 40px;"></i></div>
+        <h2 class="platform-title">Omni Terminal</h2>
+        <p class="platform-desc">High-speed PoW mining CLI for Android/Termux.</p>
+        <a href="/pages/miner-terminal.html" class="btn-download">
+          <i data-lucide="terminal"></i> Launch Miner
         </a>
         <div class="qr-box">
-           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://testflight.apple.com/join" alt="QR Code" width="100"/>
+           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://omni-trading.com/pages/miner-terminal.html" alt="Terminal QR" width="100"/>
         </div>
       </div>
 
-      <!-- macOS -->
-      <div class="platform-card">
-        <div class="platform-icon"><i data-lucide="monitor" style="width: 40px; height: 40px;"></i></div>
-        <h2 class="platform-title">Desktop DMG</h2>
-        <p class="platform-desc">Native desktop client for macOS (Intel & Apple Silicon).</p>
-        <a href="/builds/omni-desktop-mac.dmg" class="btn-download" download>
-          <i data-lucide="download"></i> Download DMG
+      <!-- Omni Node (The Sync) -->
+      <div class="platform-card gsap-reveal">
+        <div class="platform-icon"><i data-lucide="cloud" style="width: 40px; height: 40px;"></i></div>
+        <h2 class="platform-title">Omni Node</h2>
+        <p class="platform-desc">Real-time cloud sync and yield monitoring.</p>
+        <a href="/pages/cloud-dashboard.html" class="btn-download">
+          <i data-lucide="cloud"></i> Launch Node
         </a>
+        <div class="qr-box">
+           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://omni-trading.com/pages/cloud-dashboard.html" alt="Node QR" width="100"/>
+        </div>
       </div>
 
     </div>
@@ -129,6 +132,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       const qr = document.getElementById('qr-android');
       if (qr) {
+        // Pointing to the new professional Release Filename
         const url = 'https://drive.google.com/uc?export=download&id=13F_iMq4Zz-5ulG3HIQzu0vTb-C8Z9DRE';
         qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
       }

@@ -12,21 +12,48 @@ import { renderAICopilot } from '../components/AICopilot.js';
 import { renderLiveTradesFeed } from '../components/LiveTradesFeed.js';
 import { renderOrderBook } from '../components/OrderBook.js';
 import { Sparkline } from '../components/Sparkline.js';
-import { loginWithGoogle, logoutUser, onAuthStateChanged, auth } from '../services/Auth.js';
+import { renderLoader, launchSequence } from '../components/Loader.js';
+import { loginWithGoogle, logoutUser, onAuthStateChanged, auth, handleRedirectResult } from '../services/Auth.js';
 import { getActiveNode, startMiningTicker, fmtOMNI } from './cloud-mining-engine.js';
 import { defi } from './services/DeFiCore.js';
 import { audio } from './services/AudioEngine.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+  // 1. Show Cinematic Loader Immediately
+  renderLoader();
+
+  // Global Haptic Feedback Listener
+  document.addEventListener('click', (e) => {
+    const target = e.target.closest('button, a, .nav-item, .market-item, [onclick]');
+    if (target) {
+        import('../services/HapticService.js').then(({ haptics }) => haptics.lightTap());
+    }
+  }, { passive: true });
+
   // Restore saved Theme State immediately
   const savedTheme = localStorage.getItem('omni_theme_color');
   if (savedTheme) {
       document.documentElement.style.setProperty('--color-primary', savedTheme);
   }
 
+  // Monitor for Loaded Event
+  window.addEventListener('omni_loaded', () => {
+    launchSequence();
+  });
+
   // Render components
   renderNavbar();
   renderFooter();
+  
+  // Mobile Bottom Nav Setup
+  const bottomNavContainer = document.createElement('div');
+  bottomNavContainer.id = 'mobile-bottom-nav-container';
+  document.body.appendChild(bottomNavContainer);
+  
+  import('../components/MobileBottomNav.js').then(({ renderMobileBottomNav }) => {
+    renderMobileBottomNav();
+    window.addEventListener('resize', renderMobileBottomNav);
+  });
+
   renderAICopilot();
   renderLiveTradesFeed();
   renderOrderBook();
@@ -35,6 +62,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Firebase Auth Listener
   onAuthStateChanged(auth, (user) => {
       updateNavbarState(user, logoutUser, loginWithGoogle);
+  });
+  
+  // Handle Redirect Result for Mobile Login
+  handleRedirectResult().then(user => {
+    if (user) {
+        console.log("Sovereign Session Restored via Redirect:", user.email);
+        updateNavbarState(user, logoutUser, loginWithGoogle);
+    }
   });
   
   // Expose services to window for HTML element access
@@ -70,6 +105,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // Immersive Background and WebSocket Stream
   initBackground3D();
   initMarketStream();
+
+  // Initialize Hero & Footer 3D Logos
+  setTimeout(() => {
+    const heroContainer = document.getElementById('hero-logo-3d-container');
+    if (heroContainer) {
+       renderLogo3D('hero-logo-3d-container', 0x00D2A6, 3.5); // Larger scale for hero
+    }
+    
+    const footerContainer = document.getElementById('omni-footer-logo-container');
+    if (footerContainer) {
+       renderLogo3D('omni-footer-logo-container', 0x00D2A6); // Standard scale for footer
+    }
+  }, 200);
 
   // If a chart container exists on the page, render it
   if (document.getElementById('tv-chart')) {

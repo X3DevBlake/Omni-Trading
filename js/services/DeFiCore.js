@@ -5,13 +5,25 @@
 
 import { SoundService } from '../../services/SoundService.js';
 
+/**
+ * Core engine for Omni DeFi operations.
+ * Handles liquidity pools, yield farming, OMNI staking, and real-time reward distribution.
+ * Implements an observer pattern to notify UI components of state changes.
+ */
 class DeFiCore {
+  /**
+   * Initializes the DeFi engine by loading state from local storage.
+   */
   constructor() {
     this.state = this.loadState();
     this.interval = null;
     this.listeners = new Set();
   }
 
+  /**
+   * Loads the DeFi state from localStorage or initializes with default values.
+   * @returns {Object} The current DeFi state.
+   */
   loadState() {
     const defaultState = {
       liquidity: {}, // { pairName: { tA: 0, tB: 0, lp: 0 } }
@@ -39,13 +51,18 @@ class DeFiCore {
     }
   }
 
+  /**
+   * Persists the current state to localStorage and notifies subscribers.
+   */
   saveState() {
     localStorage.setItem('omni_defi_state', JSON.stringify(this.state));
     localStorage.setItem('omni_autoclaim_enabled', this.state.autoClaimEnabled);
     this.notify();
   }
 
-  // ── TICKER: Accumulate rewards per second ──────────────────
+  /**
+   * Starts the background ticker for reward accumulation and auto-claiming.
+   */
   startTicker() {
     if (this.interval) return;
     this.interval = setInterval(() => {
@@ -56,6 +73,10 @@ class DeFiCore {
     }, 1000);
   }
 
+  /**
+   * Calculates and accumulates farming and staking rewards based on elapsed time.
+   * Uses simulated dynamic APY models.
+   */
   accumulateRewards() {
     // 1. Farming Rewards
     // Dynamic Math: (Yearly Emissions / TVL) 
@@ -87,6 +108,9 @@ class DeFiCore {
     this.saveState();
   }
 
+  /**
+   * Automatically claims rewards if the auto-claim threshold is met.
+   */
   executeAutoClaim() {
     const THIRTY_MINUTES = 30 * 60 * 1000;
     const now = Date.now();
@@ -107,6 +131,10 @@ class DeFiCore {
     }
   }
 
+  /**
+   * Calculates the total amount of unclaimed rewards across all farms.
+   * @returns {number} Total unclaimed OMNI.
+   */
   getTotalUnclaimed() {
     let total = 0; // Staking rewards are now in the token itself (growing value)
     Object.values(this.state.farming).forEach(f => total += f.rewards);
@@ -115,6 +143,13 @@ class DeFiCore {
 
   // ── CORE ACTIONS ──────────────────────────────────────────
 
+  /**
+   * Adds liquidity to a specified pair.
+   * @param {string} pairName - Name of the liquidity pair (e.g., 'BTC-OMNI').
+   * @param {number} amountT1 - Amount of the first token.
+   * @param {number} amountT2 - Amount of the second token.
+   * @returns {Object} Result object containing success status and LP tokens gained.
+   */
   addLiquidity(pairName, amountT1, amountT2) {
     if (!this.state.liquidity[pairName]) {
       this.state.liquidity[pairName] = { t1: 0, t2: 0, lp: 0 };
@@ -139,6 +174,12 @@ class DeFiCore {
     return { success: true, lpGained };
   }
 
+  /**
+   * Stakes LP tokens into a yield farm.
+   * @param {string} pairName - Name of the pair to stake LP for.
+   * @param {number} amountLP - Amount of LP tokens to stake.
+   * @returns {Object} Result object with success status and optional error message.
+   */
   stakeLP(pairName, amountLP) {
     const lpSymbol = `${pairName}-LP`.toUpperCase();
     const wallet = JSON.parse(localStorage.getItem('omni_wallet') || '{"liquid":{}}');
@@ -161,6 +202,11 @@ class DeFiCore {
     return { success: true };
   }
 
+  /**
+   * Stakes OMNI tokens to receive sOMNI (staked OMNI).
+   * @param {number} amount - Amount of OMNI to stake.
+   * @returns {Object} Result object with success status and sOMNI gained.
+   */
   stakeOMNI(amount) {
     // Current OMNI / Rate = sOMNI issued
     const sOMNIIssued = amount / this.state.sOMNIExchangeRate;
@@ -178,6 +224,11 @@ class DeFiCore {
     return { success: true, sOMNIGained: sOMNIIssued };
   }
 
+  /**
+   * Claims all pending farming rewards and adds them to the user's OMNI balance.
+   * @param {boolean} [silent=false] - If true, suppresses the claim sound effect.
+   * @returns {number} Total OMNI harvested.
+   */
   claimAll(silent = false) {
     // Note: Staking rewards are now embedded in sOMNI value. 
     // This claimAll primarily harvests Yield Farming rewards.
@@ -222,9 +273,21 @@ class DeFiCore {
     }
   }
 
-  // ── OBSERVER PATTERN ───────────────────────────────────────
+  /**
+   * Adds a subscriber function to be notified on state changes.
+   * @param {Function} fn - The callback function.
+   */
   subscribe(fn) { this.listeners.add(fn); }
+
+  /**
+   * Removes a subscriber function.
+   * @param {Function} fn - The callback function to remove.
+   */
   unsubscribe(fn) { this.listeners.delete(fn); }
+
+  /**
+   * Notifies all subscribers of a state change.
+   */
   notify() { this.listeners.forEach(fn => fn(this.state)); }
 }
 

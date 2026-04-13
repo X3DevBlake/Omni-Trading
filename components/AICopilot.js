@@ -1,5 +1,11 @@
 import { WalletService } from '../services/WalletService.js';
 
+/**
+ * Renders the AI Copilot UI and initializes its logic.
+ * The Copilot provides a command-line interface and a voice-activated "Live" mode
+ * for interacting with the platform's features, such as trading and theme management.
+ * It also features a "Live Sandbox Mirror" iframe for visual feedback.
+ */
 export function renderAICopilot() {
   // Inject typing indicator CSS
   if (!document.getElementById('ai-copilot-css')) {

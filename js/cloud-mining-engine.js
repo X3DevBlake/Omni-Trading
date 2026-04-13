@@ -11,6 +11,28 @@
  *   omni_wallet           – { address, cloudMiningBalance, ... }
  *   omni_cloud_live       – live state for dashboard rendering
  */
+import { db, auth } from '../services/Auth.js';
+import { doc, getDoc, updateDoc, increment } from 'firebase/firestore';
+
+/** Syncs mining rewards to Firestore for global persistence */
+export async function syncToFirestore(amount) {
+  const user = auth.currentUser;
+  if (!user) return;
+  const userRef = doc(db, 'users', user.uid);
+  await updateDoc(userRef, {
+    'miningState.cloudBalance': increment(amount),
+    'miningState.totalMined': increment(amount),
+    'miningState.lastSyncAt': Date.now()
+  });
+}
+
+export async function fetchMiningState() {
+  const user = auth.currentUser;
+  if (!user) return null;
+  const userRef = doc(db, 'users', user.uid);
+  const snap = await getDoc(userRef);
+  return snap.exists() ? snap.data().miningState : null;
+}
 
 // ── Constants ──────────────────
 export const NETWORK_HASHRATE  = 14_200_000; // MH/s (14.2 TH/s)
@@ -39,12 +61,22 @@ export function omniPerDay(hashrateMH, blockHeight = 0, diffFactor = 1) {
   return omniPerSecond(hashrateMH, blockHeight, diffFactor) * 86400;
 }
 
-// ── Node State ──────────────────
-export function getActiveNode() {
-  try {
-    const nodes = JSON.parse(localStorage.getItem('omni_cloud_nodes') || '[]');
-    return nodes.find(n => n.active) || null;
-  } catch { return null; }
+// ── SaaS Node State ──────────────────
+export async function getActiveNode() {
+  const user = auth.currentUser;
+  if (!user) return null;
+
+  const userRef = doc(db, 'users', user.uid);
+  const snap = await getDoc(userRef);
+  
+  if (snap.exists() && snap.data().tier !== 'FREE') {
+      return { 
+          hashrate: snap.data().hashrateLimit || 0,
+          tier: snap.data().tier,
+          active: true
+      };
+  }
+  return null;
 }
 
 export function getCloudBalance() {
@@ -128,17 +160,25 @@ export function startMiningTicker(onTick) {
     return;
   }
 
-  _tickerInterval = setInterval(() => {
-    const node = getActiveNode();
+  let ticksSinceSync = 0;
+
+  _tickerInterval = setInterval(async () => {
+    const node = await getActiveNode();
     if (!node) {
       stopMiningTicker();
       return;
     }
 
     const perSec = omniPerSecond(node.hashrate);
-    addToCloudBalance(perSec);
+    
+    // Increment local session counter and trigger cloud sync
+    ticksSinceSync++;
+    if (ticksSinceSync >= 10) {
+        await syncToFirestore(perSec * 10);
+        ticksSinceSync = 0;
+    }
 
-    // Update live state
+    // Update live state for UI listeners
     const live = JSON.parse(localStorage.getItem('omni_cloud_live') || '{}');
     live.lastTick   = Date.now();
     live.totalMined = (live.totalMined || 0) + perSec;
@@ -149,7 +189,6 @@ export function startMiningTicker(onTick) {
       perSec,
       perDay:       omniPerDay(node.hashrate),
       totalMined:   live.totalMined,
-      cloudBalance: getCloudBalance(),
       node,
     };
     _listeners.forEach(fn => { try { fn(snapshot); } catch {} });

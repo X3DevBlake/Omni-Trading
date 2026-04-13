@@ -1,9 +1,52 @@
 import { Sparkline } from '../components/Sparkline.js';
 import { defi } from '../js/services/DeFiCore.js';
 
+/**
+ * Initializes the market data stream via WebSocket and manages real-time price updates.
+ * Connects to CoinCap for major crypto assets and simulates OMNI token price movements
+ * based on a volatility model and DeFi exchange rates.
+ *
+ * This function handles:
+ * - WebSocket connection for live price data.
+ * - Initialization and updating of sparkline charts.
+ * - Periodic price refreshes and UI element updates.
+ * - Dispatching global 'omni_price_update' events.
+ *
+ * @function initMarketStream
+ */
 export function initMarketStream() {
-  const ws = new WebSocket('wss://ws.coincap.io/prices?assets=bitcoin,ethereum,solana,dogecoin,ripple,cardano,polkadot');
-  
+  let ws;
+  let reconnectAttempts = 0;
+  let maxReconnectDelay = 30000; // 30s Max
+
+  function connect() {
+    console.log("🌐 Initiating Market Stream Connection...");
+    ws = new WebSocket('wss://ws.coincap.io/prices?assets=bitcoin,ethereum,solana,dogecoin,ripple,cardano,polkadot');
+    
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      Object.keys(data).forEach(asset => {
+        const sym = symbolMap[asset];
+        if (sym) {
+            prices[sym] = parseFloat(data[asset]);
+            reconnectAttempts = 0; // Reset on successful message
+        }
+      });
+    };
+
+    ws.onclose = () => {
+      reconnectAttempts++;
+      const delay = Math.min(Math.pow(2, reconnectAttempts) * 1000, maxReconnectDelay);
+      console.warn(`⚠️ WebSocket closed. Reconnecting in ${delay/1000}s...`);
+      setTimeout(connect, delay);
+    };
+
+    ws.onerror = (error) => {
+      console.error('❌ WebSocket Error:', error);
+      ws.close();
+    };
+  }
+
   const prices = {
     'BTCUSDT': 82000,
     'ETHUSDT': 3100,
@@ -37,13 +80,8 @@ export function initMarketStream() {
       for(let i=0; i<40; i++) sparklines[sym].addPoint(base + (Math.random() * 2 - 1) * (base * 0.01));
   });
 
-  ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    Object.keys(data).forEach(asset => {
-      const sym = symbolMap[asset];
-      if (sym) prices[sym] = parseFloat(data[asset]);
-    });
-  };
+  // Start Connection
+  connect();
 
   // 1s GLOBAL REFRESH LOOP
   setInterval(() => {
@@ -71,7 +109,7 @@ export function initMarketStream() {
         const oldVal = parseFloat(el.innerText.replace(/[$,]/g, ''));
         el.innerText = `$${formattedPrice}`;
         el.style.color = rawPrice >= oldVal ? 'var(--color-success)' : 'var(--color-danger)';
-        setTimeout(() => { el.style.color = ''; }, 400);
+        setTimeout(() => { if(el) el.style.color = ''; }, 400);
       });
 
       // Special Header Update
@@ -84,6 +122,4 @@ export function initMarketStream() {
     // Broadcast price event for DeFi calculations if needed
     window.dispatchEvent(new CustomEvent('omni_price_update', { detail: prices }));
   }, 1000);
-
-  ws.onerror = (error) => console.error('WebSocket Error:', error);
 }

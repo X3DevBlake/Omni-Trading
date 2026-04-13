@@ -3,884 +3,141 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Checkout | Activate Your Omni Mining Node</title>
-  <meta name="description" content="Activate your OMNI cloud mining node. Pay with crypto, card, or ACH bank transfer.">
+  <title>Omni Pay | Secure Checkout</title>
   <link rel="stylesheet" href="/css/global.css">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <style>
-    :root { --gold: #F0A500; }
-    body { background: #060810; }
-
-    .checkout-page {
-      min-height: 100vh;
-      padding: 90px 20px 80px;
-      max-width: 1000px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 28px;
-      align-items: start;
+    .checkout-container {
+      max-width: 500px;
+      margin: 80px auto;
+      padding: 40px;
+      background: var(--color-bg-glass);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 30px;
+      position: relative;
     }
-    @media (max-width: 820px) {
-      .checkout-page { grid-template-columns: 1fr; }
-      .checkout-order { order: -1; }
+    .pay-btn {
+      width: 100%;
+      padding: 18px;
+      border-radius: 40px;
+      background: var(--color-primary);
+      color: #000;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-
-    /* ── Panel Base ─────────────────────── */
-    .panel {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px; padding: 28px;
+    .pay-btn:hover {
+      transform: scale(1.02);
+      filter: brightness(1.1);
+      box-shadow: 0 10px 40px rgba(0, 210, 166, 0.3);
     }
-    .panel-title {
-      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; color: rgba(255,255,255,0.3);
-      margin-bottom: 20px;
-    }
-
-    /* ── Order Summary ──────────────────── */
-    .order-plan {
-      display: flex; align-items: center; gap: 14px;
-      background: rgba(0,210,166,0.05); border: 1px solid rgba(0,210,166,0.15);
-      border-radius: 14px; padding: 16px; margin-bottom: 20px;
-    }
-    .order-plan-icon {
-      width: 46px; height: 46px; border-radius: 12px;
-      background: rgba(0,210,166,0.1); border: 1px solid rgba(0,210,166,0.2);
-      display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
-    }
-    .order-plan-name { font-weight: 700; color: #fff; font-size: 1rem; }
-    .order-plan-detail { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
-
-    .order-line { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 8px 0; }
-    .order-line-key { color: rgba(255,255,255,0.4); }
-    .order-line-val { font-weight: 600; color: #fff; }
-    .order-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 10px 0; }
-    .order-total { display: flex; justify-content: space-between; align-items: center; }
-    .order-total-key { font-size: 0.9rem; font-weight: 700; color: #fff; }
-    .order-total-val { font-size: 1.6rem; font-weight: 800; color: #00d2a6; font-family: 'JetBrains Mono', monospace; }
-
-    /* Security badges */
-    .security-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
-    .sec-badge {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 0.68rem; color: rgba(255,255,255,0.3); font-weight: 600;
-    }
-
-    /* Perks list */
-    .order-perks { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
-    .order-perk { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; color: rgba(255,255,255,0.45); }
-    .perk-check { color: #00d2a6; font-size: 0.75rem; }
-
-    /* ── Payment Method Tabs ─────────────── */
-    .method-tabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-    @media (max-width: 500px) { .method-tabs { grid-template-columns: 1fr 1fr; } }
-
-    .method-tab {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; padding: 12px 8px;
-      cursor: pointer; transition: all 0.2s;
-      text-align: center; font-size: 0.8rem; color: rgba(255,255,255,0.45);
-      font-weight: 600;
-    }
-    .method-tab:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
-    .method-tab.active { border-color: #00d2a6; color: #fff; background: rgba(0,210,166,0.06); }
-    .method-tab-icon { font-size: 1.3rem; margin-bottom: 5px; }
-
-    /* ── Payment Sections ────────────────── */
-    .payment-section { display: none; }
-    .payment-section.active { display: block; }
-
-    /* ── Crypto Payment ──────────────────── */
-    .crypto-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-    .crypto-tab {
-      display: flex; align-items: center; gap: 7px;
-      padding: 8px 16px; border-radius: 50px;
-      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
-      cursor: pointer; transition: all 0.2s; font-size: 0.82rem;
-      color: rgba(255,255,255,0.5); font-weight: 600;
-    }
-    .crypto-tab.active { border-color: #00d2a6; color: #fff; background: rgba(0,210,166,0.08); }
-    .crypto-tab-icon { font-size: 1rem; }
-
-    .crypto-panel { display: none; }
-    .crypto-panel.active { display: block; }
-
-    .qr-box {
-      display: flex; flex-direction: column; align-items: center;
-      padding: 24px; background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; margin-bottom: 16px;
-    }
-    .qr-wrapper {
-      background: #fff; padding: 10px; border-radius: 10px;
-      margin-bottom: 16px;
-    }
-    .crypto-address {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
-      color: #00d2a6; word-break: break-all;
-      background: rgba(0,210,166,0.05); border: 1px solid rgba(0,210,166,0.15);
-      border-radius: 10px; padding: 10px 14px; text-align: center;
-      cursor: pointer; transition: background 0.2s; margin-bottom: 8px;
-    }
-    .crypto-address:hover { background: rgba(0,210,166,0.1); }
-    .copy-hint { font-size: 0.7rem; color: rgba(255,255,255,0.25); }
-
-    .crypto-amount-due {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.1rem; font-weight: 800; color: var(--gold);
-      text-align: center; margin: 12px 0;
-    }
-    .crypto-confirm-hint {
-      font-size: 0.78rem; color: rgba(255,255,255,0.35); text-align: center; line-height: 1.6;
-    }
-
-    /* ── Card Form ───────────────────────── */
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { font-size: 0.72rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 7px; }
-    .form-input {
-      width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px; color: #fff; padding: 13px 14px; font-size: 0.95rem;
-      outline: none; transition: border-color 0.2s; font-family: 'JetBrains Mono', monospace;
-    }
-    .form-input:focus { border-color: #00d2a6; }
-    .form-input::placeholder { color: rgba(255,255,255,0.2); font-family: inherit; }
-
-    /* Card icons */
-    .card-brands { display: flex; gap: 8px; margin-bottom: 14px; }
-    .card-brand {
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; padding: 6px 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);
-    }
-
-    /* ── ACH Form ────────────────────────── */
-    .ach-notice {
-      background: rgba(0,210,166,0.05); border: 1px solid rgba(0,210,166,0.15);
-      border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
-      font-size: 0.82rem; color: rgba(255,255,255,0.5); line-height: 1.6;
-    }
-    .ach-notice strong { color: #00d2a6; }
-
-    /* ── Submit Button ───────────────────── */
-    .submit-btn {
-      width: 100%; padding: 16px; font-size: 1rem; font-weight: 800;
-      border-radius: 14px; border: none; cursor: pointer;
-      background: linear-gradient(135deg, #00d2a6, #00a882);
-      color: #000; transition: all 0.3s; margin-top: 8px;
-      position: relative; overflow: hidden;
-    }
-    .submit-btn::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15));
-      opacity: 0; transition: opacity 0.3s;
-    }
-    .submit-btn:hover::before { opacity: 1; }
-    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(0,210,166,0.3); }
-
-    /* ── Confirmation Modal ─────────────── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
-      z-index: 9999; align-items: center; justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: #0d1018; border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 28px; padding: 40px; max-width: 440px; width: 90%; text-align: center;
-    }
-    .modal-icon { font-size: 4rem; margin-bottom: 16px; animation: pop-in 0.4s ease; }
-    @keyframes pop-in { from{transform:scale(0)} to{transform:scale(1)} }
-    .modal-title { font-size: 1.6rem; color: #fff; margin-bottom: 10px; }
-    .modal-body { color: rgba(255,255,255,0.45); font-size: 0.88rem; line-height: 1.7; margin-bottom: 28px; }
-    .modal-node-id { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #00d2a6; background: rgba(0,210,166,0.08); border: 1px solid rgba(0,210,166,0.2); border-radius: 10px; padding: 10px; margin: 14px 0; }
-    .modal-close-btn { background: #00d2a6; color: #000; border: none; border-radius: 50px; padding: 14px 36px; font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
-    .modal-close-btn:hover { filter: brightness(1.1); }
-
-    /* ── Step Indicators ─────────────────── */
-    .steps { display: flex; align-items: center; gap: 0; margin-bottom: 28px; }
-    .step-node-sm {
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-    }
-    .step-circle-sm {
-      width: 30px; height: 30px; border-radius: 50%;
-      background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.3);
-    }
-    .step-circle-sm.done { background: rgba(0,210,166,0.15); border-color: #00d2a6; color: #00d2a6; }
-    .step-circle-sm.active { background: rgba(240,165,0,0.15); border-color: var(--gold); color: var(--gold); }
-    .step-label-sm { font-size: 0.6rem; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.05em; }
-    .step-line-sm { flex: 1; height: 1px; background: rgba(255,255,255,0.07); margin-bottom: 16px; }
-
-    /* Toast */
-    .toast {
-      position: fixed; bottom: 30px; left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: #00d2a6; color: #000; padding: 12px 24px;
-      border-radius: 30px; font-weight: 700; z-index: 9999;
-      opacity: 0; transition: all 0.35s; pointer-events: none; white-space: nowrap; font-size: 0.9rem;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .payment-status { display: none; margin-top: 30px; text-align: center; }
   </style>
 </head>
 <body>
-<div id="navbar-container"></div>
+  <div id="navbar-container"></div>
 
-<div class="checkout-page">
+  <main class="container">
+    <div class="checkout-container gsap-reveal">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px;">
+        <h2 style="margin: 0;">Confirm Order</h2>
+        <div style="background: rgba(0, 210, 166, 0.1); color: var(--color-primary); padding: 5px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: 800;">ENCRYPTED</div>
+      </div>
 
-  <!-- ══ LEFT: PAYMENT FORM ──────────────────────────────────── -->
-  <div>
+      <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span style="color: var(--color-text-muted);">Selected Tier</span>
+          <span id="display-plan" style="font-weight: 700; color: #fff;">BRONZE</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+          <span style="color: var(--color-text-muted);">Hashrate Limit</span>
+          <span id="display-hash" style="color: var(--color-primary);">10 MH/s</span>
+        </div>
+        <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 15px 0;">
+        <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+          <span style="font-weight: 700;">Total Due</span>
+          <span id="display-price" style="font-weight: 800; color: #fff;">$19.00</span>
+        </div>
+      </div>
 
-    <!-- Step Indicator -->
-    <div class="steps">
-      <div class="step-node-sm">
-        <div class="step-circle-sm done">✓</div>
-        <div class="step-label-sm">Plan</div>
-      </div>
-      <div class="step-line-sm"></div>
-      <div class="step-node-sm">
-        <div class="step-circle-sm active">2</div>
-        <div class="step-label-sm">Payment</div>
-      </div>
-      <div class="step-line-sm"></div>
-      <div class="step-node-sm">
-        <div class="step-circle-sm">3</div>
-        <div class="step-label-sm">Activate</div>
-      </div>
+      <button id="pay-button" class="pay-btn">
+        <i data-lucide="shield-check" style="vertical-align: middle; margin-right: 8px;"></i> Complete Payment
+      </button>
+
+      <!-- Status Indicators -->
+       <div id="payment-status" class="payment-status">
+          <div id="status-icon" style="font-size: 3rem; margin-bottom: 15px;">🔄</div>
+          <h3 id="status-text">Processing Sovereign Node...</h3>
+          <p id="status-sub" style="color: var(--color-text-muted);">Syncing with Omni Blockchain...</p>
+       </div>
     </div>
+  </main>
 
-    <div class="panel">
-      <div class="panel-title">Wallet Address for Mining Payouts</div>
-      <div class="form-group">
-        <label>Your OMNI Wallet Address</label>
-        <input type="text" class="form-input" id="payout-wallet" placeholder="0x... (rewards sent here)" />
-        <div style="margin-top:6px; display:flex; gap:10px;">
-          <span style="font-size:0.75rem; color:rgba(255,255,255,0.3);">Don't have one?</span>
-          <a href="/pages/create-wallet.html" style="font-size:0.75rem; color:#00d2a6;">Create Wallet →</a>
-        </div>
-      </div>
-    </div>
+  <script type="module">
+    import { db, auth } from '../services/Auth.js';
+    import { haptics } from '../services/HapticService.js';
+    import { doc, updateDoc } from 'firebase/firestore';
 
-    <div style="height:20px;"></div>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) window.lucide.createIcons();
 
-    <!-- Payment Method -->
-    <div class="panel">
-      <div class="panel-title">Select Payment Method</div>
+      const params = new URLSearchParams(window.location.search);
+      const plan = params.get('plan') || 'BRONZE';
+      const price = params.get('price') || '19';
+      const hash = params.get('hash') || '10';
 
-      <!-- Method Tabs -->
-      <div class="method-tabs">
-        <div class="method-tab active" onclick="selectMethod('crypto')">
-          <div class="method-tab-icon">🔐</div>
-          Crypto
-        </div>
-        <div class="method-tab" onclick="selectMethod('card')">
-          <div class="method-tab-icon">💳</div>
-          Card
-        </div>
-        <div class="method-tab" onclick="selectMethod('ach')">
-          <div class="method-tab-icon">🏦</div>
-          Bank (ACH)
-        </div>
-      </div>
+      document.getElementById('display-plan').innerText = plan;
+      document.getElementById('display-price').innerText = `$${price}.00`;
+      document.getElementById('display-hash').innerText = `${hash} MH/s`;
 
-      <!-- ── CRYPTO SECTION ──────────────── -->
-      <div class="payment-section active" id="section-crypto">
+      const payBtn = document.getElementById('pay-button');
+      const statusBox = document.getElementById('payment-status');
 
-        <div class="crypto-tabs">
-          <div class="crypto-tab active" onclick="selectCrypto('usdt')">
-            <span class="crypto-tab-icon">💵</span> USDT
-          </div>
-          <div class="crypto-tab" onclick="selectCrypto('btc')">
-            <span class="crypto-tab-icon">₿</span> Bitcoin
-          </div>
-          <div class="crypto-tab" onclick="selectCrypto('eth')">
-            <span class="crypto-tab-icon">Ξ</span> Ethereum
-          </div>
-          <div class="crypto-tab" onclick="selectCrypto('omni')">
-            <span class="crypto-tab-icon">⬡</span> OMNI
-          </div>
-          <div class="crypto-tab" onclick="selectCrypto('ext')">
-            <span class="crypto-tab-icon">🔗</span> Other
-          </div>
-        </div>
+      payBtn.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("Please login to proceed.");
+            return;
+        }
 
-        <!-- USDT -->
-        <div class="crypto-panel active" id="crypto-usdt">
-          <div class="qr-box">
-            <div class="qr-wrapper" id="qr-usdt"></div>
-            <div class="crypto-amount-due" id="usdt-amount">Loading...</div>
-            <div class="crypto-address" onclick="copyAddr('usdt-addr')" id="usdt-addr">
-              TQVFhmKvLYNQ6FsDFPRPsEm2mMSXkL8TVX
-            </div>
-            <div class="copy-hint">Tap address to copy · TRC-20 (Tron) Network</div>
-          </div>
-          <div class="crypto-confirm-hint">
-            Send exactly the amount shown above to this USDT (TRC-20) address.<br>
-            Order activates automatically within <strong style="color:#fff;">2–5 minutes</strong> of confirmation.
-          </div>
-          <div style="margin-top:16px; padding:12px 14px; background:rgba(240,165,0,0.05); border:1px solid rgba(240,165,0,0.15); border-radius:10px; font-size:0.78rem; color:rgba(255,255,255,0.4);">
-            ⚠️ Only send USDT via TRC-20 (Tron) network. ERC-20 or BEP-20 will not be credited.
-          </div>
-          <button class="submit-btn" style="margin-top:16px;" onclick="confirmPayment('USDT')">✅ I've Sent the Payment</button>
-        </div>
+        haptics.impact();
+        payBtn.style.display = 'none';
+        statusBox.style.display = 'block';
 
-        <!-- BTC -->
-        <div class="crypto-panel" id="crypto-btc">
-          <div class="qr-box">
-            <div class="qr-wrapper" id="qr-btc"></div>
-            <div class="crypto-amount-due" id="btc-amount">Loading...</div>
-            <div class="crypto-address" onclick="copyAddr('btc-addr')" id="btc-addr">
-              bc1qxy2kgdygjrsqtzq2n0yrf249z0tscjzpyexwqn
-            </div>
-            <div class="copy-hint">Tap address to copy · Bitcoin Mainnet</div>
-          </div>
-          <div class="crypto-confirm-hint">
-            Send exactly the amount shown to this BTC address.<br>
-            Requires <strong style="color:#fff;">2 confirmations</strong> (~20 min). Node activates automatically.
-          </div>
-          <button class="submit-btn" style="margin-top:16px;" onclick="confirmPayment('Bitcoin')">✅ I've Sent the Payment</button>
-        </div>
+        // Simulation Loop
+        setTimeout(() => {
+          document.getElementById('status-icon').innerText = '🔥';
+          document.getElementById('status-text').innerText = 'Provisioning Hashrate...';
+        }, 1500);
 
-        <!-- ETH -->
-        <div class="crypto-panel" id="crypto-eth">
-          <div class="qr-box">
-            <div class="qr-wrapper" id="qr-eth"></div>
-            <div class="crypto-amount-due" id="eth-amount">Loading...</div>
-            <div class="crypto-address" onclick="copyAddr('eth-addr')" id="eth-addr">
-              0x71C7656EC7ab88b098defB751B7401B5f6d8976F
-            </div>
-            <div class="copy-hint">Tap address to copy · Ethereum Mainnet (ERC-20)</div>
-          </div>
-          <div class="crypto-confirm-hint">
-            Send ETH to this address on Ethereum Mainnet.<br>
-            Requires <strong style="color:#fff;">12 block confirmations</strong> (~3 min).
-          </div>
-          <button class="submit-btn" style="margin-top:16px;" onclick="confirmPayment('Ethereum')">✅ I've Sent the Payment</button>
-        </div>
+        setTimeout(async () => {
+          try {
+            // THE REAL SAAS UPDATE
+            const userRef = doc(db, 'users', user.uid);
+            await updateDoc(userRef, {
+              tier: plan,
+              hashrateLimit: parseInt(hash),
+              status: 'ACTIVE'
+            });
 
-        <!-- OMNI -->
-        <div class="crypto-panel" id="crypto-omni">
-          <div class="qr-box">
-            <div class="qr-wrapper" id="qr-omni"></div>
-            <div class="crypto-amount-due" id="omni-amount">Loading...</div>
-            <div class="crypto-address" onclick="copyAddr('omni-addr')" id="omni-addr">
-              0x71C7656EC7ab88b098defB751B7401B5f6d8976F
-            </div>
-            <div class="copy-hint">Tap address to copy · Omni Chain (ID: 8888) · Zero-fee</div>
-          </div>
-          <div class="crypto-confirm-hint">
-            Pay in native OMNI tokens for <strong style="color:#00d2a6;">zero gas fees</strong>.<br>
-            Native OMNI on Chain ID 8888. Confirmed in ~3 seconds.
-          </div>
-          <button class="submit-btn" style="margin-top:16px;" onclick="confirmPayment('OMNI')">✅ I've Sent the Payment</button>
-        </div>
+            haptics.success();
+            document.getElementById('status-icon').innerText = '✨';
+            document.getElementById('status-text').innerText = 'NODE ACTIVATED';
+            document.getElementById('status-sub').innerText = 'Your sovereign node is now online. Redirecting...';
 
-        <!-- External Crypto / Other -->
-        <div class="crypto-panel" id="crypto-ext">
-          <div style="padding: 20px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; margin-bottom: 16px;">
-            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5); line-height: 1.7; margin-bottom: 14px;">
-              Have crypto in another wallet (Coinbase, Binance, Trust Wallet, MetaMask, etc.)?<br>
-              Scan the deposit address from any of our accepted currencies above.
-            </div>
-            <div style="font-size: 0.78rem; color: rgba(255,255,255,0.3); margin-bottom: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">Accepted Currencies</div>
-            <div style="display:flex; flex-wrap:wrap; gap:8px;">
-              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;font-size:0.78rem;color:rgba(255,255,255,0.5);">₿ BTC</div>
-              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;font-size:0.78rem;color:rgba(255,255,255,0.5);">Ξ ETH</div>
-              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;font-size:0.78rem;color:rgba(255,255,255,0.5);">💵 USDT (TRC-20)</div>
-              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;font-size:0.78rem;color:rgba(255,255,255,0.5);">💵 USDC (ERC-20)</div>
-              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;font-size:0.78rem;color:rgba(255,255,255,0.5);">⬡ OMNI (Chain 8888)</div>
-              <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 12px;font-size:0.78rem;color:rgba(255,255,255,0.5);">🔶 BNB (BEP-20)</div>
-            </div>
-          </div>
-          <div style="font-size:0.8rem; color:rgba(255,255,255,0.35); text-align:center;">
-            Select USDT, BTC, ETH, or OMNI tab above to see the deposit address.
-          </div>
-        </div>
+            setTimeout(() => {
+               location.href = '/pages/cloud-dashboard.html';
+            }, 2000);
 
-      </div>
-
-      <!-- ── CARD SECTION ────────────────── -->
-      <div class="payment-section" id="section-card">
-        <div class="card-brands">
-          <div class="card-brand">💳 Visa</div>
-          <div class="card-brand">💳 Mastercard</div>
-          <div class="card-brand">💳 Amex</div>
-          <div class="card-brand">💳 Discover</div>
-        </div>
-
-        <div class="form-group">
-          <label>Cardholder Name</label>
-          <input type="text" class="form-input" id="card-name" placeholder="John Doe" autocomplete="cc-name" />
-        </div>
-
-        <div class="form-group">
-          <label>Card Number</label>
-          <input type="text" class="form-input" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" oninput="formatCard(this)" />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group" style="margin:0;">
-            <label>Expiry Date</label>
-            <input type="text" class="form-input" id="card-expiry" placeholder="MM / YY" maxlength="7" autocomplete="cc-exp" oninput="formatExpiry(this)" />
-          </div>
-          <div class="form-group" style="margin:0;">
-            <label>CVV / CVC</label>
-            <input type="password" class="form-input" id="card-cvv" placeholder="•••" maxlength="4" autocomplete="cc-csc" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Billing Email</label>
-          <input type="email" class="form-input" id="card-email" placeholder="you@example.com" autocomplete="email" />
-        </div>
-
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px; font-size:0.75rem; color:rgba(255,255,255,0.3);">
-          <span>🔒</span> Your card data is encrypted via TLS. We never store your raw card number.
-        </div>
-
-        <button class="submit-btn" onclick="processCard()">
-          🔒 Pay $<span id="card-total">10</span> — Activate Node
-        </button>
-      </div>
-
-      <!-- ── ACH SECTION ─────────────────── -->
-      <div class="payment-section" id="section-ach">
-        <div class="ach-notice">
-          <strong>ACH Bank Transfer</strong> — US bank accounts only. Transfers process in 1–3 business days. Your node activates immediately upon payment receipt. No fees.
-        </div>
-
-        <div class="form-group">
-          <label>Account Holder Name</label>
-          <input type="text" class="form-input" id="ach-name" placeholder="Full legal name on account" />
-        </div>
-
-        <div class="form-row">
-          <div class="form-group" style="margin:0;">
-            <label>Routing Number</label>
-            <input type="text" class="form-input" id="ach-routing" placeholder="9 digits" maxlength="9" pattern="[0-9]*" inputmode="numeric" />
-          </div>
-          <div class="form-group" style="margin:0;">
-            <label>Account Number</label>
-            <input type="text" class="form-input" id="ach-account" placeholder="Account number" />
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Account Type</label>
-          <select class="form-input" id="ach-type">
-            <option value="checking">Checking Account</option>
-            <option value="savings">Savings Account</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Billing Email</label>
-          <input type="email" class="form-input" id="ach-email" placeholder="you@example.com" />
-        </div>
-
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px; font-size:0.75rem; color:rgba(255,255,255,0.3);">
-          🏦 Bank details are encrypted and handled by our ACH processor. Your node activates on confirmation.
-        </div>
-
-        <button class="submit-btn" onclick="processACH()">
-          🏦 Submit ACH — $<span id="ach-total">10</span>/month
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ══ RIGHT: ORDER SUMMARY ─────────────────────────────────── -->
-  <div class="checkout-order">
-    <div class="panel">
-      <div class="panel-title">Order Summary</div>
-
-      <div class="order-plan">
-        <div class="order-plan-icon" id="plan-icon">⛏</div>
-        <div>
-          <div class="order-plan-name" id="plan-display-name">Starter Node</div>
-          <div class="order-plan-detail" id="plan-hashrate-display">500 MH/s · Cloud Miner</div>
-        </div>
-      </div>
-
-      <div class="order-line">
-        <span class="order-line-key">Plan</span>
-        <span class="order-line-val" id="sum-plan">Starter Node</span>
-      </div>
-      <div class="order-line">
-        <span class="order-line-key">Hashrate</span>
-        <span class="order-line-val" id="sum-hashrate">500 MH/s</span>
-      </div>
-      <div class="order-line">
-        <span class="order-line-key">Daily Est. Earnings</span>
-        <span class="order-line-val" id="sum-daily">~3.6 OMNI/day</span>
-      </div>
-      <div class="order-line">
-        <span class="order-line-key">Billing Cycle</span>
-        <span class="order-line-val">Monthly</span>
-      </div>
-      <div class="order-line">
-        <span class="order-line-key">Activation</span>
-        <span class="order-line-val" style="color:#00d2a6">Instant</span>
-      </div>
-      <div class="order-divider"></div>
-      <div class="order-total">
-        <span class="order-total-key">Total Today</span>
-        <span class="order-total-val" id="sum-total">$10</span>
-      </div>
-
-      <div class="order-perks">
-        <div class="order-perk"><span class="perk-check">✓</span> No setup fees</div>
-        <div class="order-perk"><span class="perk-check">✓</span> Cancel anytime</div>
-        <div class="order-perk"><span class="perk-check">✓</span> 99.98% uptime SLA</div>
-        <div class="order-perk"><span class="perk-check">✓</span> Non-custodial payouts</div>
-        <div class="order-perk"><span class="perk-check">✓</span> Live dashboard access</div>
-      </div>
-
-      <div class="order-divider"></div>
-
-      <div class="security-badges">
-        <div class="sec-badge">🔒 SSL Secured</div>
-        <div class="sec-badge">🛡️ PCI Compliant</div>
-        <div class="sec-badge">✅ Crypto Native</div>
-        <div class="sec-badge">🌐 Non-Custodial</div>
-      </div>
-
-      <!-- Crypto conversion rates -->
-      <div style="margin-top:20px; padding:14px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.05); border-radius:12px;">
-        <div style="font-size:0.68rem; color:rgba(255,255,255,0.25); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px;">Live Rates</div>
-        <div id="rate-list" style="display:flex; flex-direction:column; gap:6px;"></div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- ══ CONFIRMATION MODAL ════════════════════════════════════ -->
-<div class="modal-overlay" id="confirm-modal">
-  <div class="modal-box">
-    <div class="modal-icon">🎉</div>
-    <div class="modal-title">Node Activating!</div>
-    <div class="modal-body">
-      Your payment is being processed. Your mining node will be active within the confirmation window.<br><br>
-      Rewards will be sent to your wallet address every 24 hours.
-    </div>
-    <div class="modal-node-id" id="modal-node-id">NODE-XXXX-XXXX</div>
-    <div style="font-size:0.78rem; color:rgba(255,255,255,0.3); margin-bottom:20px;">
-      Save this Node ID for your dashboard access.
-    </div>
-    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-      <button class="modal-close-btn" onclick="closeModal()">⛏ View Dashboard</button>
-      <button style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);border-radius:50px;padding:14px 24px;cursor:pointer;font-size:0.9rem;" onclick="closeModal()">Close</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script type="module" src="/js/main.js"></script>
-<script type="module">
-// Import engine on checkout page to settle any offline earnings from a prior node
-import '/js/cloud-mining-engine.js';
-</script>
-<script>
-/* ═══════════════════════════════════════════════════════════
-   OMNI CLOUD CHECKOUT ENGINE
-═══════════════════════════════════════════════════════════ */
-
-// Mining reward math (same as cloud-mining.html)
-const GENESIS_REWARD   = 50;
-const HALVING_INTERVAL = 210_000;
-const BLOCKS_PER_DAY   = 1440;
-const NETWORK_HASHRATE = 14_200_000; // MH/s
-
-const PLANS = {
-  starter:   { name: 'Starter Node',   icon: '⛏',  hashrate: 500,   hashLabel: '500 MH/s', price: 10  },
-  pro:       { name: 'Pro Node',        icon: '🚀',  hashrate: 3000,  hashLabel: '3 GH/s',   price: 50  },
-  elite:     { name: 'Elite Node',      icon: '⚡',  hashrate: 7000,  hashLabel: '7 GH/s',   price: 100 },
-  sovereign: { name: 'Sovereign Node',  icon: '👑',  hashrate: 40000, hashLabel: '40 GH/s',  price: 500 },
-};
-
-// Simulated live rates (in reality from CoinGecko/Binance)
-const RATES = {
-  usdt: 1.0,
-  btc:  68420,
-  eth:  3215,
-  omni: 0.0042,
-};
-
-let currentPlan = 'starter';
-let currentMethod = 'crypto';
-let currentCrypto = 'usdt';
-
-// ── Init ──────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof lucide !== 'undefined') lucide.createIcons();
-
-  // Read plan from URL params
-  const params = new URLSearchParams(window.location.search);
-  const planKey = params.get('plan') || 'starter';
-  if (PLANS[planKey]) currentPlan = planKey;
-
-  updateOrderSummary();
-  updateCryptoAmounts();
-  renderRates();
-  generateQRCodes();
-
-  // Pre-fill wallet from localStorage
-  try {
-    const w = JSON.parse(localStorage.getItem('omni_wallet') || 'null');
-    if (w?.address) {
-      document.getElementById('payout-wallet').value = w.address;
-    }
-  } catch(e) {}
-});
-
-// ── Order Summary ─────────────────────────────────────────────
-function updateOrderSummary() {
-  const plan = PLANS[currentPlan];
-  const daily = dailyOMNI(plan.hashrate);
-
-  document.getElementById('plan-icon').textContent          = plan.icon;
-  document.getElementById('plan-display-name').textContent  = plan.name;
-  document.getElementById('plan-hashrate-display').textContent = plan.hashLabel + ' · Cloud Miner';
-  document.getElementById('sum-plan').textContent           = plan.name;
-  document.getElementById('sum-hashrate').textContent       = plan.hashLabel;
-  document.getElementById('sum-daily').textContent          = `~${daily.toFixed(1)} OMNI/day`;
-  document.getElementById('sum-total').textContent          = '$' + plan.price;
-  document.getElementById('card-total').textContent         = plan.price;
-  document.getElementById('ach-total').textContent          = plan.price;
-}
-
-function dailyOMNI(hashrateMH) {
-  return (hashrateMH / NETWORK_HASHRATE) * BLOCKS_PER_DAY * GENESIS_REWARD;
-}
-
-// ── Live Rates Display ────────────────────────────────────────
-function renderRates() {
-  const plan = PLANS[currentPlan];
-  const containerEl = document.getElementById('rate-list');
-  const currencies = [
-    { key: 'usdt', label: 'USDT', symbol: '💵' },
-    { key: 'btc',  label: 'BTC',  symbol: '₿'  },
-    { key: 'eth',  label: 'ETH',  symbol: 'Ξ'  },
-    { key: 'omni', label: 'OMNI', symbol: '⬡'  },
-  ];
-  containerEl.innerHTML = currencies.map(c => {
-    const amount = plan.price / RATES[c.key];
-    let formatted;
-    if (c.key === 'btc')       formatted = amount.toFixed(6);
-    else if (c.key === 'eth')  formatted = amount.toFixed(4);
-    else if (c.key === 'omni') formatted = Math.round(amount).toLocaleString();
-    else                       formatted = amount.toFixed(2);
-    return `<div style="display:flex;justify-content:space-between;font-size:0.78rem;">
-      <span style="color:rgba(255,255,255,0.35);">${c.symbol} ${c.label}</span>
-      <span style="color:#fff;font-family:'JetBrains Mono',monospace;font-weight:600;">${formatted}</span>
-    </div>`;
-  }).join('');
-}
-
-// ── Crypto Amount Labels ──────────────────────────────────────
-function updateCryptoAmounts() {
-  const plan = PLANS[currentPlan];
-  const usdAmount = plan.price;
-
-  const amounts = {
-    usdt: (usdAmount / RATES.usdt).toFixed(2) + ' USDT',
-    btc:  (usdAmount / RATES.btc).toFixed(6)  + ' BTC',
-    eth:  (usdAmount / RATES.eth).toFixed(4)  + ' ETH',
-    omni: Math.round(usdAmount / RATES.omni).toLocaleString() + ' OMNI',
-  };
-
-  Object.entries(amounts).forEach(([key, val]) => {
-    const el = document.getElementById(key + '-amount');
-    if (el) el.textContent = val;
-  });
-}
-
-// ── QR Code Generation ────────────────────────────────────────
-function generateQRCodes() {
-  const addrs = {
-    usdt: 'TQVFhmKvLYNQ6FsDFPRPsEm2mMSXkL8TVX',
-    btc:  'bc1qxy2kgdygjrsqtzq2n0yrf249z0tscjzpyexwqn',
-    eth:  '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-    omni: '0x71C7656EC7ab88b098defB751B7401B5f6d8976F',
-  };
-
-  Object.entries(addrs).forEach(([key, addr]) => {
-    const container = document.getElementById('qr-' + key);
-    if (container && typeof QRCode !== 'undefined') {
-      container.innerHTML = '';
-      new QRCode(container, {
-        text: addr, width: 140, height: 140,
-        colorDark: '#000000', colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.M
+          } catch (e) {
+            console.error("Payment sync error:", e);
+            document.getElementById('status-text').innerText = 'SYNC ERROR';
+          }
+        }, 3000);
       });
-    }
-  });
-}
-
-// ── Method / Crypto Selectors ─────────────────────────────────
-function selectMethod(method) {
-  currentMethod = method;
-  document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  document.querySelectorAll('.payment-section').forEach(s => s.classList.remove('active'));
-  document.getElementById('section-' + method).classList.add('active');
-}
-
-function selectCrypto(key) {
-  currentCrypto = key;
-  document.querySelectorAll('.crypto-tab').forEach(t => t.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  document.querySelectorAll('.crypto-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('crypto-' + key).classList.add('active');
-}
-
-// ── Address Copy ──────────────────────────────────────────────
-function copyAddr(elId) {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  const text = el.textContent.trim();
-  navigator.clipboard.writeText(text).then(() => showToast('📋 Address copied!')).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    showToast('📋 Address copied!');
-  });
-}
-
-// ── Payment Processing ────────────────────────────────────────
-function confirmPayment(method) {
-  const wallet = document.getElementById('payout-wallet').value.trim();
-  if (!wallet) { showToast('⚠️ Paste your OMNI wallet address first!'); return; }
-  activateNode(method, wallet);
-}
-
-function processCard() {
-  const name   = document.getElementById('card-name').value.trim();
-  const num    = document.getElementById('card-number').value.replace(/\s/g,'');
-  const expiry = document.getElementById('card-expiry').value.trim();
-  const cvv    = document.getElementById('card-cvv').value.trim();
-  const wallet = document.getElementById('payout-wallet').value.trim();
-
-  if (!name)   { showToast('⚠️ Enter cardholder name'); return; }
-  if (num.length < 15) { showToast('⚠️ Enter a valid card number'); return; }
-  if (!expiry) { showToast('⚠️ Enter expiry date'); return; }
-  if (cvv.length < 3)  { showToast('⚠️ Enter CVV'); return; }
-  if (!wallet) { showToast('⚠️ Enter your OMNI wallet address'); return; }
-
-  activateNode('Credit Card', wallet);
-}
-
-function processACH() {
-  const name    = document.getElementById('ach-name').value.trim();
-  const routing = document.getElementById('ach-routing').value.trim();
-  const account = document.getElementById('ach-account').value.trim();
-  const wallet  = document.getElementById('payout-wallet').value.trim();
-
-  if (!name)            { showToast('⚠️ Enter account holder name'); return; }
-  if (routing.length !== 9) { showToast('⚠️ Routing number must be 9 digits'); return; }
-  if (!account)         { showToast('⚠️ Enter account number'); return; }
-  if (!wallet)          { showToast('⚠️ Enter your OMNI wallet address'); return; }
-
-  showToast('🏦 ACH submitted — node activates on bank confirmation (1–3 days)');
-  setTimeout(() => activateNode('ACH Bank Transfer', wallet, false), 1500);
-}
-
-function activateNode(method, wallet, instant = true) {
-  const plan = PLANS[currentPlan];
-
-  // Deactivate any previously active node first
-  const existingNodes = JSON.parse(localStorage.getItem('omni_cloud_nodes') || '[]');
-  existingNodes.forEach(n => n.active = false);
-
-  // Build new node record — this is what the engine reads
-  const nodeId = 'NODE-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
-  const nodeRecord = {
-    nodeId,
-    plan:         currentPlan,
-    planName:     plan.name,
-    hashrate:     plan.hashrate,   // MH/s — used by omniPerSecond()
-    price:        plan.price,
-    wallet,
-    method,
-    server:       document.querySelector('.server-chip.selected')?.textContent?.trim() || 'US-East',
-    activatedAt:  Date.now(),
-    active:       true,
-  };
-  existingNodes.push(nodeRecord);
-  localStorage.setItem('omni_cloud_nodes', JSON.stringify(existingNodes));
-
-  // Seed live state so dashboard loads instantly
-  localStorage.setItem('omni_cloud_live', JSON.stringify({
-    lastTick:     Date.now(),
-    totalMined:   0,
-    sessionStart: Date.now(),
-  }));
-
-  // Ensure wallet has a cloudMiningBalance key
-  try {
-    const w = JSON.parse(localStorage.getItem('omni_wallet') || '{}');
-    if (w.cloudMiningBalance === undefined) w.cloudMiningBalance = 0;
-    if (wallet && !w.address) w.address = wallet;
-    localStorage.setItem('omni_wallet', JSON.stringify(w));
-  } catch {}
-
-  // Show confirmation modal with node ID + countdown redirect
-  document.getElementById('modal-node-id').textContent = nodeId;
-  document.getElementById('confirm-modal').classList.add('open');
-
-  // Auto-redirect to dashboard after 4 seconds
-  let countdown = 4;
-  const btn = document.querySelector('.modal-close-btn');
-  if (btn) {
-    const orig = btn.textContent;
-    const timer = setInterval(() => {
-      countdown--;
-      if (btn) btn.textContent = `⛏ Go to Dashboard (${countdown}s)`;
-      if (countdown <= 0) {
-        clearInterval(timer);
-        window.location.href = '/pages/cloud-dashboard.html';
-      }
-    }, 1000);
-    if (btn) btn.textContent = `⛏ Go to Dashboard (${countdown}s)`;
-  }
-}
-
-function closeModal() {
-  document.getElementById('confirm-modal').classList.remove('open');
-  window.location.href = '/pages/cloud-dashboard.html';
-}
-
-// ── Card / Input Formatters ───────────────────────────────────
-function formatCard(input) {
-  let v = input.value.replace(/\D/g,'').slice(0,16);
-  input.value = v.match(/.{1,4}/g)?.join(' ') || v;
-}
-function formatExpiry(input) {
-  let v = input.value.replace(/\D/g,'');
-  if (v.length >= 2) v = v.slice(0,2) + ' / ' + v.slice(2,4);
-  input.value = v;
-}
-
-// ── Toast ─────────────────────────────────────────────────────
-let toastT;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastT);
-  toastT = setTimeout(() => t.classList.remove('show'), 3000);
-}
-</script>
+    });
+  </script>
 </body>
 </html>

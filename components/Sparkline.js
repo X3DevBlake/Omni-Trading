@@ -1,4 +1,13 @@
+/**
+ * Represents a lightweight sparkline chart for visualizing price trends.
+ * Renders data points onto a 2D canvas with a gradient fill.
+ */
 export class Sparkline {
+  /**
+   * Initializes the sparkline chart.
+   * @param {HTMLCanvasElement} canvasElement - The canvas element to render on.
+   * @param {string} [color='#00D2A6'] - The primary stroke color for the line.
+   */
   constructor(canvasElement, color = '#00D2A6') {
     this.canvas = canvasElement;
     this.ctx = this.canvas.getContext('2d');
@@ -12,6 +21,11 @@ export class Sparkline {
     this.canvas.height = 60; // Fixed small height
   }
 
+  /**
+   * Adds a new data point to the sparkline and triggers a redraw.
+   * Automatically shifts old data points if the limit is reached.
+   * @param {number} price - The price value to add.
+   */
   addPoint(price) {
     this.dataPoints.push(price);
     if (this.dataPoints.length > this.maxPoints) {
@@ -20,6 +34,11 @@ export class Sparkline {
     this.draw();
   }
 
+  /**
+   * Renders the sparkline on the canvas.
+   * Calculates scaling based on the min/max values of the data points.
+   * @private
+   */
   draw() {
     if (this.dataPoints.length < 2) return;
 

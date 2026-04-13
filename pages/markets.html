@@ -65,7 +65,7 @@
          TOP_100_ASSETS.forEach((coin, i) => {
              const changeColor = coin.change >= 0 ? 'var(--color-success)' : 'var(--color-danger)';
              const sign = coin.change >= 0 ? '+' : '';
-             html += `<tr>
+             html += `<tr onclick="location.href='/pages/spot.html?asset=${coin.symbol}'" style="cursor:pointer;">
                 <td><div style="display:flex; align-items:center; gap:10px;">
                     <span style="color:var(--color-text-muted);">★</span>
                     <img src="${coin.image}" width="24" height="24" style="border-radius:12px;"/>
@@ -75,7 +75,7 @@
                 <td><span style="color:#fff;">$${coin.price.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:6})}</span></td>
                 <td><span style="color:${changeColor};">${sign}${coin.change ? coin.change.toFixed(2) : 0.00}%</span></td>
                 <td><span class="text-muted">${(coin.volume / 1000000).toFixed(1)}M</span></td>
-                <td style="text-align:right;"><button class="action-btn" onclick="window.location.href='/pages/spot.html?pair=${coin.symbol}USDT'">Trade</button></td>
+                <td style="text-align:right;"><button class="action-btn">Trade</button></td>
              </tr>`;
          });
          tbody.innerHTML = html;

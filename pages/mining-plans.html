@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mining Tiers | Omni Cloud</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .plan-card {
+      background: var(--color-bg-glass);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .plan-card:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-10px);
+    }
+    .plan-card.popular {
+      border: 2px solid var(--color-primary);
+      box-shadow: 0 10px 40px rgba(0, 210, 166, 0.2);
+    }
+    .price { font-size: 3rem; font-weight: 800; margin: 20px 0; }
+    .price span { font-size: 1rem; color: var(--color-text-muted); }
+    .feature-list { text-align: left; margin: 30px 0; padding: 0; list-style: none; }
+    .feature-list li { margin-bottom: 12px; color: var(--color-text-muted); display: flex; align-items: center; gap: 10px; }
+    .feature-list i { color: var(--color-primary); width: 18px; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main class="container" style="padding: 120px 20px;">
+    <div style="text-align: center; margin-bottom: 60px;">
+      <h1 class="gsap-reveal" style="font-size: 3.5rem; margin-bottom: 15px;">Sovereign Tiers</h1>
+      <p class="gsap-reveal" style="color: var(--color-text-muted); font-size: 1.2rem;">Upgrade your node to unlock high-speed Proof-of-Work and automated Cloud yields.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+      
+      <!-- BRONZE -->
+      <div class="plan-card gsap-reveal">
+        <h3 style="color: #CD7F32;">BRONZE NODE</h3>
+        <div class="price">$19<span>/mo</span></div>
+        <ul class="feature-list">
+          <li><i data-lucide="check"></i> 10 MH/s Cloud Hashrate</li>
+          <li><i data-lucide="check"></i> Terminal Access (Basic)</li>
+          <li><i data-lucide="check"></i> 1% Daily Yield</li>
+        </ul>
+        <a href="/pages/cloud-checkout.html?plan=BRONZE&price=19&hash=10" class="btn btn-outline" style="width: 100%; border-radius: 30px;">Select Bronze</a>
+      </div>
+
+      <!-- SILVER (Popular) -->
+      <div class="plan-card popular gsap-reveal">
+        <div style="position: absolute; top: 20px; right: -30px; background: var(--color-primary); color: #000; padding: 5px 40px; transform: rotate(45deg); font-weight: 800; font-size: 0.7rem;">POPULAR</div>
+        <h3 style="color: #C0C0C0;">SILVER NODE</h3>
+        <div class="price">$49<span>/mo</span></div>
+        <ul class="feature-list">
+          <li><i data-lucide="check"></i> 50 MH/s Cloud Hashrate</li>
+          <li><i data-lucide="check"></i> Pro Terminal Access</li>
+          <li><i data-lucide="check"></i> 2.5% Daily Yield</li>
+          <li><i data-lucide="check"></i> Priority Support</li>
+        </ul>
+        <a href="/pages/cloud-checkout.html?plan=SILVER&price=49&hash=50" class="btn btn-primary" style="width: 100%; border-radius: 30px;">Upgrade to Silver</a>
+      </div>
+
+      <!-- GOLD -->
+      <div class="plan-card gsap-reveal">
+        <h3 style="color: #FFD700;">GOLD NODE</h3>
+        <div class="price">$149<span>/mo</span></div>
+        <ul class="feature-list">
+          <li><i data-lucide="check"></i> 250 MH/s Cloud Hashrate</li>
+          <li><i data-lucide="check"></i> Master Terminal Access</li>
+          <li><i data-lucide="check"></i> 5% Daily Yield</li>
+          <li><i data-lucide="check"></i> Custom API Access</li>
+        </ul>
+        <a href="/pages/cloud-checkout.html?plan=GOLD&price=149&hash=250" class="btn btn-outline" style="width: 100%; border-radius: 30px;">Unlock Gold</a>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) window.lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
