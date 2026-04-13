@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spot Trading | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <style>
+    /* Spot Interface Layout (Similar to Futures but no leverage) */
+    .trading-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: auto 1fr 250px;
+      gap: 5px;
+      height: calc(100vh - var(--header-height));
+      background: #000;
+      padding: 5px;
+    }
+    .panel {
+      background: var(--color-bg-deep);
+      border: 1px solid var(--color-bg-light);
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-header {
+      padding: 10px 15px;
+      border-bottom: 1px solid var(--color-bg-light);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+    .ticker-header { grid-column: 1 / -1; display:flex; gap: 30px; align-items:center; padding: 10px 20px;}
+    .chart-area { grid-column: 1 / 2; grid-row: 2 / 3; }
+    .orderbook-area { grid-column: 2 / 3; grid-row: 2 / 3; }
+    .order-entry-area { grid-column: 3 / 4; grid-row: 2 / 4; padding-bottom:20px; overflow-y:auto; }
+    .position-area { grid-column: 1 / 3; grid-row: 3 / 4; }
+    
+    .price-lg { font-size: 1.5rem; color: var(--color-success); font-family: var(--font-heading); font-weight: 700; }
+    .stat { display:flex; flex-direction:column; gap:4px; font-size:0.8rem; color:var(--color-text-muted); }
+    .stat span:last-child { color: #fff; font-weight:600; }
+    
+    /* Order Entry Specific for Spot */
+    .input-group {
+      background: var(--color-bg-light);
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    .input-group input { background: transparent; border: none; color: #fff; flex: 1; text-align: right; outline: none;}
+    .buy-btn { background: var(--color-success); color: #fff; width: 100%; border-radius: 4px; padding: 12px; border:none; font-weight:700; cursor:pointer;}
+    .sell-btn { background: var(--color-danger); color: #fff; width: 100%; border-radius: 4px; padding: 12px; border:none; font-weight:700; cursor:pointer;}
+  </style>
+</head>
+<body style="overflow: hidden;">
+  <div id="navbar-container"></div>
+  
+  <main class="trading-layout">
+    <!-- Header -->
+    <div class="panel ticker-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.5rem; font-weight:bold; color:#fff;">BTC/USDT</span>
+        <span style="background:var(--color-bg-light); padding:2px 6px; border-radius:4px; font-size:0.8rem; color:var(--color-text-muted);">Spot</span>
+      </div>
+      <div class="price-lg" data-symbol-price="BTCUSDT" id="active-ticker-price">64,230.50</div>
+      <div class="stat"><span>24h Change</span><span class="text-success" data-symbol-change="BTCUSDT">+2.45%</span></div>
+      <div class="stat"><span>24h High</span><span>65,100.00</span></div>
+      <div class="stat"><span>24h Low</span><span>62,050.00</span></div>
+      <div class="stat"><span>24h Volume</span><span data-symbol-vol="BTCUSDT">Vol: $1.2B</span></div>
+    </div>
+    
+    <!-- Chart -->
+    <div class="panel chart-area">
+      <div class="panel-header">Basic Chart</div>
+      <div id="tv-chart" style="width: 100%; height: 100%;"></div>
+    </div>
+    
+    <!-- Orderbook -->
+    <div class="panel orderbook-area">
+      <div class="panel-header">Order Book</div>
+      <div id="spot-orderbook-container" style="padding:5px;"></div>
+    </div>
+    
+    <!-- Spot Order Entry -->
+    <div class="panel order-entry-area">
+      <div class="panel-header" style="justify-content:space-between; display:flex;">
+        <span>Spot</span>
+      </div>
+      <div style="padding:15px;">
+        <div style="display:flex; gap:10px; margin-bottom:15px; font-size:0.9rem;">
+          <span style="color:#fff; border-bottom:2px solid var(--color-primary); padding-bottom:5px; cursor:pointer;">Limit</span>
+          <span style="color:var(--color-text-muted); cursor:pointer;">Market</span>
+        </div>
+        
+        <!-- Updated with ID for dynamic symbol replacement -->
+        <h2 id="spot-asset-title" style="color:#fff; font-size:1.5rem; display:flex; align-items:center; gap:10px;">
+          <img id="spot-asset-logo" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" width="32" />
+          <span>BTC / USDT</span>
+        </h2>
+        <div style="display:flex; gap:30px; font-size:0.9rem; margin-bottom: 20px;">
+          <div>
+            <div style="color:var(--color-text-muted);">24h Change</div>
+            <div id="spot-asset-change" class="text-success" style="font-weight:bold;">+2.45%</div>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+          <!-- BUY SIDE -->
+          <div style="flex:1">
+             <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--color-text-muted); margin-bottom:5px;">
+              <span>Avail</span><span style="color:#fff;" id="spot-avail-usd">... USDT</span>
+            </div>
+            <div class="input-group">
+              <span style="color:var(--color-text-muted); font-size:0.9rem; padding-right:10px;">Price</span>
+              <input type="number" id="spot-buy-price" placeholder="Market Price..." readonly style="color:var(--color-success);" />
+            </div>
+            <div class="input-group">
+              <span style="color:var(--color-text-muted); font-size:0.9rem; padding-right:10px;">Amount</span>
+              <input type="number" id="spot-buy-amount" placeholder="0.00" />
+            </div>
+            <button class="buy-btn" id="spot-buy-btn">Buy Limit / Market</button>
+          </div>
+          <!-- SELL SIDE -->
+          <div style="flex:1">
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--color-text-muted); margin-bottom:5px;">
+              <span>Avail</span><span style="color:#fff;" id="spot-avail-crypto">... Asset</span>
+            </div>
+            <div class="input-group">
+              <span style="color:var(--color-text-muted); font-size:0.9rem; padding-right:10px;">Price</span>
+              <input type="number" id="spot-sell-price" placeholder="Market Price..." readonly style="color:var(--color-danger);" />
+            </div>
+            <div class="input-group">
+              <span style="color:var(--color-text-muted); font-size:0.9rem; padding-right:10px;">Amount</span>
+              <input type="number" id="spot-sell-amount" placeholder="0.00" />
+            </div>
+            <button class="sell-btn" id="spot-sell-btn">Sell Limit / Market</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Open Orders -->
+    <div class="panel position-area">
+      <div class="panel-header" style="display:flex; gap:20px;">
+        <span style="color:#fff; border-bottom:2px solid var(--color-primary); padding-bottom:10px; margin-bottom:-11px;">Firebase Transaction Ledger</span>
+        <span>Order History</span>
+      </div>
+      <div id="spot-ledger" style="padding:50px; font-size:0.9rem; text-align:center; color:var(--color-text-muted);">
+        Waiting for Trade Execution Hook...
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { renderTradingChart } from '../components/TradingChart.js';
+    import { renderOrderBook } from '../components/OrderBook.js';
+    import { WalletService } from '../services/WalletService.js';
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+        const params = new URLSearchParams(window.location.search);
+        const dynamicPair = params.get('pair') || 'BTCUSDT';
+        const baseCoin = dynamicPair.replace('USDT', '');
+        
+        document.getElementById('spot-asset-title').innerHTML = `
+          <img id="spot-asset-logo" src="https://cryptologos.cc/logos/${baseCoin.toLowerCase()}-${baseCoin.toLowerCase()}-logo.png" width="32" onerror="this.src='https://cryptologos.cc/logos/bitcoin-btc-logo.png'"/>
+          <span>${baseCoin} / USDT</span>
+        `;
+        document.getElementById('spot-asset-change').innerText = (Math.random() * 5).toFixed(2) + '%';
+        
+        // Re-read live Cloud Wallet
+        async function fetchSpotWallet() {
+           const walletExt = await WalletService.getBalance();
+           const usd = walletExt.liquid['USD'] || 0;
+           const crypto = walletExt.liquid[baseCoin] || 0;
+           
+           document.getElementById('spot-avail-usd').innerText = usd.toLocaleString(undefined, {minimumFractionDigits:2}) + ' USDT';
+           document.getElementById('spot-avail-crypto').innerText = crypto.toLocaleString(undefined, {minimumFractionDigits:4}) + ' ' + baseCoin;
+        }
+        await fetchSpotWallet();
+        
+        renderTradingChart('tv-chart', dynamicPair, '1m');
+        renderOrderBook('spot-orderbook-container', true, dynamicPair);
+        
+        const buyBtn = document.getElementById('spot-buy-btn');
+        const sellBtn = document.getElementById('spot-sell-btn');
+        const buyAmt = document.getElementById('spot-buy-amount');
+        const sellAmt = document.getElementById('spot-sell-amount');
+        const ledger = document.getElementById('spot-ledger');
+        
+        // Continuous hack polling of the WS data header for 'Current Market Price'
+        setInterval(() => {
+           const priceString = document.getElementById('active-ticker-price').innerText.replace(/,/g, '');
+           const rate = parseFloat(priceString);
+           if (!isNaN(rate)) {
+               if(!document.getElementById('spot-buy-price').value) document.getElementById('spot-buy-price').placeholder = rate;
+               if(!document.getElementById('spot-sell-price').value) document.getElementById('spot-sell-price').placeholder = rate;
+           }
+        }, 1000);
+
+        buyBtn.onclick = async () => {
+           let rate = parseFloat(document.getElementById('spot-buy-price').value);
+           if (isNaN(rate)) rate = parseFloat(document.getElementById('active-ticker-price').innerText.replace(/,/g, ''));
+           
+           const amt = parseFloat(buyAmt.value);
+           if (isNaN(amt) || amt <= 0) return alert('Enter valid quantity.');
+           
+           const spendUSD = amt * rate;
+           buyBtn.innerText = 'Transmitting...';
+           
+           const res = await WalletService.executeBuy(baseCoin, spendUSD, rate);
+           buyBtn.innerText = 'Buy Limit / Market';
+           
+           if(res.success) {
+               ledger.innerHTML = `<div style="color:var(--color-success);">[${new Date().toLocaleTimeString()}] BUY FILLED: ${amt} ${baseCoin} @ $${rate}</div>` + ledger.innerHTML;
+               fetchSpotWallet();
+           } else {
+               alert(res.msg);
+           }
+        };
+        
+        sellBtn.onclick = async () => {
+           let rate = parseFloat(document.getElementById('spot-sell-price').value);
+           if (isNaN(rate)) rate = parseFloat(document.getElementById('active-ticker-price').innerText.replace(/,/g, ''));
+           
+           const amt = parseFloat(sellAmt.value);
+           if (isNaN(amt) || amt <= 0) return alert('Enter valid quantity.');
+           
+           sellBtn.innerText = 'Transmitting...';
+           
+           const res = await WalletService.executeSell(baseCoin, amt, rate);
+           sellBtn.innerText = 'Sell Limit / Market';
+           
+           if(res.success) {
+               ledger.innerHTML = `<div style="color:var(--color-danger);">[${new Date().toLocaleTimeString()}] SELL FILLED: ${amt} ${baseCoin} @ $${rate}</div>` + ledger.innerHTML;
+               fetchSpotWallet();
+           } else {
+               alert(res.msg);
+           }
+        };
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legal Agreements & Policies | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <style>
+    .legal-layout { display: grid; grid-template-columns: 250px 1fr; gap: 40px; padding: 60px 0; }
+    .sidebar-menu { list-style: none; padding: 0; margin: 0; position: sticky; top: 100px; border-right: 1px solid var(--color-bg-light); height: fit-content; }
+    .sidebar-menu li { padding: 15px 20px; color: var(--color-text-muted); cursor: pointer; border-left: 3px solid transparent; font-size: 0.95rem; display:block; }
+    .sidebar-menu li:hover { background: rgba(255, 255, 255, 0.02); color: #fff; }
+    .sidebar-menu li.active { color: var(--color-primary); border-left-color: var(--color-primary); font-weight: bold; }
+    
+    .legal-content h1 { font-size: 2.2rem; color: #fff; margin-bottom: 20px; font-family: var(--font-heading); }
+    .legal-content h2 { font-size: 1.5rem; color: #fff; margin-top: 40px; margin-bottom: 15px; border-bottom: 1px solid var(--color-bg-light); padding-bottom: 10px;}
+    .legal-content p { color: var(--color-text-muted); line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+    .legal-content .update-date { font-style: italic; color: var(--color-primary); margin-bottom: 40px; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  
+  <main class="container legal-layout" style="min-height: 80vh;">
+    <aside>
+      <ul class="sidebar-menu">
+        <li class="active">Terms of Use</li>
+        <li>Privacy Policy</li>
+        <li>Risk Disclosure Statement</li>
+        <li>AML / CTF Policy</li>
+        <li>API Agreement</li>
+        <li>P2P Merchant Rules</li>
+        <li>Futures Trading Rules</li>
+        <li>Copy Trading Agreement</li>
+      </ul>
+    </aside>
+
+    <div class="legal-content">
+      <h1>Omni User Agreement (Terms of Use)</h1>
+      <div class="update-date">Effective Date: April 10, 2026</div>
+      
+      <h2>1. Introduction & Acceptance of Terms</h2>
+      <p>Welcome to the legal hub of the Omni Trading Platform (hereinafter referred to as strictly "Omni", "we", "us", or "our"). These General Terms of Use ("Terms") govern your access to and use of our globally distributed cryptocurrency exchange services, including our website, mobile applications, APIs, and associated infrastructure.</p>
+      <p>By creating an account, accessing the platform, or executing any trade, you expressly acknowledge that you have read, understood, and agreed to be legally bound by this agreement. If you do not agree to these Terms, you must strictly cease all interaction with Omni's services immediately. We reserve the right to unilaterally update, modify, or append conditions to these Terms at any time. Your continued use of the platform constitutes your binding acceptance of any such material modifications.</p>
+
+      <h2>2. Eligibility and Prohibited Jurisdictions</h2>
+      <p>By registering for an Omni account, you represent and inherently warrant that you are at least 18 years of age (or the age of legal majority in your jurisdiction) and possess the legal capacity to enter into binding contracts. You further declare that your usage of Omni does not violate the laws of your native jurisdiction.</p>
+      <p>Omni maintains a strict regulatory compliance matrix. Services are strictly prohibited for persons located in, or citizens of, explicitly restricted jurisdictions including, but not limited to, the United States of America, Mainland China, North Korea, Iran, Syria, and regions subject to comprehensive OFAC or UN Security Council sanctions. Using VPNs or proxy layers to bypass these geographic filters is a direct violation of these Terms and will result in immediate algorithmic account termination and asset freezing.</p>
+
+      <h2>3. Account Registration & KYC / AML Requirements</h2>
+      <p>To engage in spot trading, futures trading, or fiat onboarding/offboarding, users must register via a valid email address or phone number and complete our comprehensive identity verification (KYC) algorithms.</p>
+      <p>Omni fully complies with international Anti-Money Laundering (AML) and Counter-Terrorism Financing (CTF) statutes. We inherently reserve the absolute operational right to request additional due diligence documents—such as Proof of Address, Declaration of Source of Wealth, or biometric liveness checks—at any point. Refusal to comply with KYC mandates will result in a permanent withdrawal lock and the ultimate closure of the Omni account.</p>
+
+      <h2>4. Risk Disclosure: Trading & Leverage</h2>
+      <p>You explicitly acknowledge that digital asset trading is highly speculative and profoundly volatile. The value of cryptocurrencies can critically fluctuate in milliseconds.</p>
+      <p><strong>Futures & Margin Declarations:</strong> Omni offers derivative instruments with extreme leverage capabilities (up to 400x). While margin trading amplifies potential algorithmic gains, it equally amplifies catastrophic loss. You acknowledge the mechanic of forced liquidations—if your account margin dips below the Maintenance Margin Ratio, Omni's liquidation engine will unilaterally unwind your positions without notice. Omni explicitly disclaims any and all liability for losses incurred due to market volatility or forced liquidations.</p>
+
+      <h2>5. Platform Integrity and Acceptable Use</h2>
+      <p>While interacting with the Omni matching engine, users must strictly abstain from the following market abuses: 
+        <br>
+        • <strong>Wash Trading:</strong> Simultaneously entering buy and sell orders for the identical asset to artificially inflate volume.<br>
+        • <strong>Spoofing:</strong> Placing massive algorithmic orders without the intention of execution to manipulate the orderbook.<br>
+        • <strong>API Abuse:</strong> Exceeding standard REST/WebSocket rate limits or attempting to execute DDoS attacks against the Omni infrastructure.<br>
+        Any detected infractions will trigger Omni's internal security matrix, resulting in immediate voiding of generated profits, account bans, and potential referral to global regulatory agencies.</p>
+
+      <h2>6. Intellectual Property</h2>
+      <p>All technology, algorithms, source code, UI/UX designs, trademarks—specifically the Omni 3D Gyroscope Logo, "Omni", and "Omni Zone"—are the exclusive, proprietary intellectual property of the Omni Trading Foundation. You are granted a limited, personal, non-exclusive license strictly to engage with the platform. You may not reverse-engineer, decompile, or otherwise clone the platform's infrastructure.</p>
+
+      <h1 style="margin-top: 80px;">Privacy Policy Highlights</h1>
+      <p>Omni deploys bank-grade, zero-knowledge encryption protocols to protect your KYC documents. We strictly do not sell your personal demographic or behavioral trading data to untrusted third-party data brokers. Data sharing is limited strictly to approved sub-contractors (e.g., fiat payment gateway providers like Wyre or Banxa) solely for the orchestration of your transaction, or when actively subpoenaed by verified law enforcement entities possessing appropriate international jurisdiction.</p>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "appId": "com.omnitrading.app",
+  "appName": "Omni Trading",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

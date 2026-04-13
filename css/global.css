@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Rajdhani:wght@400;500;600;700&display=swap');
+@import 'variables.css';
+@import 'animations.css';
+@import 'galaxy.css';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-bg-deep);
+  color: var(--color-text-main);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+a:hover {
+  text-shadow: var(--shadow-neon);
+}
+
+ul {
+  list-style: none;
+}
+
+/* Standard Panels classes */
+.glass-panel {
+  background: var(--color-bg-glass);
+  border-radius: var(--border-radius-lg);
+}
+
+/* Typography Classes */
+.text-gradient {
+  color: var(--color-primary);
+  display: inline-block;
+}
+
+.text-success { color: var(--color-success); }
+.text-danger { color: var(--color-danger); }
+.text-muted { color: var(--color-text-muted); }
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  border: none;
+  font-family: var(--font-body);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #181a20;
+  border: none;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+}
+
+.btn-outline:hover {
+  background: #2b3139;
+}
+
+/* Containers */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section {
+  padding: 80px 0;
+  position: relative;
+  z-index: 2; /* above galaxy bg */
+}
+
+/* Global Navbar Placeholder */
+#navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* Layout adjusting for fixed nav */
+main {
+  padding-top: var(--header-height);
+}
+
+/* --- Phase 2: Global Animation & Smoothing Rules --- */
+img, svg {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smooth-hover {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.smooth-hover:hover {
+  transform: translateY(-5px) scale(1.02);
+  filter: drop-shadow(0 10px 15px rgba(0, 210, 166, 0.2));
+}
+
+@keyframes smoothFloating {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.float-animation {
+  animation: smoothFloating 6s ease-in-out infinite;
+}
+
+/* Custom Cursor Trailer */
+.cursor-trailer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, rgba(0,210,166,0.5) 0%, rgba(0,210,166,0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+}
+
+/* ── Mobile-first global fixes ──────────────────────────────── */
+/* Ensure body scrolls freely on all devices */
+html {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+body {
+  /* Allow vertical scrolling always; lock horizontal */
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+}
+
+/* Main content always scrollable above the 3D bg */
+main {
+  position: relative;
+  z-index: 2;
+  touch-action: pan-y;
+}
+
+/* Hide cursor trailer on touch devices */
+@media (pointer: coarse) {
+  .cursor-trailer { display: none !important; }
+}
+
+/* Responsive global container */
+@media (max-width: 768px) {
+  .container { padding: 0 16px; }
+  .section { padding: 50px 0; }
+
+  h1 { font-size: clamp(1.8rem, 6vw, 3rem); }
+  h2 { font-size: clamp(1.4rem, 4vw, 2.2rem); }
+
+  /* Navbar full-width on mobile */
+  .nav-links { display: none; }
+
+  /* Buttons full-width on mobile if stacked */
+  .btn-stack-mobile { width: 100%; text-align: center; }
+
+  /* Cards full bleed on mobile */
+  .hub-grid,
+  .two-col-section { padding: 0 12px; }
+}
+
+/* Tap target minimum size */
+@media (pointer: coarse) {
+  .btn, .btn-hub, .btn-sm, .tab-item, .net-option {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

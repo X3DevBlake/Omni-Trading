@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wallet | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <style>
+    .wallet-layout { display: grid; grid-template-columns: 250px 1fr; gap: 30px; padding: 40px 0; }
+    .sidebar { background: var(--color-bg-glass); padding: 20px 0; border-radius: var(--border-radius-lg); border: 1px solid var(--color-bg-light); height: fit-content; }
+    .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+    .sidebar-menu li { padding: 15px 25px; color: var(--color-text-muted); cursor: pointer; border-left: 3px solid transparent; font-weight: 500;}
+    .sidebar-menu li:hover { background: rgba(255, 255, 255, 0.05); color: #fff;}
+    .sidebar-menu li.active { background: rgba(0, 210, 166, 0.1); color: var(--color-primary); border-left-color: var(--color-primary); }
+    
+    .overview-card { background: var(--color-bg-glass); border-radius: var(--border-radius-lg); padding: 30px; border: 1px solid var(--color-bg-light); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;}
+    .total-balance { font-size: 2.5rem; font-weight: bold; color: #fff; margin: 10px 0; font-family: var(--font-heading);}
+    .action-row { display: flex; gap: 15px; margin-top: 20px; }
+
+    /* Pie chart visualization simulation */
+    .portfolio-visualizer { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(var(--color-primary) 0% 70%, var(--color-success) 70% 85%, #E6AA00 85% 100%); display:flex; align-items:center; justify-content:center;}
+    .portfolio-visualizer::after { content: ""; width: 90px; height: 90px; background: var(--color-bg-deep); border-radius: 50%; }
+
+    .asset-table { width: 100%; border-collapse: collapse; margin-top: 20px;}
+    .asset-table th { text-align: left; padding: 15px 10px; color: var(--color-text-muted); font-weight: normal; border-bottom: 1px solid var(--color-bg-light); }
+    .asset-table td { padding: 15px 10px; border-bottom: 1px solid var(--color-bg-light); color: #fff; font-weight: 500; }
+    .action-link { color: var(--color-primary); margin-right: 15px; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
+    .action-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  
+  <main class="container wallet-layout" style="min-height: 80vh;">
+    <aside class="sidebar">
+      <ul class="sidebar-menu">
+        <li class="active">Overview</li>
+        <li>Funding Account</li>
+        <li>Spot Account</li>
+        <li>Futures Account</li>
+        <li>Copy Trading Account</li>
+        <li style="margin-top:20px; padding-top:20px; border-top:1px solid var(--color-bg-light);">Transaction History</li>
+      </ul>
+    </aside>
+
+    <div class="wallet-content">
+      <div class="overview-card" style="background: linear-gradient(135deg, rgba(0,210,166,0.08), rgba(0,0,0,0.4)); border-color: rgba(0,210,166,0.3); margin-bottom:20px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+            <span style="display:inline-block; width:8px; height:8px; background:var(--color-primary); border-radius:50%; box-shadow:0 0 8px var(--color-primary); animation: pulse 2s infinite;"></span>
+            <span style="color:var(--color-primary); font-size:0.85rem; font-weight:bold; letter-spacing:1px;">OMNI LAYER-1 LIVE WALLET</span>
+          </div>
+          <div style="font-size:0.8rem; color:var(--color-text-muted); margin-bottom:10px; font-family:monospace; display:flex; align-items:center; gap:8px;">
+            <span id="user-chain-address">0x...</span>
+            <span style="font-size:0.6rem; color:var(--color-primary); cursor:pointer; text-decoration:underline;" onclick="navigator.clipboard.writeText(document.getElementById('user-chain-address').innerText); alert('Address Copied!')">COPY</span>
+          </div>
+          <div style="font-size:2.8rem; font-weight:bold; color:#fff; font-family:var(--font-heading);" id="omni-live-balance">
+            Connecting...
+          </div>
+          <div style="color:var(--color-text-muted); font-size:0.9rem; margin-top:5px;">Native OMNI · Zero-Gas · Chain ID 8888</div>
+          <div style="margin-top:15px; display:flex; gap:10px;">
+            <span style="color:var(--color-text-muted); font-size:0.85rem;">Last Block: <strong id="omni-block-num" style="color:#fff;">—</strong></span>
+            <span style="color:var(--color-text-muted); font-size:0.85rem; margin-left:20px;">Session Mined: <strong id="omni-mined-session" style="color:var(--color-primary);">0 OMNI</strong></span>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div id="omni-node-status" style="padding:10px 20px; border-radius:20px; font-size:0.85rem; font-weight:bold; background:rgba(255,50,50,0.1); color:#ff6b6b; border:1px solid #ff6b6b;">
+            ⚪ Node Offline
+          </div>
+          <a href="/pages/explorer.html" style="display:block; margin-top:15px; color:var(--color-primary); font-size:0.85rem;">View OmniScan →</a>
+        </div>
+      </div>
+
+      <div class="overview-card">
+        <div>
+          <span style="color:var(--color-text-muted); display:flex; align-items:center; gap:10px;">Estimated Balance <span style="cursor:pointer;" id="toggle-balance">👁️</span></span>
+          <div class="total-balance" id="balance-amount">$14,520.45</div>
+          <span style="color:var(--color-text-muted);">≈ 0.2245 BTC</span>
+          
+          <div class="action-row">
+            <button class="btn btn-primary" style="padding:10px 25px;">Deposit</button>
+            <button class="btn btn-outline" style="background:var(--color-bg-light); color:#fff; border:none; padding:10px 25px;">Withdraw</button>
+            <button class="btn btn-outline" style="background:var(--color-bg-light); color:#fff; border:none; padding:10px 25px;">Transfer</button>
+          </div>
+        </div>
+        
+        <div style="display:flex; gap:30px; align-items:center;">
+          <div class="portfolio-visualizer"></div>
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><span style="width:10px; height:10px; border-radius:50%; background:var(--color-primary);"></span> <span style="color:var(--color-text-muted);">USDT (70%)</span></div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><span style="width:10px; height:10px; border-radius:50%; background:var(--color-success);"></span> <span style="color:var(--color-text-muted);">BTC (15%)</span></div>
+            <div style="display:flex; align-items:center; gap:10px;"><span style="width:10px; height:10px; border-radius:50%; background:#E6AA00;"></span> <span style="color:var(--color-text-muted);">OMNI (15%)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <style>
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+      </style>
+
+
+      <h3 style="color:#fff; margin-bottom:15px; font-size:1.2rem;">Assets Distribution</h3>
+      
+      <div class="glass-panel" style="padding:10px 20px; border:1px solid var(--color-bg-light);">
+        <table class="asset-table">
+          <thead>
+            <tr>
+              <th>Asset</th>
+              <th>Total Balance</th>
+              <th>Available</th>
+              <th>In Order</th>
+              <th style="text-align:right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="asset-table-body">
+            <!-- Injected via WalletService -->
+          </tbody>
+        </table>      <!-- DeFi Positions Summary -->
+      <div id="defi-positions-row" style="margin-top:16px; display:none;">
+        <h3 style="color:#fff; margin:24px 0 15px; font-size:1.1rem;">DeFi Positions</h3>
+        <div class="glass-panel" style="padding:20px; border:1px solid rgba(0,210,166,0.2); background:rgba(0,210,166,0.03);">
+          <div id="defi-positions-container" style="display:flex; flex-direction:column; gap:12px;">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- Cloud Mining Live Balance Row -->
+      <div id="cloud-mining-wallet-row" style="display:none; margin-top:16px; padding:20px 24px; background:linear-gradient(135deg,rgba(0,210,166,0.06),rgba(0,0,0,0.4)); border:1px solid rgba(0,210,166,0.2); border-radius:16px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <div style="width:42px;height:42px;border-radius:12px;background:rgba(0,210,166,0.1);border:1px solid rgba(0,210,166,0.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">☁️</div>
+            <div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="color:#fff;font-weight:700;">OMNI Cloud Mining</span>
+                <span style="display:inline-block;width:7px;height:7px;background:#00d2a6;border-radius:50%;animation:pulse 1.5s infinite;"></span>
+                <span style="font-size:0.7rem;color:#00d2a6;font-weight:700;">LIVE</span>
+              </div>
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.35);margin-top:2px;" id="wallet-node-info">Loading node info...</div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:1.8rem;font-weight:800;color:#fff;font-family:'JetBrains Mono',monospace;" id="wallet-cloud-bal">0.000000</div>
+            <div style="font-size:0.78rem;color:rgba(255,255,255,0.35);" id="wallet-cloud-usd">≈ $0.0000</div>
+            <div style="font-size:0.7rem;color:#00d2a6;margin-top:4px;" id="wallet-cloud-rate">+0.000000 OMNI/sec</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="/pages/cloud-dashboard.html" style="background:#00d2a6;color:#000;border:none;border-radius:30px;padding:9px 20px;font-weight:800;font-size:0.82rem;cursor:pointer;text-decoration:none;">📊 Dashboard</a>
+            <a href="/pages/cloud-dashboard.html#swap" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:9px 20px;font-weight:700;font-size:0.82rem;cursor:pointer;text-decoration:none;">↔ Swap</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { WalletService } from '../services/WalletService.js';
+    import { TOP_100_ASSETS } from '../data/CryptoDatabase.js';
+    import { getActiveNode, getCloudBalance, omniPerSecond, startMiningTicker, fmtOMNI } from '../js/cloud-mining-engine.js';
+    
+    const OMNI_PRICE = 0.0042;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const balanceEl = document.getElementById('balance-amount');
+      const tableBody = document.getElementById('asset-table-body');
+      const toggleBtn = document.getElementById('toggle-balance');
+      
+      async function renderWallet() {
+          tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Syncing global cloud data...</td></tr>';
+          
+          const wallet = await WalletService.getBalance();
+          const balances = wallet.liquid || {};
+
+          const priceMap = { USD: 1 };
+          const assetMap = { 
+              USD: { name: "US Dollar", contract: "Native Fiat", image: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=029" } 
+          };
+          
+          TOP_100_ASSETS.forEach(c => {
+              priceMap[c.symbol] = c.price;
+              assetMap[c.symbol] = c;
+          });
+          
+          let totalUSD = 0;
+          let html = '';
+          
+          for (const [asset, amount] of Object.entries(balances)) {
+              const stakedAmount = wallet.staked ? (wallet.staked[asset] || 0) : 0;
+              const totalAmount = amount + stakedAmount;
+              if(totalAmount === 0 && asset !== 'USD') continue;
+              
+              const price = priceMap[asset] || 0;
+              totalUSD += totalAmount * price;
+              
+              const meta = assetMap[asset] || { name: asset, contract: "Native Integration", image: "https://upload.wikimedia.org/wikipedia/commons/3/30/OMNI_Logo.png" };
+              
+              html += `<tr>
+                  <td>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="${meta.image}" width="24" height="24" style="border-radius:12px;"/>
+                        <div>
+                            <div style="font-weight:bold; color:#fff;">${asset}</div>
+                            <div style="color:var(--color-text-muted); font-size:0.7rem; font-family:monospace;">CA: ${meta.contract ? meta.contract.substring(0,10)+'...' : 'Native'}</div>
+                        </div>
+                    </div>
+                  </td>
+                  <td>${totalAmount.toLocaleString(undefined, {minimumFractionDigits: asset === 'USD' ? 2 : 4})}</td>
+                  <td>${amount.toLocaleString(undefined, {minimumFractionDigits: asset === 'USD' ? 2 : 4})}</td>
+                  <td><span style="color:var(--color-primary);">${stakedAmount.toLocaleString(undefined, {minimumFractionDigits: asset === 'USD' ? 2 : 4})}</span></td>
+                  <td style="text-align:right;">
+                    <span class="action-link deposit-btn" data-asset="${asset}">Deposit</span>
+                    <span class="action-link withdraw-btn" data-asset="${asset}">Withdraw</span>
+                    <a href="/pages/spot.html?pair=${asset === 'USD' ? 'BTCUSDT' : asset+'USDT'}" class="action-link" style="text-decoration:none;">Trade</a>
+                  </td>
+                </tr>`;
+          }
+          
+          tableBody.innerHTML = html;
+          
+          let isHidden = false;
+          const actualBalance = '$' + totalUSD.toLocaleString(undefined, {minimumFractionDigits: 2});
+          balanceEl.innerText = actualBalance;
+          
+          toggleBtn.onclick = () => {
+            isHidden = !isHidden;
+            balanceEl.innerText = isHidden ? '********' : actualBalance;
+          };
+          
+          document.querySelectorAll('.deposit-btn').forEach(btn => {
+             btn.onclick = async (e) => {
+                 const asset = e.target.getAttribute('data-asset');
+                 const amt = prompt(`Bank Deposit Form\nEnter amount of ${asset} to permanently forge into your sandbox:`);
+                 if(amt && !isNaN(amt)) {
+                     const res = await WalletService.deposit(asset, parseFloat(amt));
+                     if(res.success) Object.values(document.querySelectorAll('.overview-card')).forEach(i=>i.style.boxShadow = '0 0 20px var(--color-success)'), setTimeout(()=>Object.values(document.querySelectorAll('.overview-card')).forEach(i=>i.style.boxShadow = 'none'), 500), renderWallet();
+                     else alert("Network error: "+res.msg);
+                 }
+             };
+          });
+          
+          document.querySelectorAll('.withdraw-btn').forEach(btn => {
+             btn.onclick = async (e) => {
+                 const asset = e.target.getAttribute('data-asset');
+                 const amt = prompt(`Withdraw Form\nEnter amount of ${asset} to destroy from sandbox:`);
+                 if(amt && !isNaN(amt)) {
+                     const res = await WalletService.withdraw(asset, parseFloat(amt));
+                     if(res.success) renderWallet();
+                     else alert(res.msg);
+                 }
+             };
+          });
+      }
+      
+      await renderWallet();
+
+      // ── Cloud Mining Live Widget ──────────────────────────────────
+      const node = getActiveNode();
+      const cloudRow = document.getElementById('cloud-mining-wallet-row');
+      if (node && cloudRow) {
+        cloudRow.style.display = 'block';
+        const nodeInfo = document.getElementById('wallet-node-info');
+        if (nodeInfo) nodeInfo.textContent = `${node.planName} · ${node.nodeId} · Activated ${new Date(node.activatedAt).toLocaleDateString()}`;
+
+        startMiningTicker((snap) => {
+          const balEl  = document.getElementById('wallet-cloud-bal');
+          const usdEl  = document.getElementById('wallet-cloud-usd');
+          const rateEl = document.getElementById('wallet-cloud-rate');
+          if (balEl)  balEl.textContent  = fmtOMNI(snap.cloudBalance) + ' OMNI';
+          if (usdEl)  usdEl.textContent  = '≈ $' + (snap.cloudBalance * OMNI_PRICE).toFixed(4);
+          if (rateEl) rateEl.textContent = '+' + snap.perSec.toFixed(8) + ' OMNI/sec';
+        });
+      }
+
+      // ── DeFi Position Widget ──────────────────────────────────────
+      const defiRow = document.getElementById('defi-positions-row');
+      const defiCont = document.getElementById('defi-positions-container');
+      
+      function updateDeFiUI() {
+        const state = JSON.parse(localStorage.getItem('omni_defi_state') || '{}');
+        let html = '';
+        let hasData = false;
+
+        // Staking OMNI -> sOMNI
+        if (state.staking?.sOMNI > 0) {
+          hasData = true;
+          html += `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:32px; height:32px; border-radius:50%; background:var(--gradient-primary); display:flex; align-items:center; justify-content:center; color:#000; font-size:0.7rem; font-weight:800;">s</div>
+                <div>
+                  <div style="font-weight:700; color:#fff;">Liquid Staked OMNI (sOMNI)</div>
+                  <div style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Flex Yield · 25% APY</div>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div style="color:#fff; font-family:monospace; font-weight:700;">${state.staking.sOMNI.toFixed(4)} sOMNI</div>
+                <div style="font-size:0.7rem; color:var(--color-primary);">+${state.staking.rewards.toFixed(6)} OMNI rewards</div>
+              </div>
+            </div>
+          `;
+        }
+
+        // LP Tokens
+        Object.keys(state.liquidity || {}).forEach(pair => {
+          if (state.liquidity[pair].lp > 0 || (state.farming[pair]?.stakedLP > 0)) {
+            hasData = true;
+            const lp = state.liquidity[pair].lp;
+            const farm = state.farming[pair]?.stakedLP || 0;
+            html += `
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.05);">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <div style="width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">🔗</div>
+                  <div>
+                    <div style="font-weight:700; color:#fff;">${pair} LP Token</div>
+                    <div style="font-size:0.7rem; color:rgba(255,255,255,0.3);">
+                      Wallet: ${lp.toFixed(4)} · Farmed: ${farm.toFixed(4)}
+                    </div>
+                  </div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="color:var(--color-success); font-weight:700;">${(state.farming[pair]?.rewards || 0).toFixed(6)} OMNI</div>
+                  <div style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Harvestable Rewards</div>
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        if (hasData) {
+          defiRow.style.display = 'block';
+          defiCont.innerHTML = html;
+        } else {
+          defiRow.style.display = 'none';
+        }
+      }
+
+      updateDeFiUI();
+      setInterval(updateDeFiUI, 2000); // Sync wallet view every 2s
+    });
+  </script>
+
+  <!-- LIVE OMNI NODE BALANCE POLLER -->
+  <script>
+
+    
+    document.addEventListener('DOMContentLoaded', async () => {
+      const balanceEl = document.getElementById('balance-amount');
+      const tableBody = document.getElementById('asset-table-body');
+      const toggleBtn = document.getElementById('toggle-balance');
+      
+      async function renderWallet() {
+          tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Syncing global cloud data...</td></tr>';
+          
+          const wallet = await WalletService.getBalance();
+          const balances = wallet.liquid || {};
+
+          const priceMap = { USD: 1 };
+          const assetMap = { 
+              USD: { name: "US Dollar", contract: "Native Fiat", image: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=029" } 
+          };
+          
+          TOP_100_ASSETS.forEach(c => {
+              priceMap[c.symbol] = c.price;
+              assetMap[c.symbol] = c;
+          });
+          
+          let totalUSD = 0;
+          let html = '';
+          
+          for (const [asset, amount] of Object.entries(balances)) {
+              const stakedAmount = wallet.staked ? (wallet.staked[asset] || 0) : 0;
+              const totalAmount = amount + stakedAmount;
+              if(totalAmount === 0 && asset !== 'USD') continue; // Only show held assets to save space, but they can still click "deposit" globally. Wait, I will show all so they can deposit. 
+              
+              const price = priceMap[asset] || 0;
+              totalUSD += totalAmount * price;
+              
+              const meta = assetMap[asset] || { name: asset, contract: "Native Integration", image: "https://upload.wikimedia.org/wikipedia/commons/3/30/OMNI_Logo.png" };
+              
+              html += `<tr>
+                  <td>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="${meta.image}" width="24" height="24" style="border-radius:12px;"/>
+                        <div>
+                            <div style="font-weight:bold; color:#fff;">${asset}</div>
+                            <div style="color:var(--color-text-muted); font-size:0.7rem; font-family:monospace;">CA: ${meta.contract ? meta.contract.substring(0,10)+'...' : 'Native'}</div>
+                        </div>
+                    </div>
+                  </td>
+                  <td>${totalAmount.toLocaleString(undefined, {minimumFractionDigits: asset === 'USD' ? 2 : 4})}</td>
+                  <td>${amount.toLocaleString(undefined, {minimumFractionDigits: asset === 'USD' ? 2 : 4})}</td>
+                  <td><span style="color:var(--color-primary);">${stakedAmount.toLocaleString(undefined, {minimumFractionDigits: asset === 'USD' ? 2 : 4})}</span></td>
+                  <td style="text-align:right;">
+                    <span class="action-link deposit-btn" data-asset="${asset}">Deposit</span>
+                    <span class="action-link withdraw-btn" data-asset="${asset}">Withdraw</span>
+                    <a href="/pages/spot.html?pair=${asset === 'USD' ? 'BTCUSDT' : asset+'USDT'}" class="action-link" style="text-decoration:none;">Trade</a>
+                  </td>
+                </tr>`;
+          }
+          
+          tableBody.innerHTML = html;
+          
+          let isHidden = false;
+          const actualBalance = '$' + totalUSD.toLocaleString(undefined, {minimumFractionDigits: 2});
+          balanceEl.innerText = actualBalance;
+          
+          toggleBtn.onclick = () => {
+            isHidden = !isHidden;
+            balanceEl.innerText = isHidden ? '********' : actualBalance;
+          };
+          
+          // Attach physical banking handlers
+          document.querySelectorAll('.deposit-btn').forEach(btn => {
+             btn.onclick = async (e) => {
+                 const asset = e.target.getAttribute('data-asset');
+                 const amt = prompt(`Bank Deposit Form\nEnter amount of ${asset} to permanently forge into your sandbox:`);
+                 if(amt && !isNaN(amt)) {
+                     const res = await WalletService.deposit(asset, parseFloat(amt));
+                     if(res.success) Object.values(document.querySelectorAll('.overview-card')).forEach(i=>i.style.boxShadow = '0 0 20px var(--color-success)'), setTimeout(()=>Object.values(document.querySelectorAll('.overview-card')).forEach(i=>i.style.boxShadow = 'none'), 500), renderWallet();
+                     else alert("Network error: "+res.msg);
+                 }
+             };
+          });
+          
+          document.querySelectorAll('.withdraw-btn').forEach(btn => {
+             btn.onclick = async (e) => {
+                 const asset = e.target.getAttribute('data-asset');
+                 const amt = prompt(`Withdraw Form\nEnter amount of ${asset} to destroy from sandbox:`);
+                 if(amt && !isNaN(amt)) {
+                     const res = await WalletService.withdraw(asset, parseFloat(amt));
+                     if(res.success) renderWallet();
+                     else alert(res.msg);
+                 }
+             };
+          });
+      }
+      
+      await renderWallet();
+    });
+  </script>
+
+  <!-- LIVE OMNI NODE BALANCE POLLER -->
+  <script>
+    const OMNI_RPC = 'http://127.0.0.1:8545';
+    const GENESIS_WALLET = '0x49f16218147299ca9d0407066A54587dbc3d3791';
+    let lastBlock = 0;
+    let sessionMined = 0;
+    const REWARD_PER_BLOCK = 50;
+
+    async function pollOmniNode() {
+      const liveBalEl = document.getElementById('omni-live-balance');
+      const statusEl = document.getElementById('omni-node-status');
+      const blockEl = document.getElementById('omni-block-num');
+      const sessionEl = document.getElementById('omni-mined-session');
+      const addrEl = document.getElementById('user-chain-address');
+
+      const user = await WalletService.getUserProfile();
+      const userAddr = WalletService.getChainAddress(user?.uid || 'guest');
+      addrEl.innerText = userAddr;
+
+      try {
+        // Fetch balance
+        const balResp = await fetch(OMNI_RPC, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_getBalance', params: [userAddr, 'latest'], id: 1 })
+        });
+        const balData = await balResp.json();
+        if (balData.error) throw new Error(balData.error.message);
+        
+        const weiHex = balData.result;
+        const wei = BigInt(weiHex);
+        const omni = Number(wei) / 1e18;
+        liveBalEl.innerText = omni.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' OMNI';
+
+        // Fetch block
+        const blockResp = await fetch(OMNI_RPC, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 2 })
+        });
+        const blockData = await blockResp.json();
+        const currentBlock = parseInt(blockData.result, 16);
+        blockEl.innerText = '#' + currentBlock;
+
+        if (lastBlock > 0 && currentBlock > lastBlock) {
+          sessionMined += (currentBlock - lastBlock) * REWARD_PER_BLOCK;
+          sessionEl.innerText = sessionMined.toLocaleString() + ' OMNI';
+        }
+        lastBlock = currentBlock;
+
+        // Node is online
+        statusEl.style.background = 'rgba(0,210,166,0.1)';
+        statusEl.style.color = 'var(--color-primary)';
+        statusEl.style.borderColor = 'var(--color-primary)';
+        statusEl.innerText = '🟢 Node Online';
+
+      } catch(e) {
+        liveBalEl.innerText = '— Node Offline';
+        statusEl.style.background = 'rgba(255,50,50,0.1)';
+        statusEl.style.color = '#ff6b6b';
+        statusEl.style.borderColor = '#ff6b6b';
+        statusEl.innerText = '⚪ Node Offline';
+      }
+    }
+
+    pollOmniNode();
+    setInterval(pollOmniNode, 5000);
+  </script>
+
+</body>
+</html>

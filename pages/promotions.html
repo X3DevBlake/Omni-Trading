@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rewards Hub | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <style>
+    .promos-hero { text-align: center; padding: 60px 0; border-bottom: 1px solid var(--color-bg-light); background: linear-gradient(180deg, rgba(230,170,0,0.1) 0%, transparent 100%); }
+    .task-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 40px; }
+    .task-card { background: var(--color-bg-glass); border: 1px solid var(--color-bg-light); border-radius: 12px; padding: 25px; display:flex; align-items:center; justify-content:space-between; }
+    .task-card:hover { border-color: #E6AA00; }
+    .reward-badge { background: rgba(230,170,0,0.15); color: #E6AA00; padding: 10px 15px; border-radius: 8px; font-weight: 900; font-size: 1.2rem; }
+    .task-btn { background: var(--color-bg-light); color: #fff; padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; transition: background 0.2s;}
+    .task-btn:hover { background: var(--color-primary); color: #000; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  
+  <main class="container" style="min-height: 80vh; padding-bottom: 80px;">
+    <div class="promos-hero">
+      <h1 style="font-size: 3rem; color: #fff; margin-bottom:10px;">Omni Rewards Hub</h1>
+      <p style="color: var(--color-text-muted); font-size: 1.1rem;">Complete tasks to unlock up to $5,000 in trading bonuses.</p>
+    </div>
+
+    <div style="margin-top:40px;">
+      <h2 style="color:#fff;">New User Tasks</h2>
+      <div class="task-grid">
+        <!-- Task 1 -->
+        <div class="task-card">
+           <div>
+             <h3 style="color:#fff; margin:0 0 5px 0;">Complete KYC Verification</h3>
+             <p style="color:var(--color-text-muted); margin:0; font-size:0.9rem;">Reach Level 2 Identity Verification.</p>
+           </div>
+           <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+             <div class="reward-badge">+ 10 USDT Bonus</div>
+             <button class="task-btn">Verify Now</button>
+           </div>
+        </div>
+        <!-- Task 2 -->
+        <div class="task-card">
+           <div>
+             <h3 style="color:#fff; margin:0 0 5px 0;">First Deposit Milestone</h3>
+             <p style="color:var(--color-text-muted); margin:0; font-size:0.9rem;">Deposit >= 500 USDT in a single transaction.</p>
+           </div>
+           <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+             <div class="reward-badge">+ 50 USDT Bonus</div>
+             <button class="task-btn">Deposit Now</button>
+           </div>
+        </div>
+      </div>
+
+      <h2 style="color:#fff; margin-top:60px;">Trading Tasks</h2>
+      <div class="task-grid">
+         <!-- Task 3 -->
+        <div class="task-card">
+           <div>
+             <h3 style="color:#fff; margin:0 0 5px 0;">Execute First Futures Trade</h3>
+             <p style="color:var(--color-text-muted); margin:0; font-size:0.9rem;">Any volume on USDT-M Futures.</p>
+           </div>
+           <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+             <div class="reward-badge">+ 5 USDT Bonus</div>
+             <button class="task-btn">Trade</button>
+           </div>
+        </div>
+        <!-- Task 4 -->
+        <div class="task-card">
+           <div>
+             <h3 style="color:#fff; margin:0 0 5px 0;">Futures Volume > 1M USDT</h3>
+             <p style="color:var(--color-text-muted); margin:0; font-size:0.9rem;">Achieve 1,000,000+ USDT trading volume.</p>
+             <div style="background:var(--color-bg-light); border-radius:4px; height:6px; width:100%; margin-top:10px;"><div style="background:#E6AA00; height:100%; width:30%;"></div></div>
+           </div>
+           <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+             <div class="reward-badge">+ 500 OMNI Token</div>
+             <button class="task-btn">Trade</button>
+           </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

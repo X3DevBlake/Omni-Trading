@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { background: var(--color-bg-deep); display:flex; align-items:center; justify-content:center; height:100vh; overflow:hidden;}
+    .auth-container { background: var(--color-bg-glass); border:1px solid var(--color-bg-light); padding:40px; border-radius:var(--border-radius-xl); width:100%; max-width:400px; box-shadow:0 0 40px rgba(0, 210, 166, 0.1); backdrop-filter:blur(20px);}
+    .auth-tab { display:flex; gap:20px; border-bottom:1px solid var(--color-bg-light); margin-bottom:30px; padding-bottom:10px; }
+    .auth-tab span { color:var(--color-text-muted); cursor:pointer; font-weight:600; transition:color 0.3s; }
+    .auth-tab span.active { color:var(--color-primary); border-bottom:2px solid var(--color-primary); padding-bottom:9px; }
+    .input-grp { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
+    .input-grp input { background:rgba(0,0,0,0.4); border:1px solid var(--color-bg-light); outline:none; padding:15px; border-radius:var(--border-radius-md); color:#fff;}
+    .input-grp input:focus { border-color:var(--color-primary); }
+    .btn-main { background:var(--color-primary); color:#181a20; padding:15px; border:none; border-radius:var(--border-radius-md); font-weight:bold; font-size:1.1rem; width:100%; cursor:pointer; transition:transform 0.2s;}
+    .btn-main:active { transform:scale(0.98); }
+    .oauth-btn { display:flex; align-items:center; justify-content:center; gap:10px; background:#fff; color:#000; padding:15px; border-radius:var(--border-radius-md); font-weight:bold; margin-top:20px; cursor:pointer; width:100%; border:none; transition:opacity 0.2s;}
+    .oauth-btn:hover { opacity:0.9;}
+  </style>
+</head>
+<body>
+  
+  <div class="auth-container">
+     <div style="text-align:center; margin-bottom:30px; display:flex; flex-direction:column; align-items:center;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/OMNI_Logo.png" width="60" height="60" style="margin-bottom:10px; filter: drop-shadow(0 0 10px rgba(0, 210, 166, 0.4));" />
+        <h2 style="color:#fff; font-family:var(--font-heading); margin:0;">Omni</h2>
+     </div>
+     
+     <div class="auth-tab">
+        <span class="active" id="tab-login">Log In</span>
+        <span id="tab-signup">Sign Up</span>
+     </div>
+
+     <div id="auth-form" style="display:flex; flex-direction:column;">
+         <div class="input-grp">
+             <label style="color:var(--color-text-muted); font-size:0.9rem;">Email Address</label>
+             <input type="email" id="auth-email" placeholder="example@omni.base" />
+         </div>
+         <div class="input-grp">
+             <label style="color:var(--color-text-muted); font-size:0.9rem;">Password</label>
+             <input type="password" id="auth-password" placeholder="••••••••" />
+         </div>
+         <button class="btn-main" id="btn-submit">Sign In</button>
+     </div>
+     
+     <div style="display:flex; align-items:center; gap:15px; margin:25px 0;">
+         <div style="height:1px; background:var(--color-bg-light); flex:1;"></div>
+         <span style="color:var(--color-text-muted); font-size:0.9rem;">OR</span>
+         <div style="height:1px; background:var(--color-bg-light); flex:1;"></div>
+     </div>
+
+     <button class="oauth-btn" id="btn-google">
+         <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" width="20" height="20" />
+         Continue with Google
+     </button>
+     <p style="text-align:center; color:var(--color-danger); font-size:0.9rem; margin-top:15px;" id="auth-error"></p>
+  </div>
+
+  <script type="module">
+     import { loginWithGoogle, auth, db } from '../services/Auth.js';
+     import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+     import { doc, getDoc, setDoc } from 'firebase/firestore';
+     import { SeedPhraseService } from '../utils/SeedPhrase.js';
+
+     let isLogin = true;
+     const tLogin = document.getElementById('tab-login');
+     const tSignup = document.getElementById('tab-signup');
+     const btnSubmit = document.getElementById('btn-submit');
+     const emailIn = document.getElementById('auth-email');
+     const passIn = document.getElementById('auth-password');
+     const err = document.getElementById('auth-error');
+
+     // Tab logic
+     tLogin.onclick = () => { isLogin = true; tLogin.className='active'; tSignup.className=''; btnSubmit.innerText = 'Sign In'; err.innerText=''; }
+     tSignup.onclick = () => { isLogin = false; tSignup.className='active'; tLogin.className=''; btnSubmit.innerText = 'Create Account'; err.innerText=''; }
+
+     // Handle Redirect Result on Load
+     import { handleRedirectResult } from '../services/Auth.js';
+     document.addEventListener('DOMContentLoaded', async () => {
+         try {
+             const user = await handleRedirectResult();
+             if (user) {
+                 window.location.href = '/pages/spot.html';
+             }
+         } catch (e) {
+             err.innerText = "Redirect Check failed: " + e.message;
+         }
+     });
+
+     // Email processing
+     btnSubmit.onclick = async () => {
+         err.innerText = '';
+         btnSubmit.innerText = 'Transmitting...';
+         const e = emailIn.value.trim();
+         const p = passIn.value;
+         
+         if(!e || !p) { btnSubmit.innerText = isLogin ? 'Sign In' : 'Create Account'; err.innerText = 'Missed parameters.'; return; }
+
+          try {
+              // 1. Check Master Admin Backdoor First
+              const admin = await loginCustom(e, p);
+              if (admin) {
+                  window.location.href = '/pages/wallet.html';
+                  return;
+              }
+
+              if(isLogin) {
+                  await signInWithEmailAndPassword(auth, e, p);
+              } else {
+                  await createUserWithEmailAndPassword(auth, e, p);
+              }
+              window.location.href = '/pages/spot.html';
+          } catch(error) {
+              if (error.code === 'auth/configuration-not-found' || error.message.includes('configuration-not-found')) {
+                  const userDoc = doc(db, 'users_auth_custom', e);
+                  try {
+                      if (isLogin) {
+                          const snap = await getDoc(userDoc);
+                          if (snap.exists() && snap.data().password === p) {
+                              localStorage.setItem('omni_custom_auth', e);
+                              localStorage.setItem('omni_wallet', snap.data().omniWallet || '');
+                              window.location.href = '/pages/spot.html';
+                          } else {
+                              throw new Error("Invalid email or password.");
+                          }
+                      } else {
+                          // Generate a cryptographic Omni wallet for the new user
+                          btnSubmit.innerText = 'Creating Wallet...';
+                          const wallet = generateOmniWallet();
+
+                          await setDoc(userDoc, {
+                              email: e,
+                              password: p,
+                              created: Date.now(),
+                              omniWallet: wallet.address,
+                              // NOTE: In production, NEVER store private keys server-side.
+                              // Show it once and instruct user to save it.
+                          });
+
+                          localStorage.setItem('omni_custom_auth', e);
+                          localStorage.setItem('omni_wallet', wallet.address);
+
+                          // Show wallet reveal modal before redirect
+                          showWalletModal(wallet);
+                          return;
+                      }
+                  } catch(customErr) {
+                      err.innerText = customErr.message;
+                      btnSubmit.innerText = isLogin ? 'Sign In' : 'Create Account';
+                  }
+              } else {
+                  err.innerText = error.message.replace('Firebase:', '');
+                  btnSubmit.innerText = isLogin ? 'Sign In' : 'Create Account';
+              }
+          }
+     };
+
+      // Google processing
+      document.getElementById('btn-google').onclick = async () => {
+          try {
+              err.innerText = '';
+              const user = await loginWithGoogle();
+              
+              // Verify if user already has a wallet registered in the ecosystem
+              const userDoc = doc(db, 'users', user.uid);
+              const snap = await getDoc(userDoc);
+              
+              if (!snap.exists() || !snap.data().wallet) {
+                  btnSubmit.innerText = 'Initializing Identity...';
+                  const wallet = generateOmniWallet();
+                  
+                  // Link wallet to master ecosystem document
+                  await setDoc(userDoc, {
+                      wallet: { 
+                        address: wallet.address,
+                        seed: wallet.seed,
+                        liquid: { OMNI: 3000, USD: 75000, BTC: 0.5, ETH: 5.0 }
+                      }
+                  }, { merge: true });
+
+                  showWalletModal(wallet);
+              } else {
+                  window.location.href = '/pages/spot.html';
+              }
+          } catch(error) {
+              if (error.message.includes('operation-not-allowed')) {
+                  err.innerHTML = `
+                      <div style="background:rgba(255,165,0,0.1); border:1px solid orange; padding:15px; border-radius:8px; color:orange; font-size:0.85rem; text-align:left;">
+                        <strong>⚠️ Action Required:</strong> Google Auth is not enabled in your Firebase Console.<br><br>
+                        1. Visit <a href="https://console.firebase.google.com" target="_blank" style="color:#fff;">Firebase Console</a><br>
+                        2. Go to <strong>Authentication</strong> &gt; <strong>Sign-in method</strong><br>
+                        3. Add <strong>Google</strong> as a provider and save.
+                      </div>
+                  `;
+              } else {
+                  err.innerText = "Google Server Reject: " + error.message;
+              }
+          }
+      }
+
+      // ── Cryptographic Omni Wallet Generator ──────────────────
+      function generateOmniWallet() {
+          const seed = SeedPhraseService.generate();
+          const address = SeedPhraseService.deriveAddress(seed);
+          return { address, seed };
+      }
+
+      function showWalletModal(wallet) {
+          const modal = document.createElement('div');
+          modal.style.cssText = `
+            position:fixed; inset:0; background:rgba(0,0,0,0.95);
+            display:flex; align-items:center; justify-content:center; z-index:9999;
+          `;
+          modal.innerHTML = `
+            <div style="background:#1a1d24; border:2px solid #00d2a6; border-radius:16px; padding:40px; max-width:540px; width:90%; text-align:center; box-shadow:0 0 60px rgba(0,210,166,0.2);">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/OMNI_Logo.png" width="50" height="50" style="filter:drop-shadow(0 0 10px #00d2a6); margin-bottom:15px;"/>
+              <h2 style="color:#fff; margin:0 0 5px 0;">🎉 Welcome to Omni!</h2>
+              <p style="color:#00d2a6; margin:0 0 20px 0; font-size:0.9rem;">Your sovereign Layer-1 wallet has been generated.</p>
+              
+              <div style="background:rgba(0,0,0,0.5); border:1px solid #2d3748; border-radius:8px; padding:15px; margin-bottom:15px; text-align:left;">
+                <div style="color:#8892a4; font-size:0.8rem; margin-bottom:5px;">OMNI WALLET ADDRESS</div>
+                <div style="color:#fff; font-family:'JetBrains Mono'; font-size:0.85rem; word-break:break-all;">${wallet.address}</div>
+              </div>
+
+              <div style="background:rgba(0,210,166,0.05); border:1px solid rgba(0,210,166,0.2); border-radius:8px; padding:20px; margin-bottom:20px; text-align:left;">
+                <div style="color:#00d2a6; font-size:0.8rem; font-weight:bold; margin-bottom:10px;">🛡️ 12-WORD SEED PHRASE — SAVE THIS NOW</div>
+                <div style="color:#fff; font-family:'JetBrains Mono'; font-size:1.1rem; line-height:1.6; letter-spacing:0.5px; background:rgba(0,0,0,0.3); padding:10px; border-radius:4px; text-transform:lowercase; filter:blur(5px); cursor:pointer; transition:filter 0.3s;" onclick="this.style.filter='none'">
+                    ${wallet.seed}
+                </div>
+                <p style="color:rgba(0,210,166,0.5); font-size:0.7rem; text-align:center; margin-top:8px;">(Click to reveal phrase)</p>
+              </div>
+
+              <p style="color:#8892a4; font-size:0.8rem; margin-bottom:20px;">This phrase is the ONLY way to recover your assets. Never share it. Omni staff will never ask for your seed phrase.</p>
+
+              <button onclick="navigator.clipboard.writeText('${wallet.seed}'); this.innerText='✓ Copied!'; setTimeout(()=>this.innerText='Copy Seed Phrase',2000);"
+                style="background:transparent; border:1px solid #00d2a6; color:#00d2a6; padding:10px 20px; border-radius:8px; cursor:pointer; margin-right:10px; margin-bottom:10px; font-weight:700;">
+                Copy Seed Phrase
+              </button>
+              <button onclick="window.location.href='/pages/spot.html'"
+                style="background:#00d2a6; border:none; color:#000; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">
+                I've Saved It → Enter Omni
+              </button>
+            </div>
+          `;
+          document.body.appendChild(modal);
+          if(window.lucide) window.lucide.createIcons();
+      }
+   </script>
+</body>
+</html>

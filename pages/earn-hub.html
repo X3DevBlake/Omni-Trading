@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omni Auto-Earn | Smart DeFi Automation</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .earn-hero { text-align: center; padding: 100px 20px 40px; }
+    .earn-hero h1 { font-size: 3.5rem; background: linear-gradient(135deg, #fff, #00d2a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+    
+    .automation-banner {
+      max-width: 1000px; margin: 0 auto 50px;
+      background: linear-gradient(135deg, rgba(0,210,166,0.1), rgba(0,0,0,0.4));
+      border: 1px solid rgba(0,210,166,0.25); border-radius: 24px; padding: 40px;
+      display: flex; align-items: center; gap: 40px;
+    }
+    @media (max-width: 768px) { .automation-banner { flex-direction: column; text-align: center; padding: 30px 20px; } }
+    
+    .auto-toggle-wrap { display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.4); padding: 15px 25px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.05); }
+    
+    .earn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1100px; margin: 0 auto 100px; padding: 0 20px; }
+    .earn-card {
+      background: var(--color-bg-glass); border: 1px solid var(--color-bg-light);
+      border-radius: 24px; padding: 32px; transition: all 0.3s cubic-bezier(.4,0,.2,1);
+      position: relative; overflow: hidden;
+    }
+    .earn-card:hover { transform: translateY(-5px); border-color: var(--color-primary); box-shadow: 0 20px 40px rgba(0,210,166,0.1); }
+    .earn-card.featured::before { content: 'BEST APY'; position: absolute; top: 12px; right: -30px; background: var(--color-primary); color: #000; font-size: 0.65rem; font-weight: 900; padding: 4px 40px; transform: rotate(45deg); }
+    
+    .asset-icon { width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+    .apr-val { font-size: 2.5rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; margin: 10px 0; }
+    .apr-sub { color: var(--color-primary); font-size: 0.85rem; font-weight: 700; letter-spacing: 1px; }
+
+    /* Switch Style */
+    .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #2d3139; transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: var(--color-primary); }
+    input:checked + .slider:before { transform: translateX(26px); }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main>
+    <div class="earn-hero">
+      <h1 class="text-gradient">Smart Auto-Earn</h1>
+      <p class="text-muted" style="max-width: 600px; margin: 0 auto;">Passive income redefined. Let Omni's smart engine manage your yield compounds, auto-harvesting, and flexible staking across the entire sovereign layer.</p>
+    </div>
+
+    <!-- Automation Center -->
+    <div class="automation-banner">
+      <div style="flex:1;">
+        <h2 style="color:#fff; margin-bottom:10px;">⚡ Auto-Harvest Engine</h2>
+        <p style="color:var(--color-text-muted); font-size:0.95rem; line-height:1.6; margin-bottom:0;">When enabled, our high-frequency relayer will automatically scan your liquidity pools and farms every 30 minutes, claim pending OMNI, and re-deposit them into your chosen staking vault. <strong>Maximum APY, zero effort.</strong></p>
+      </div>
+      <div class="auto-toggle-wrap">
+        <div style="text-align:right;">
+          <div id="toggle-status" style="color:var(--color-primary); font-weight:800; font-size:0.9rem;">ENGINE ACTIVE</div>
+          <div style="color:rgba(255,255,255,0.4); font-size:0.7rem;">30m Interval Scan</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="main-auto-toggle" checked onchange="updateToggleStatus(this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="earn-grid">
+      <!-- OMNI-USDT LP -->
+      <div class="earn-card featured">
+        <div class="asset-icon" style="background:rgba(0,210,166,0.1); color:var(--color-primary);"><i data-lucide="tractor"></i></div>
+        <h3 style="color:#fff; margin:0;">OMNI/USDT Auto-Farm</h3>
+        <div class="apr-val">114.2%</div>
+        <div class="apr-sub">COMPOUNDED APY</div>
+        <p style="color:var(--color-text-muted); font-size:0.85rem; margin:15px 0;">Auto-compounds OMNI rewards back into the liquidity pool to rapidly grow your share.</p>
+        <button class="btn btn-primary" style="width:100%; padding:14px; border-radius:14px; font-weight:800;" onclick="location.href='/pages/farming.html'">Manage Auto-Farm</button>
+      </div>
+
+      <!-- Flexible OMNI -->
+      <div class="earn-card">
+        <div class="asset-icon" style="color:var(--color-primary);"><i data-lucide="zap"></i></div>
+        <h3 style="color:#fff; margin:0;">Flexible OMNI Saver</h3>
+        <div class="apr-val">22.5%</div>
+        <div class="apr-sub">NOMINAL APR</div>
+        <p style="color:var(--color-text-muted); font-size:0.85rem; margin:15px 0;">No lock-up period. Withdraw your OMNI anytime. Interest paid out every hour into your wallet.</p>
+        <button class="btn btn-outline" style="width:100%; padding:14px; border-radius:14px; font-weight:700;">Subscribe Flexible</button>
+      </div>
+
+      <!-- USDT Stable -->
+      <div class="earn-card">
+        <div class="asset-icon" style="color:#2775ca;"><i data-lucide="shield-check"></i></div>
+        <h3 style="color:#fff; margin:0;">Stable Yield USDT</h3>
+        <div class="apr-val">12.5%</div>
+        <div class="apr-sub">FIXED EARN</div>
+        <p style="color:var(--color-text-muted); font-size:0.85rem; margin:15px 0;">Low risk, stable appreciation. Secured by the Omni bridge treasury and cross-chain reserves.</p>
+        <button class="btn btn-outline" style="width:100%; padding:14px; border-radius:14px; font-weight:700;">Subscribe USDT</button>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { defi } from '/js/services/DeFiCore.js';
+    
+    window.updateToggleStatus = (checked) => {
+      const status = document.getElementById('toggle-status');
+      status.innerText = checked ? 'ENGINE ACTIVE' : 'ENGINE PAUSED';
+      status.style.color = checked ? 'var(--color-primary)' : 'rgba(255,255,255,0.3)';
+      
+      if (window.omniDefi) {
+        window.omniDefi.state.autoClaimEnabled = checked;
+        window.omniDefi.saveState();
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      
+      // Sync toggle with state
+      const state = defi.loadState();
+      const toggle = document.getElementById('main-auto-toggle');
+      if (state.autoClaimEnabled !== undefined) {
+        toggle.checked = state.autoClaimEnabled;
+        updateToggleStatus(toggle.checked);
+      }
+    });
+  </script>
+</body>
+</html>

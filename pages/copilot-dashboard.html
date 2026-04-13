@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automations & Cron | OmniMind</title>
+</head>
+<body>
+  <div class="galaxy-overlay" style="background: radial-gradient(circle at center, transparent 0%, #05050f 100%);"></div>
+  <div id="navbar-container"></div>
+  
+  <main id="app" class="container" style="padding-top: calc(var(--header-height) + 40px); min-height: 80vh;">
+    
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 40px;">
+      <div>
+        <h1 class="text-gradient" style="margin-bottom:10px;">Automations & Cron</h1>
+        <p class="text-muted">Manage the autonomous tasks, scheduled jobs, and watchdogs handled by OmniMind.</p>
+      </div>
+      <a href="/pages/copilot.html" class="btn btn-outline">Back to Chat</a>
+    </div>
+
+    <!-- Active Jobs -->
+    <div style="display:grid; grid-template-columns: 1fr; gap: 20px;">
+      
+      <div class="glass-panel" style="padding: 20px; display:flex; justify-content:space-between; align-items:center; border-left:4px solid var(--color-success);">
+        <div>
+          <h3 style="margin: 0 0 5px 0;">Buy $50 ETH Every Monday</h3>
+          <p class="text-muted" style="margin:0; font-family:monospace; font-size:0.85rem;">CRON: 0 9 * * 1 (Next run: Tomorrow at 9:00 AM)</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" style="border-color:var(--color-text-muted); color:var(--color-text-muted);">Pause</button>
+          <button class="btn btn-outline" style="border-color:var(--color-danger); color:var(--color-danger);">Delete</button>
+        </div>
+      </div>
+
+      <div class="glass-panel" style="padding: 20px; display:flex; justify-content:space-between; align-items:center; border-left:4px solid var(--color-warning);">
+        <div>
+          <h3 style="margin: 0 0 5px 0;">Stop-Loss Watchdog: $PEPE</h3>
+          <p class="text-muted" style="margin:0; font-family:monospace; font-size:0.85rem;">TRIGGER: Market Price &lt; 0.00000850. Action: Market Sell 100%.</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" style="border-color:var(--color-text-muted); color:var(--color-text-muted);">Pause</button>
+          <button class="btn btn-outline" style="border-color:var(--color-danger); color:var(--color-danger);">Delete</button>
+        </div>
+      </div>
+
+      <div class="glass-panel" style="padding: 20px; display:flex; justify-content:space-between; align-items:center; border-left:4px solid var(--color-primary);">
+        <div>
+          <h3 style="margin: 0 0 5px 0;">Agentic Research: OmniForge Snipe</h3>
+          <p class="text-muted" style="margin:0; font-family:monospace; font-size:0.85rem;">TASK: Monitor OmniForge. If token has FF8 theme + MC &lt; $20k, buy $10 OMNI.</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" style="border-color:var(--color-text-muted); color:var(--color-text-muted);">Pause</button>
+          <button class="btn btn-outline" style="border-color:var(--color-danger); color:var(--color-danger);">Delete</button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script type="module">
+    import '../css/global.css';
+    import { renderNavbar } from '../components/Navbar.js';
+    document.addEventListener('DOMContentLoaded', () => { renderNavbar(); });
+  </script>
+</body>
+</html>

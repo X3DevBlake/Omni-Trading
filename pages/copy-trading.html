@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copy Trading | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <style>
+    .copy-hero {
+      text-align: center;
+      padding: 60px 0;
+      background: var(--color-bg-glass);
+      border-bottom: 1px solid var(--color-bg-light);
+    }
+    .copy-hero h1 { font-size: 3rem; margin-bottom: 15px; color: #fff; }
+    .copy-hero p { color: var(--color-text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+    
+    .trader-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      padding: 40px 0;
+    }
+    .trader-card {
+      background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light);
+      border-radius: var(--border-radius-lg);
+      padding: 24px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .trader-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-card);
+      border-color: var(--color-primary);
+    }
+    .trader-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .trader-profile {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--color-bg-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-box { display: flex; flex-direction: column; gap: 5px; }
+    .stat-label { font-size: 0.85rem; color: var(--color-text-muted); }
+    .stat-val { font-size: 1.2rem; font-weight: bold; color: #fff; }
+    .copy-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--color-primary);
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: var(--border-radius-sm);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  
+  <main id="app">
+    <div class="copy-hero">
+      <h1>Elite Copy Trading</h1>
+      <p>Follow top-performing elite traders and replicate their exact trades with one click.</p>
+    </div>
+    
+    <div class="container">
+      <div style="margin-top:40px; display:flex; gap:20px; border-bottom:1px solid var(--color-bg-light); padding-bottom:15px;">
+        <span style="color:var(--color-primary); font-weight:bold; border-bottom:2px solid var(--color-primary); padding-bottom:14px; margin-bottom:-16px;">Top ROI</span>
+        <span style="color:var(--color-text-muted); cursor:pointer;">Most Followers</span>
+        <span style="color:var(--color-text-muted); cursor:pointer;">Highest Win Rate</span>
+      </div>
+      
+      <div class="trader-grid">
+        <!-- Trader 1 -->
+        <div class="trader-card">
+          <div class="trader-header">
+            <div class="trader-profile">
+              <div class="avatar">🚀</div>
+              <div>
+                <h3 style="color:#fff; margin:0; font-size:1.1rem;">Alpha Voyager</h3>
+                <span style="font-size:0.8rem; color:var(--color-text-muted);">Profit Share: 10%</span>
+              </div>
+            </div>
+            <span style="background:rgba(14,203,129,0.1); color:var(--color-success); padding:4px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Elite</span>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-box"><span class="stat-label">30D ROI</span><span class="stat-val text-success">+845.2%</span></div>
+            <div class="stat-box"><span class="stat-label">Win Rate</span><span class="stat-val">92.5%</span></div>
+            <div class="stat-box"><span class="stat-label">Followers</span><span class="stat-val">1,245 / 1,500</span></div>
+            <div class="stat-box"><span class="stat-label">AUM</span><span class="stat-val">$2.4M</span></div>
+          </div>
+          <button class="copy-btn">Copy Now</button>
+        </div>
+        
+        <!-- Trader 2 -->
+        <div class="trader-card">
+          <div class="trader-header">
+            <div class="trader-profile">
+              <div class="avatar" style="background:#552288">🎯</div>
+              <div>
+                <h3 style="color:#fff; margin:0; font-size:1.1rem;">Sniper Trading</h3>
+                <span style="font-size:0.8rem; color:var(--color-text-muted);">Profit Share: 15%</span>
+              </div>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-box"><span class="stat-label">30D ROI</span><span class="stat-val text-success">+420.8%</span></div>
+            <div class="stat-box"><span class="stat-label">Win Rate</span><span class="stat-val">100%</span></div>
+            <div class="stat-box"><span class="stat-label">Followers</span><span class="stat-val">300 / 500</span></div>
+            <div class="stat-box"><span class="stat-label">AUM</span><span class="stat-val">$850K</span></div>
+          </div>
+          <button class="copy-btn">Copy Now</button>
+        </div>
+        
+        <!-- Trader 3 -->
+        <div class="trader-card">
+          <div class="trader-header">
+            <div class="trader-profile">
+              <div class="avatar" style="background:#228844">💰</div>
+              <div>
+                <h3 style="color:#fff; margin:0; font-size:1.1rem;">Whale Tracker</h3>
+                <span style="font-size:0.8rem; color:var(--color-text-muted);">Profit Share: 10%</span>
+              </div>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-box"><span class="stat-label">30D ROI</span><span class="stat-val text-success">+315.0%</span></div>
+            <div class="stat-box"><span class="stat-label">Win Rate</span><span class="stat-val">88.4%</span></div>
+            <div class="stat-box"><span class="stat-label">Followers</span><span class="stat-val">4,200 / 5,000</span></div>
+            <div class="stat-box"><span class="stat-label">AUM</span><span class="stat-val">$12.5M</span></div>
+          </div>
+          <button class="copy-btn">Copy Now</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer Injection Point -->
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

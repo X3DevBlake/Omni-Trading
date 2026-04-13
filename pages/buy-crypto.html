@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buy Crypto | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <style>
+    .buy-layout { max-width: 600px; margin: 60px auto; min-height: 80vh;}
+    .buy-card { background: var(--color-bg-deep); border: 1px solid var(--color-bg-light); border-radius: 12px; padding: 30px; }
+    .tabs { display: flex; border-bottom: 1px solid var(--color-bg-light); margin-bottom: 25px; }
+    .tab { flex: 1; text-align: center; padding: 15px; font-weight: bold; color: var(--color-text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;}
+    .tab.active { color: #fff; border-bottom-color: var(--color-primary); }
+    
+    .input-box { background: rgba(255,255,255,0.05); border: 1px solid var(--color-bg-light); border-radius: 8px; padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;}
+    .input-box input { background: transparent; border: none; color: #fff; font-size: 1.5rem; width: 60%; outline: none; }
+    .currency-selector { display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--color-bg-light); padding: 5px 12px; border-radius: 20px; font-weight: bold; color: #fff;}
+    
+    .payment-method { border: 1px solid var(--color-bg-light); padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: border 0.2s;}
+    .payment-method:hover { border-color: var(--color-primary); }
+    .method-icon { width: 30px; height: 30px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #000; font-size: 0.8rem;}
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  
+  <main class="container buy-layout">
+    <div class="buy-card">
+      <div class="tabs">
+        <div class="tab active">Quick Buy</div>
+        <div class="tab">P2P Trading</div>
+      </div>
+      
+      <div>
+        <label style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:5px; display:block;">I want to pay</label>
+        <div class="input-box">
+          <input id="usd-input" type="number" placeholder="100.00" value="100.00" />
+          <div class="currency-selector">
+            <span style="border-radius:50%; width:20px; height:20px; background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/800px-Flag_of_the_United_States.svg.png') center/cover;"></span>
+            USD
+          </div>
+        </div>
+        
+        <label style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:5px; display:block;">I will receive (approx)</label>
+        <div class="input-box">
+          <input id="btc-output" type="text" value="0.00142" readonly />
+          <div class="currency-selector">
+            <span style="border-radius:50%; width:20px; height:20px; background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/800px-Bitcoin.svg.png') center/cover;"></span>
+            BTC
+          </div>
+        </div>
+        
+        <div style="display:flex; justify-content:space-between; color:var(--color-text-muted); font-size:0.9rem; margin-bottom:20px;">
+          <span id="rate-display">1 BTC ≈ 70,422 USD</span>
+          <span style="color:var(--color-primary); display:flex; align-items:center; gap:5px;"><strong id="wallet-balance" style="color:#fff;"></strong> USD Avail</span>
+        </div>
+
+        <label style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:10px; display:block;">Payment Method</label>
+        <div class="payment-method">
+           <div style="display:flex; align-items:center; gap:15px;">
+             <div class="method-icon">V/M</div>
+             <div>
+               <div style="color:#fff; font-weight:bold;">Credit / Debit Card</div>
+               <div style="color:var(--color-text-muted); font-size:0.8rem;">Visa / Mastercard</div>
+             </div>
+           </div>
+           <span style="color:var(--color-success); font-weight:bold;">Best Offer</span>
+        </div>
+
+        <button id="buy-btn" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem; margin-top:30px;">Buy BTC</button>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+      import { WalletService } from '../services/WalletService.js';
+      
+      const usdInput = document.getElementById('usd-input');
+      const btcOutput = document.getElementById('btc-output');
+      const walletBalance = document.getElementById('wallet-balance');
+      const buyBtn = document.getElementById('buy-btn');
+      
+      const EXCHANGE_RATE = 70422.00;
+      
+      function updateUI() {
+          const balance = WalletService.getBalance();
+          walletBalance.textContent = balance['USD'].toLocaleString(undefined, {minimumFractionDigits: 2});
+          
+          const usdVal = parseFloat(usdInput.value) || 0;
+          btcOutput.value = (usdVal / EXCHANGE_RATE).toFixed(5);
+      }
+      
+      usdInput.addEventListener('input', updateUI);
+      
+      buyBtn.addEventListener('click', () => {
+          const usdVal = parseFloat(usdInput.value) || 0;
+          if(usdVal <= 0) return;
+          
+          const result = WalletService.executeBuy('BTC', usdVal, EXCHANGE_RATE);
+          
+          if(result.success) {
+              const prevText = buyBtn.textContent;
+              buyBtn.textContent = 'Success! View Wallet';
+              buyBtn.style.background = 'var(--color-success)';
+              
+              updateUI();
+              
+              setTimeout(() => {
+                  window.location.href = '/pages/wallet.html';
+              }, 2000);
+          }
+      });
+      
+      updateUI();
+  </script>
+</body>
+</html>

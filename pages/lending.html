@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lending & Borrowing | Omni Trading</title>
+</head>
+<body>
+  <div class="galaxy-overlay" style="background: radial-gradient(circle at center, transparent 0%, #05050f 100%);"></div>
+  <div id="navbar-container"></div>
+  
+  <main id="app" class="container" style="padding-top: calc(var(--header-height) + 40px); min-height: 80vh;">
+    <h1 class="text-gradient">Crypto Loans & Supply</h1>
+    <p class="text-muted" style="margin-bottom: 40px; max-width:600px;">Supply your assets to the Omni Lending protocol to earn variable interest, or use your portfolio as collateral to instantly borrow crypto.</p>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+      
+      <!-- Supply Markets -->
+      <div class="glass-panel" style="padding: 20px;">
+        <h2 style="margin-bottom:20px; font-size:1.3rem;">Supply Markets</h2>
+        <div id="supply-container"></div>
+      </div>
+      
+      <!-- Borrow Markets -->
+      <div class="glass-panel" style="padding: 20px;">
+        <h2 style="margin-bottom:20px; font-size:1.3rem;">Borrow Markets</h2>
+        <div id="borrow-container"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="ticker-container" style="margin-top: 100px;"></div>
+  <div id="footer-container"></div>
+
+  <script type="module">
+    import '../css/global.css';
+    import { renderNavbar } from '../components/Navbar.js';
+    import { renderTicker } from '../components/Ticker.js';
+    import { renderFooter } from '../components/Footer.js';
+    import { LENDING_MARKETS } from '../data/mock-data.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNavbar();
+      renderTicker();
+      renderFooter();
+
+      // Render Supply
+      const sc = document.getElementById('supply-container');
+      sc.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead style="border-bottom: 1px solid var(--color-border); color: var(--color-text-muted); font-size:0.9rem;">
+            <tr><th style="text-align:left; padding-bottom:10px;">Asset</th><th style="padding-bottom:10px;text-align:right;">Supply APY</th><th style="padding-bottom:10px;text-align:right;">Action</th></tr>
+          </thead>
+          <tbody>
+            ${LENDING_MARKETS.map(m => `
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding:15px 0;">${m.token}</td>
+                <td style="padding:15px 0; text-align:right;" class="text-success">${m.supplyApy}%</td>
+                <td style="padding:15px 0; text-align:right;"><button class="btn btn-outline" style="padding:3px 10px;">Supply</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      // Render Borrow
+      const bc = document.getElementById('borrow-container');
+      bc.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead style="border-bottom: 1px solid var(--color-border); color: var(--color-text-muted); font-size:0.9rem;">
+            <tr><th style="text-align:left; padding-bottom:10px;">Asset</th><th style="padding-bottom:10px;text-align:right;">Borrow APY</th><th style="padding-bottom:10px;text-align:right;">Action</th></tr>
+          </thead>
+          <tbody>
+            ${LENDING_MARKETS.map(m => `
+              <tr style="border-bottom: 1px solid var(--color-border);">
+                <td style="padding:15px 0;">${m.token}</td>
+                <td style="padding:15px 0; text-align:right;" class="text-danger">${m.borrowApy}%</td>
+                <td style="padding:15px 0; text-align:right;"><button class="btn btn-outline" style="padding:3px 10px;border-color:var(--color-warning);color:var(--color-warning);">Borrow</button></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+    });
+  </script>
+</body>
+</html>

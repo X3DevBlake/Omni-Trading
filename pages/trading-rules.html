@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Rules | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+</head>
+<body>
+  <div id="navbar-container"></div>
+  <main class="container" style="min-height: 80vh; max-width:800px; padding: 60px 0; color:var(--color-text-muted); line-height: 1.8;">
+    <h1 style="color:#fff;">Spot & Futures Trading Rules</h1>
+    <p>Last Updated: April 2026</p>
+    <h2 style="color:#fff; margin-top:30px;">1. Trading Mechanisms</h2>
+    <p>Omni utilizes a highly efficient matching engine evaluating orders on a strict Price-Time priority algorithm. Market Orders are executed immediately against the best available prices on the Order Book. Limit Orders rest on the book until the specific price threshold is met.</p>
+    <h2 style="color:#fff; margin-top:30px;">2. Price Limits & Collar Logic</h2>
+    <p>To prevent drastic market manipulation, Omni enforces price deviation limits during periods of extreme volatility. Orders deviating beyond +/- 10% of the Mark Price on highly liquid pairs may face instant rejection to protect users from cascading liquidations.</p>
+    <h2 style="color:#fff; margin-top:30px;">3. Liquidation Parameters</h2>
+    <p>USDT-M Futures utilize the Omni Global Mark Price mechanism to calculate unrealized PNL and margin levels. If a user's isolated or cross margin drops below the required Maintenance Margin Ratio, our robust liquidation engine incrementally unwinds positions.</p>
+  </main>
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

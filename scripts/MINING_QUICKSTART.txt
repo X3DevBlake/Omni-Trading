@@ -1,0 +1,93 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    OMNI CHAIN MINING ENGINE — QUICK START                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+─── THE ONE-LINER ────────────────────────────────────────────────────────────
+
+  pip install colorama cryptography && python scripts/mine_omni.py
+
+─── PLATFORMS ────────────────────────────────────────────────────────────────
+
+  Windows PowerShell:
+    pip install colorama cryptography; python scripts\mine_omni.py
+
+  macOS / Linux bash:
+    pip3 install colorama cryptography && python3 scripts/mine_omni.py
+
+─── OPTIONS ──────────────────────────────────────────────────────────────────
+
+  -h, --help                Show help and all options
+  --address 0xYOUR          Mine rewards to an existing wallet address
+  --key 0xPRIVATEKEY        Load a specific private key
+  --threads N               Use N parallel mining threads   (default: 1)
+  --difficulty N            Proof-of-Work leading zeros      (default: 4)
+  --turbo                   Disable CPU throttle (max hashrate)
+  --export                  Export wallet & session JSON on exit
+
+─── EXAMPLES ─────────────────────────────────────────────────────────────────
+
+  # Basic mining (auto-generates wallet):
+  python scripts/mine_omni.py
+
+  # 4-thread turbo mining:
+  python scripts/mine_omni.py --threads 4 --turbo
+
+  # Mine to existing wallet:
+  python scripts/mine_omni.py --address 0xABC123... --threads 2
+
+  # Mine & export session on Ctrl+C:
+  python scripts/mine_omni.py --export
+
+─── WHAT HAPPENS ─────────────────────────────────────────────────────────────
+
+  1. On first run, a new EVM-compatible wallet is generated and saved to:
+       scripts/omni-node/chaindata/local_wallet.json
+
+  2. Mining begins immediately with a live ASCII dashboard showing:
+       • Hashrate (H/s, KH/s, MH/s)
+       • Blocks mined this session
+       • OMNI earned (50 OMNI / block, halves every 210,000 blocks)
+       • Current nonce & block hash
+       • Chain height
+
+  3. Each mined block is written to:
+       scripts/omni-node/chaindata/chain.json
+
+  4. Press Ctrl+C to stop. A session report is exported to:
+       scripts/omni-node/chaindata/session_<timestamp>.json
+
+─── FULL OMNI NODE (Geth-based RPC) ──────────────────────────────────────────
+
+  Step 1 — Generate genesis & wallet:
+    python scripts/omni-node/launch_omni_network.py
+
+  Step 2 — Download Geth from https://geth.ethereum.org/downloads
+
+  Step 3 — Init chain:
+    geth init scripts/omni-node/genesis.json --datadir scripts/omni-node/chaindata
+
+  Step 4 — Launch RPC node:
+    geth --datadir scripts/omni-node/chaindata \
+         --networkid 8888 \
+         --http --http.api eth,net,web3,personal \
+         --mine --miner.threads=1 --miner.gasprice=0
+
+  Step 5 — Connect MetaMask:
+    Network Name:   Omni Chain
+    RPC URL:        http://127.0.0.1:8545
+    Chain ID:       8888
+    Symbol:         OMNI
+    Explorer:       /pages/explorer.html
+
+─── CREATE YOUR WALLET ───────────────────────────────────────────────────────
+
+  Browser wallet (zero install):
+    Open http://localhost in browser → Ecosystem → Create Wallet
+
+  Or use the mining script (auto-generates on first run):
+    python scripts/mine_omni.py --export
+
+  Your wallet credentials are stored locally at:
+    scripts/omni-node/chaindata/local_wallet.json
+
+═══════════════════════════════════════════════════════════════════════════════

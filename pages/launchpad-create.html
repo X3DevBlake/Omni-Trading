@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Token | OmniForge</title>
+</head>
+<body>
+  <div class="galaxy-overlay" style="background: radial-gradient(circle at center, transparent 0%, #05050f 100%);"></div>
+  <div id="navbar-container"></div>
+  
+  <main id="app" class="container" style="padding-top: calc(var(--header-height) + 40px); min-height: 80vh; display:flex; justify-content:center;">
+    
+    <div class="glass-panel" style="width: 100%; max-width: 600px; padding: 40px;">
+      <h2 style="font-family:monospace; margin-bottom: 20px; text-align:center;">Deploy to OmniForge</h2>
+      <p class="text-muted" style="text-align:center; margin-bottom: 30px; font-size:0.9rem;">Cost to deploy: ~0.02 OMNI. Token will be instantly tradeable on the bonding curve.</p>
+      
+      <form onsubmit="event.preventDefault(); window.location.href='/pages/launchpad-token.html';">
+        <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:var(--color-text-muted);">Token Name</label>
+        <input type="text" placeholder="e.g. Balamb Garden" required style="width:100%; box-sizing:border-box; padding:12px; margin-bottom:20px; background:rgba(0,0,0,0.3); border:1px solid var(--color-border); color:white; border-radius:6px; outline:none;" />
+
+        <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:var(--color-text-muted);">Ticker Symbol</label>
+        <input type="text" placeholder="e.g. BALAMB" required style="width:100%; box-sizing:border-box; padding:12px; margin-bottom:20px; background:rgba(0,0,0,0.3); border:1px solid var(--color-border); color:white; border-radius:6px; outline:none;" />
+
+        <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:var(--color-text-muted);">Description</label>
+        <textarea rows="4" placeholder="Brief description of your token..." required style="width:100%; box-sizing:border-box; padding:12px; margin-bottom:20px; background:rgba(0,0,0,0.3); border:1px solid var(--color-border); color:white; border-radius:6px; outline:none; resize:vertical;"></textarea>
+
+        <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:var(--color-text-muted);">Image URL</label>
+        <input type="url" placeholder="https://..." required style="width:100%; box-sizing:border-box; padding:12px; margin-bottom:30px; background:rgba(0,0,0,0.3); border:1px solid var(--color-border); color:white; border-radius:6px; outline:none;" />
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 6px; box-shadow: 0 0 15px rgba(0,240,255,0.3);">🚀 Launch Token</button>
+      </form>
+    </div>
+
+  </main>
+
+  <script type="module">
+    import '../css/global.css';
+    import { renderNavbar } from '../components/Navbar.js';
+    document.addEventListener('DOMContentLoaded', () => { renderNavbar(); });
+  </script>
+</body>
+</html>

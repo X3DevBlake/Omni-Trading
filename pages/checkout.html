@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Checkout | Omni Base</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { background: var(--color-bg-deep); height:100vh; overflow:hidden;}
+    .checkout-layout { display:flex; height:100vh; align-items:center; justify-content:center; }
+    .checkout-panel { background:var(--color-bg-glass); border:1px solid var(--color-bg-light); border-radius:var(--border-radius-xl); padding:40px; width:100%; max-width:800px; display:grid; grid-template-columns: 1fr 1fr; gap:40px; box-shadow:0 0 50px rgba(0, 210, 166, 0.05); }
+    
+    .payment-methods { display:flex; flex-direction:column; gap:15px; }
+    .method-card { border:1px solid var(--color-bg-light); padding:20px; border-radius:var(--border-radius-lg); cursor:pointer; display:flex; align-items:center; gap:15px; transition:all 0.3s; }
+    .method-card:hover { border-color:var(--color-primary); background:rgba(0, 210, 166, 0.05); }
+    .method-card.selected { border-color:var(--color-primary); background:rgba(0, 210, 166, 0.1); box-shadow:0 0 15px rgba(0,210,166,0.2); }
+    
+    .receipt { background:rgba(0,0,0,0.4); border-radius:var(--border-radius-lg); padding:30px; border:1px solid var(--color-bg-light); }
+    .receipt h3 { color:#fff; font-size:1.5rem; border-bottom:1px solid var(--color-bg-light); padding-bottom:15px; margin-bottom:20px; font-family:var(--font-heading); }
+    .line-item { display:flex; justify-content:space-between; color:var(--color-text-muted); margin-bottom:15px; font-size:0.9rem; }
+    .line-item span:last-child { color:#fff; font-weight:600; }
+    .total-line { display:flex; justify-content:space-between; padding-top:15px; border-top:1px dashed var(--color-bg-light); margin-top:15px; font-size:1.2rem; }
+    .total-line span:last-child { color:var(--color-primary); font-weight:bold; }
+    
+    .btn-exec { background:var(--color-primary); color:#000; font-weight:bold; width:100%; padding:18px; border:none; border-radius:var(--border-radius-lg); font-size:1.1rem; cursor:pointer; margin-top:30px; transition:all 0.2s; box-shadow:0 0 20px rgba(0,210,166,0.3);}
+    .btn-exec:active { transform:scale(0.98); }
+    .btn-exec.loading { background:var(--color-text-muted); cursor:not-allowed; box-shadow:none; }
+  </style>
+</head>
+<body>
+
+  <div id="navbar-container" style="position:fixed; top:0; width:100%;"></div>
+
+  <div class="checkout-layout">
+     <div class="checkout-panel">
+         <!-- Left: Payment Config -->
+         <div>
+            <h2 style="color:#fff; margin-bottom:10px; font-family:var(--font-heading);"><i data-lucide="credit-card" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;"></i> Checkout Engine</h2>
+            <p class="text-muted" style="margin-bottom:30px; font-size:0.9rem;">Select your preferred fiat gateway to forge assets directly into your Cloud Wallet.</p>
+            
+            <div class="payment-methods">
+                <div class="method-card selected" data-method="card">
+                    <div style="width:40px;height:40px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;"><i data-lucide="credit-card"></i></div>
+                    <div>
+                        <div style="font-weight:bold; color:#fff;">Credit / Debit Card</div>
+                        <div style="font-size:0.8rem; color:var(--color-text-muted);">Visa, Mastercard, Amex (Instant)</div>
+                    </div>
+                </div>
+                <div class="method-card" data-method="ach">
+                    <div style="width:40px;height:40px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;"><i data-lucide="landmark"></i></div>
+                    <div>
+                        <div style="font-weight:bold; color:#fff;">Bank Transfer (ACH)</div>
+                        <div style="font-size:0.8rem; color:var(--color-text-muted);">0% Fees (1-3 Business Days)</div>
+                    </div>
+                </div>
+                <div class="method-card" data-method="crypto">
+                    <div style="width:40px;height:40px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;"><i data-lucide="wallet"></i></div>
+                    <div>
+                        <div style="font-weight:bold; color:#fff;">Crypto Transfer</div>
+                        <div style="font-size:0.8rem; color:var(--color-text-muted);">Deposit Web3 Native Tokens</div>
+                    </div>
+                </div>
+            </div>
+         </div>
+
+         <!-- Right: Summary -->
+         <div class="receipt">
+            <h3>Transaction Invoice</h3>
+            
+            <div class="line-item"><span>Executing Asset</span> <span id="summ-asset" style="display:flex;align-items:center;gap:5px;"><img id="summ-logo" src="" width="16"/> BTC</span></div>
+            <div class="line-item"><span>Spot Exchange Rate</span> <span id="summ-rate">$64,230.15 / BTC</span></div>
+            <div class="line-item"><span>Quantity Received</span> <span id="summ-qty">0.0075 BTC</span></div>
+            <div class="line-item"><span>Network Fee</span> <span>$0.00</span></div>
+            
+            <div class="total-line">
+                <span class="text-muted">Total USD Debited</span>
+                <span id="summ-total">$500.00</span>
+            </div>
+
+            <button class="btn-exec" id="btn-checkout">Confirm & Process</button>
+            <p id="checkout-msg" style="text-align:center; margin-top:15px; font-size:0.9rem; color:var(--color-success);"></p>
+         </div>
+     </div>
+  </div>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+     import { WalletService } from '../services/WalletService.js';
+     
+     document.addEventListener('DOMContentLoaded', async () => {
+         const urlParams = new URLSearchParams(window.location.search);
+         const paramAmount = parseFloat(urlParams.get('amount')) || 500;
+         const paramCoin = (urlParams.get('coin') || 'BTC').toUpperCase();
+         const isP2P = urlParams.get('mode') === 'p2p';
+
+         if(isP2P) {
+             document.querySelector('h2').innerHTML = `<i data-lucide="users" style="width:24px;height:24px;vertical-align:middle;margin-right:8px;"></i> P2P Escrow Engine`;
+         }
+
+         // Fetch pseudo-live mock rate
+         const assumedPrices = { BTC: 64230, ETH: 3450, SOL: 145, DOGE: 0.18 };
+         const rate = assumedPrices[paramCoin] || 1.0;
+         const qty = paramAmount / rate;
+
+         // UI Updates
+         document.getElementById('summ-asset').innerHTML = `<img src="https://cryptologos.cc/logos/${paramCoin === 'BTC' ? 'bitcoin-btc' : paramCoin === 'ETH' ? 'ethereum-eth' : 'usd-coin-usdc'}-logo.png?v=029" width="16"/> ${paramCoin}`;
+         document.getElementById('summ-rate').innerText = `$${rate.toLocaleString()} / ${paramCoin}`;
+         document.getElementById('summ-qty').innerText = `${qty.toFixed(6)} ${paramCoin}`;
+         document.getElementById('summ-total').innerText = `$${paramAmount.toLocaleString()}`;
+
+         const cards = document.querySelectorAll('.method-card');
+         cards.forEach(c => {
+             c.onclick = () => {
+                 cards.forEach(x => x.classList.remove('selected'));
+                 c.classList.add('selected');
+             };
+         });
+
+         const btn = document.getElementById('btn-checkout');
+         const msg = document.getElementById('checkout-msg');
+
+         btn.onclick = async () => {
+             btn.innerText = 'Processing via Cloud Network...';
+             btn.classList.add('loading');
+             msg.innerText = '';
+             
+             // First deposit the USD so they can theoretically "spend" it seamlessly if fiat mock
+             await WalletService.deposit('USD', paramAmount);
+             // Execute trade natively
+             const res = await WalletService.executeBuy(paramCoin, paramAmount, rate);
+             
+             if(res.success) {
+                 msg.innerHTML = '<i data-lucide="check-circle" style="width:14px;vertical-align:middle;"></i> Asset successfully forged to Firebase Cloud Wallet.';
+                 btn.innerText = 'Redirecting to Wallet...';
+                 if(window.lucide) window.lucide.createIcons();
+                 setTimeout(() => window.location.href = '/pages/wallet.html', 2000);
+             } else {
+                 msg.style.color = 'var(--color-danger)';
+                 msg.innerText = res.msg;
+                 btn.classList.remove('loading');
+                 btn.innerText = 'Try Again';
+             }
+         };
+     });
+  </script>
+</body>
+</html>

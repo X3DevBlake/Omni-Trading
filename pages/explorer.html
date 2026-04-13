@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omni Chain Explorer</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .explorer-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    .data-card {
+      background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light);
+      border-radius: var(--border-radius-lg);
+      padding: 25px;
+    }
+    .data-card h3 {
+      margin-top: 0;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .stat-row:last-child {
+      border: none;
+    }
+    .stat-label {
+      color: var(--color-text-muted);
+      font-size: 0.95rem;
+    }
+    .stat-value {
+      font-weight: bold;
+      color: #fff;
+      font-size: 1.1rem;
+    }
+    .tx-hash {
+      color: var(--color-primary);
+      cursor: pointer;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main class="container" style="padding-top: 100px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div>
+            <h1 style="color:#fff; margin-bottom:5px;">OmniScan</h1>
+            <p style="color:var(--color-primary); margin:0;">
+                <span style="display:inline-block; width:8px; height:8px; background:var(--color-primary); border-radius:50%; margin-right:5px; box-shadow:0 0 10px var(--color-primary);"></span>
+                Active: Block #<span id="latest-block-header">1</span>
+            </p>
+        </div>
+        <div style="background:var(--color-bg-glass); padding:10px 20px; border-radius:20px; border:1px solid var(--color-bg-light); display:flex; align-items:center; gap:15px;">
+            <div>
+              <span style="color:var(--color-text-muted); font-size:0.8rem;">Gas Fee: </span><strong style="color:var(--color-success); font-size:0.85rem;">0 Gwei</strong>
+            </div>
+            <div style="width:1px; height:20px; background:rgba(255,255,255,0.1);"></div>
+            <div id="connection-status" style="font-size:0.75rem; color:var(--color-danger); display:flex; align-items:center; gap:5px;">
+              <span style="width:6px; height:6px; background:var(--color-danger); border-radius:50%;"></span> Node Offline
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Engine -->
+    <div class="data-card" style="margin-bottom: 40px; padding: 15px; background: linear-gradient(90deg, rgba(0,210,166,0.05) 0%, transparent 100%);">
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1; position:relative;">
+                <i data-lucide="search" style="position:absolute; left:15px; top:50%; transform:translateY(-50%); width:18px; color:var(--color-text-muted);"></i>
+                <input type="text" id="master-search-input" placeholder="Search by Address / Txn Hash / Block..." style="width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--color-bg-light); border-radius:var(--border-radius-lg); padding:12px 15px 12px 45px; color:white; font-family:'JetBrains Mono'; font-size:0.9rem; outline:none;" />
+            </div>
+            <button class="btn btn-primary" onclick="window.executeSearch()">Search</button>
+        </div>
+        <div id="search-feedback" style="margin-top:10px; font-size:0.7rem; color:var(--color-text-muted); padding-left:10px;"></div>
+    </div>
+
+    <!-- Search Result View (Hidden by default) -->
+    <div id="search-result-container" style="display:none; margin-bottom:40px;">
+        <div class="data-card" style="border:1px solid var(--color-primary); box-shadow:0 0 30px rgba(0,210,166,0.1);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="margin:0;"><i data-lucide="info"></i> Search Result</h3>
+                <button class="btn btn-outline" style="padding:4px 10px; font-size:0.7rem;" onclick="this.parentElement.parentElement.parentElement.style.display='none'">Close</button>
+            </div>
+            <div id="result-content"></div>
+        </div>
+    </div>
+
+    <!-- Network Stats -->
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-bottom:40px;">
+        <div class="data-card" style="text-align:center;">
+            <p class="stat-label" style="margin-bottom:5px;">OMNI Price</p>
+            <p class="stat-value" style="font-size:1.5rem;">$1.24</p>
+        </div>
+        <div class="data-card" style="text-align:center;">
+            <p class="stat-label" style="margin-bottom:5px;">Transactions</p>
+            <p class="stat-value" style="font-size:1.5rem;" id="tx-count">0</p>
+        </div>
+        <div class="data-card" style="text-align:center;">
+            <p class="stat-label" style="margin-bottom:5px;">Validators</p>
+            <p class="stat-value" style="font-size:1.5rem;">5 (PoA)</p>
+        </div>
+        <div class="data-card" style="text-align:center;">
+            <p class="stat-label" style="margin-bottom:5px;">Circulating Supply</p>
+            <p class="stat-value" style="font-size:1.5rem;" id="circulating-supply">10.00B OMNI</p>
+        </div>
+    </div>
+
+    <div class="explorer-layout">
+        <!-- Built Blocks -->
+        <div class="data-card">
+            <h3><i data-lucide="box"></i> Latest Blocks</h3>
+            <div id="blocks-container">
+               <div class="stat-row" style="background:rgba(0,210,166,0.1); padding:15px; border-radius:8px; margin-bottom:10px; border:1px solid var(--color-primary);">
+                   <span class="stat-label">Genesis Block</span>
+                   <span class="stat-value tx-hash">#000000</span>
+               </div>
+            </div>
+        </div>
+
+        <!-- Genesis Supply Allocation Log -->
+        <div class="data-card">
+            <h3><i data-lucide="database"></i> Ecosystem Architecture Ledger</h3>
+            <div class="stat-row">
+                <span class="stat-label">Maximum Protocol Limit</span>
+                <span class="stat-value">10,000,000,000 OMNI</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Total Handled Supply</span>
+                <span class="stat-value">10,000,000,000 OMNI</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Deflationary Burn (Pit)</span>
+                <span class="stat-value" style="color:var(--color-danger);" id="total-burned-display">Calculating...</span>
+            </div>
+            <div class="stat-row" style="flex-direction:column; align-items:flex-start; gap:10px;">
+                <span class="stat-label">Master Multi-Sig Controller</span>
+                <span id="master-controller-address" class="stat-value" style="font-family:monospace; background:rgba(0,0,0,0.5); padding:8px; border-radius:4px; font-size:0.75rem; width:100%; border:1px solid var(--color-bg-light); text-align:center; color:var(--color-primary); word-break:break-all;">
+                    Querying RPC...
+                </span>
+            </div>
+        </div>
+    </div>
+  </main>
+
+  <script type="module">
+      import { ethers } from 'https://cdnjs.cloudflare.com/ajax/libs/ethers/6.6.2/ethers.min.js';
+      import { renderNavbar } from '../components/Navbar.js';
+      
+      let provider = null;
+
+      const setupRPC = async () => {
+          renderNavbar();
+          try {
+              provider = new ethers.JsonRpcProvider('http://127.0.0.1:8545');
+              const blockNumber = await provider.getBlockNumber();
+              
+              document.getElementById('latest-block-header').innerText = blockNumber;
+              document.getElementById('connection-status').innerHTML = '<span style="width:6px; height:6px; background:var(--color-success); border-radius:50%;"></span> Node Online';
+              document.getElementById('connection-status').style.color = 'var(--color-success)';
+
+              // Fetch Master Account (Dev Mode Support)
+              const accounts = await provider.listAccounts();
+              if (accounts.length > 0) {
+                  document.getElementById('master-controller-address').innerText = accounts[0].address;
+                  window.masterAddress = accounts[0].address.toLowerCase();
+              }
+
+              // Fetch Burned Supply (Zero Address)
+              const zeroAddress = '0x0000000000000000000000000000000000000000';
+              const burnedWei = await provider.getBalance(zeroAddress);
+              const burnedOmni = parseFloat(ethers.formatEther(burnedWei));
+              const circulating = 10000000000 - burnedOmni;
+
+              document.getElementById('total-burned-display').innerText = burnedOmni.toLocaleString() + ' OMNI';
+              document.getElementById('circulating-supply').innerText = (circulating / 1000000000).toFixed(6) + 'B OMNI';
+
+              const blocksHtml = [];
+              for(let i=0; i<Math.min(5, blockNumber + 1); i++) {
+                  const b = await provider.getBlock(blockNumber - i);
+                  if(!b) continue;
+                  blocksHtml.push(`
+                    <div class="stat-row">
+                      <span class="stat-label text-primary">#${b.number}</span>
+                      <span class="stat-value" style="font-size:0.8rem; font-family:monospace;">${b.hash.substring(0,20)}...</span>
+                    </div>
+                  `);
+              }
+              if(blocksHtml.length > 0) {
+                  document.getElementById('blocks-container').innerHTML = blocksHtml.join('');
+              }
+          } catch(e) {
+              console.log("Omni RPC Offline.");
+          }
+      };
+
+      window.executeSearch = async () => {
+        const query = document.getElementById('master-search-input').value.trim();
+        const feedback = document.getElementById('search-feedback');
+        const container = document.getElementById('search-result-container');
+        const content = document.getElementById('result-content');
+
+        if (!provider) return alert("Blockchain node is offline.");
+        if (!query) return;
+
+        feedback.innerText = "Querying Decentralized Ledger...";
+        
+        try {
+            let resHtml = '';
+            
+            // 1. Address Search (42 chars starting with 0x)
+            if (query.length === 42 && query.startsWith('0x')) {
+                const balance = await provider.getBalance(query);
+                const txCount = await provider.getTransactionCount(query);
+                const isPool = query.toLowerCase() === '0x000000000000000000000000000000000000ba5e';
+                const isMaster = query.toLowerCase() === window.masterAddress;
+                
+                resHtml = `
+                    <div style="display:flex; flex-direction:column; gap:15px;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span class="stat-label">Address</span>
+                            <span class="stat-value" style="color:var(--color-primary); font-family:monospace;">${query}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between;">
+                            <span class="stat-label">Identity Status</span>
+                            <span class="stat-value">
+                                ${isPool ? '<span style="background:var(--color-success); color:#000; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:bold;">OFFICIAL POOL</span>' : ''}
+                                ${isMaster ? '<span style="background:var(--color-primary); color:#000; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:bold;">GENESIS ADMIN</span>' : ''}
+                                ${!isPool && !isMaster ? '<span style="color:var(--color-text-muted);">Standard EOA Wallet</span>' : ''}
+                            </span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; background:rgba(255,255,255,0.02); padding:15px; border-radius:8px;">
+                            <span class="stat-label">Native Balance</span>
+                            <span class="stat-value" style="font-size:1.4rem; color:var(--color-success);">${ethers.formatEther(balance)} OMNI</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between;">
+                            <span class="stat-label">Transactions Output</span>
+                            <span class="stat-value">${txCount} Total</span>
+                        </div>
+                    </div>
+                `;
+            } 
+            // 2. Transaction Hash (66 chars)
+            else if (query.length === 66 && query.startsWith('0x')) {
+                const tx = await provider.getTransaction(query);
+                if (!tx) throw new Error("Transaction not found on-chain.");
+                resHtml = `
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div class="stat-row"><span class="stat-label">TX Hash</span><span class="stat-value" style="font-size:0.8rem;">${tx.hash}</span></div>
+                        <div class="stat-row"><span class="stat-label">Block</span><span class="stat-value">#${tx.blockNumber}</span></div>
+                        <div class="stat-row"><span class="stat-label">From</span><span class="stat-value" style="font-size:0.8rem;">${tx.from}</span></div>
+                        <div class="stat-row"><span class="stat-label">To</span><span class="stat-value" style="font-size:0.8rem;">${tx.to}</span></div>
+                        <div class="stat-row"><span class="stat-label">Value</span><span class="stat-value" style="color:var(--color-primary);">${ethers.formatEther(tx.value)} OMNI</span></div>
+                    </div>
+                `;
+            }
+            // 3. Block Number
+            else if (!isNaN(query)) {
+                const block = await provider.getBlock(parseInt(query));
+                if (!block) throw new Error("Block not found.");
+                resHtml = `
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div class="stat-row"><span class="stat-label">Block Height</span><span class="stat-value">#${block.number}</span></div>
+                        <div class="stat-row"><span class="stat-label">Timestamp</span><span class="stat-value">${new Date(block.timestamp * 1000).toLocaleString()}</span></div>
+                        <div class="stat-row"><span class="stat-label">Transactions</span><span class="stat-value">${block.transactions.length}</span></div>
+                        <div class="stat-row"><span class="stat-label">Gas Used</span><span class="stat-value">0 (Gas Free)</span></div>
+                    </div>
+                `;
+            } else {
+                throw new Error("Invalid search format. Use 0x Address, TX Hash, or Block Number.");
+            }
+
+            content.innerHTML = resHtml;
+            container.style.display = 'block';
+            feedback.innerText = "Query Successful.";
+            lucide.createIcons();
+        } catch (err) {
+            feedback.innerText = "Search Error: " + err.message;
+            feedback.style.color = 'var(--color-danger)';
+        }
+      };
+      
+      setTimeout(setupRPC, 800);
+  </script>
+</body>
+</html>

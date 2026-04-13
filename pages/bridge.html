@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omni Bridge | Cross-Chain Asset Transfer</title>
+  <meta name="description" content="Bridge OMNI tokens cross-chain to Ethereum, BNB Chain, Polygon, and Avalanche networks with zero L1 gas fees.">
+  <link rel="stylesheet" href="/css/global.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root { --gold: #F0A500; }
+    body { background: #060810; }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+    .bridge-page {
+      min-height: 100vh;
+      padding: 100px 20px 60px;
+      display: flex;
+      gap: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: flex-start;
+    }
+    .bridge-main { flex: 1; min-width: 0; max-width: 520px; }
+    .bridge-side { width: 340px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px; }
+
+    @media (max-width: 900px) {
+      .bridge-page { flex-direction: column; align-items: center; }
+      .bridge-side { width: 100%; max-width: 520px; }
+    }
+
+    /* ── Card Base ──────────────────────────────────────────── */
+    .bcard {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .bcard-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 18px;
+    }
+
+    /* ── Hero Header ─────────────────────────────────────────── */
+    .bridge-hero {
+      text-align: center;
+      padding: 0 0 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 26px;
+    }
+    .bridge-hero h1 {
+      font-size: 1.8rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .bridge-hero p { color: rgba(255,255,255,0.4); font-size: 0.85rem; }
+    .bridge-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0,210,166,0.08);
+      border: 1px solid rgba(0,210,166,0.2);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #00d2a6;
+      margin-bottom: 16px;
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #00d2a6;
+      animation: living 1.5s infinite;
+    }
+    @keyframes living { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    /* ── Network Selector ───────────────────────────────────── */
+    .net-label { font-size: 0.78rem; color: rgba(255,255,255,0.35); font-weight: 600; margin-bottom: 8px; }
+    .net-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #fff;
+    }
+    .net-btn:hover { border-color: #00d2a6; background: rgba(0,210,166,0.04); }
+    .net-btn.active { border-color: rgba(0,210,166,0.4); background: rgba(0,210,166,0.06); }
+    .net-info { display: flex; align-items: center; gap: 12px; }
+    .net-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .net-name { font-weight: 700; font-size: 1rem; }
+    .net-chain { font-size: 0.72rem; color: rgba(255,255,255,0.35); margin-top: 1px; }
+    .net-balance { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: rgba(255,255,255,0.4); text-align: right; }
+    .net-balance strong { display: block; color: #fff; font-size: 0.95rem; }
+    .net-chevron { color: rgba(255,255,255,0.3); font-size: 0.7rem; margin-left: 8px; }
+
+    /* Network Dropdown */
+    .net-dropdown {
+      display: none;
+      position: absolute;
+      left: 0; right: 0;
+      top: calc(100% + 8px);
+      z-index: 50;
+      background: #0d1018;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+    .net-dropdown.open { display: block; }
+    .net-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+      color: #fff;
+    }
+    .net-option:hover { background: rgba(255,255,255,0.05); }
+    .net-option.selected { background: rgba(0,210,166,0.08); }
+    .net-option-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+    .net-option-name { font-weight: 600; font-size: 0.9rem; }
+    .net-option-chain { font-size: 0.72rem; color: rgba(255,255,255,0.3); }
+
+    /* Relative wrappers for dropdowns */
+    .net-selector-wrap { position: relative; margin-bottom: 8px; }
+
+    /* ── Swap Direction Button ──────────────────────────────── */
+    .swap-direction {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 6px 0;
+    }
+    .swap-dir-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: rgba(0,210,166,0.1);
+      border: 1px solid rgba(0,210,166,0.25);
+      color: #00d2a6;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+    }
+    .swap-dir-btn:hover { background: #00d2a6; color: #000; transform: rotate(180deg); }
+
+    /* ── Amount Box ─────────────────────────────────────────── */
+    .amount-box {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 20px;
+      margin: 18px 0;
+      transition: border-color 0.2s;
+    }
+    .amount-box:focus-within { border-color: rgba(0,210,166,0.4); }
+    .amount-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .amount-label { font-size: 0.78rem; color: rgba(255,255,255,0.35); }
+    .amount-max {
+      font-size: 0.75rem; font-weight: 700; color: #00d2a6; cursor: pointer;
+      background: rgba(0,210,166,0.1); padding: 3px 10px; border-radius: 10px;
+      transition: all 0.2s; border: 1px solid rgba(0,210,166,0.2);
+    }
+    .amount-max:hover { background: #00d2a6; color: #000; }
+    .amount-input-row { display: flex; align-items: center; gap: 12px; }
+    .amount-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      min-width: 0;
+    }
+    .amount-input::placeholder { color: rgba(255,255,255,0.12); }
+    .amount-token {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-weight: 700; color: #fff; font-size: 0.95rem;
+      white-space: nowrap;
+    }
+    .amount-usd { font-size: 0.8rem; color: rgba(255,255,255,0.3); margin-top: 6px; }
+
+    /* ── Fee Summary ─────────────────────────────────────────── */
+    .fee-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 22px;
+      padding: 16px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .fee-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+    .fee-key { color: rgba(255,255,255,0.4); }
+    .fee-val { color: #fff; font-weight: 600; }
+    .fee-val.green { color: #00d2a6; }
+    .fee-val.gold { color: var(--gold); }
+    .fee-divider { height: 1px; background: rgba(255,255,255,0.06); margin: 2px 0; }
+
+    /* ── Bridge Button ──────────────────────────────────────── */
+    .bridge-submit {
+      width: 100%;
+      padding: 18px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(135deg, #00d2a6, #00a882);
+      color: #000;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.03em;
+    }
+    .bridge-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .bridge-submit:hover::before { opacity: 1; }
+    .bridge-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(0,210,166,0.3); }
+    .bridge-submit:disabled {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.25);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ── Progress Tracker ───────────────────────────────────── */
+    .progress-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .progress-modal.open { display: flex; }
+    .progress-panel {
+      background: #0d1018;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 28px;
+      padding: 40px;
+      max-width: 440px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+    }
+    .progress-panel h2 { color: #fff; font-size: 1.4rem; margin-bottom: 8px; }
+    .progress-panel p { color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-bottom: 36px; }
+
+    /* Step Track */
+    .step-track {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      margin-bottom: 36px;
+    }
+    .step-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-circle {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      transition: all 0.5s;
+      position: relative;
+    }
+    .step-circle.done {
+      background: rgba(0,210,166,0.15);
+      border-color: #00d2a6;
+    }
+    .step-circle.active {
+      background: rgba(240,165,0,0.15);
+      border-color: var(--gold);
+      animation: step-pulse 1s infinite;
+    }
+    @keyframes step-pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(240,165,0,0.3); }
+      50% { box-shadow: 0 0 0 10px rgba(240,165,0,0); }
+    }
+    .step-label { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.06em; max-width: 60px; text-align: center; }
+    .step-label.done { color: #00d2a6; }
+    .step-label.active { color: var(--gold); }
+
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,0.07);
+      margin-bottom: 28px;
+      transition: background 0.5s;
+    }
+    .step-line.done { background: #00d2a6; }
+
+    .progress-bar-track {
+      height: 6px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00d2a6, var(--gold));
+      border-radius: 6px;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .tx-hash-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #00d2a6;
+      background: rgba(0,210,166,0.06);
+      border: 1px solid rgba(0,210,166,0.2);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 24px;
+      word-break: break-all;
+      display: none;
+    }
+
+    .close-progress {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.6);
+      padding: 12px 32px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .close-progress:hover { border-color: #fff; color: #fff; }
+
+    /* ── Side Widgets ───────────────────────────────────────── */
+    .side-title { font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 14px; }
+
+    /* Route Info */
+    .route-card { display: flex; flex-direction: column; gap: 10px; }
+    .route-step {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.82rem; color: rgba(255,255,255,0.55);
+    }
+    .route-icon {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(0,210,166,0.1); border: 1px solid rgba(0,210,166,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; flex-shrink: 0; color: #00d2a6;
+    }
+
+    /* Stats Grid */
+    .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mini-stat {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .mini-stat-label { font-size: 0.65rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .mini-stat-val { font-size: 1rem; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace; }
+    .mini-stat-val.green { color: #00d2a6; }
+    .mini-stat-val.gold { color: var(--gold); }
+
+    /* Transaction History */
+    .tx-list { display: flex; flex-direction: column; gap: 8px; max-height: 350px; overflow-y: auto; }
+    .tx-list::-webkit-scrollbar { width: 4px; }
+    .tx-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .tx-item {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slide-in 0.3s ease;
+    }
+    @keyframes slide-in { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+    .tx-icon { font-size: 1rem; }
+    .tx-info { flex: 1; min-width: 0; }
+    .tx-pair { font-size: 0.82rem; font-weight: 600; color: #fff; }
+    .tx-hash { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: rgba(255,255,255,0.25); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tx-amount { text-align: right; }
+    .tx-val { font-size: 0.88rem; font-weight: 700; color: #00d2a6; font-family: 'JetBrains Mono', monospace; }
+    .tx-status { font-size: 0.65rem; color: rgba(255,255,255,0.3); }
+    .tx-status.done { color: #00d2a6; }
+
+    /* Supported Networks */
+    .net-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .net-chip {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.6);
+      font-weight: 600;
+    }
+    .net-chip.omni { border-color: rgba(0,210,166,0.3); color: #00d2a6; }
+
+    /* Toast */
+    .bridge-toast {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #00d2a6; color: #000;
+      padding: 12px 24px; border-radius: 30px;
+      font-weight: 700; font-size: 0.9rem;
+      z-index: 9999; opacity: 0;
+      transition: all 0.35s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .bridge-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+<div id="navbar-container"></div>
+
+<div class="bridge-page">
+
+  <!-- ══ MAIN BRIDGE PANEL ═══════════════════════════════════════════ -->
+  <div class="bridge-main">
+    <div class="bcard">
+
+      <!-- Hero -->
+      <div class="bridge-hero">
+        <div class="bridge-badge">
+          <div class="live-dot"></div>
+          Omni Bridge — Live
+        </div>
+        <h1>🌉 Cross-Chain Bridge</h1>
+        <p>Lock native OMNI on Layer-1 · Receive wrapped tokens on target chain</p>
+      </div>
+
+      <!-- FROM Network -->
+      <div class="net-label">From Network</div>
+      <div class="net-selector-wrap" id="from-wrap">
+        <button class="net-btn active" id="from-btn" onclick="toggleDropdown('from-drop')">
+          <div class="net-info">
+            <div class="net-icon" id="from-icon" style="background:rgba(0,210,166,0.15)">⬡</div>
+            <div>
+              <div class="net-name" id="from-name">Omni Layer-1</div>
+              <div class="net-chain" id="from-chain">Chain ID: 8888</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="net-balance">
+              <span style="font-size:0.7rem;">Balance</span>
+              <strong id="from-balance">—</strong>
+            </div>
+            <span style="color:rgba(255,255,255,0.3);font-size:0.75rem;">▼</span>
+          </div>
+        </button>
+        <div class="net-dropdown" id="from-drop">
+          <div class="net-option selected" data-network="omni" onclick="selectFrom('omni')">
+            <div class="net-option-icon" style="background:rgba(0,210,166,0.15)">⬡</div>
+            <div><div class="net-option-name">Omni Layer-1</div><div class="net-option-chain">Chain ID: 8888 · Native OMNI</div></div>
+          </div>
+          <div class="net-option" data-network="eth" onclick="selectFrom('eth')">
+            <div class="net-option-icon" style="background:rgba(98,126,234,0.2)">Ξ</div>
+            <div><div class="net-option-name">Ethereum</div><div class="net-option-chain">Chain ID: 1 · ETH</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Swap Direction -->
+      <div class="swap-direction">
+        <button class="swap-dir-btn" onclick="swapNetworks()" title="Swap networks">
+          <i data-lucide="arrow-down-up" style="width:18px;height:18px;"></i>
+        </button>
+      </div>
+
+      <!-- TO Network -->
+      <div class="net-label">To Network</div>
+      <div class="net-selector-wrap" id="to-wrap">
+        <button class="net-btn" id="to-btn" onclick="toggleDropdown('to-drop')">
+          <div class="net-info">
+            <div class="net-icon" id="to-icon" style="background:rgba(98,126,234,0.15)">Ξ</div>
+            <div>
+              <div class="net-name" id="to-name">Ethereum Mainnet</div>
+              <div class="net-chain" id="to-chain">Chain ID: 1</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="net-balance">
+              <span style="font-size:0.7rem;">Receive</span>
+              <strong id="to-receive">0.00 wOMNI</strong>
+            </div>
+            <span style="color:rgba(255,255,255,0.3);font-size:0.75rem;">▼</span>
+          </div>
+        </button>
+        <div class="net-dropdown" id="to-drop">
+          <div class="net-option" data-network="eth" onclick="selectTo('eth')">
+            <div class="net-option-icon" style="background:rgba(98,126,234,0.2)">Ξ</div>
+            <div><div class="net-option-name">Ethereum</div><div class="net-option-chain">Chain ID: 1 · wOMNI (ERC-20)</div></div>
+          </div>
+          <div class="net-option" data-network="bnb" onclick="selectTo('bnb')">
+            <div class="net-option-icon" style="background:rgba(240,185,11,0.2)">⬡</div>
+            <div><div class="net-option-name">BNB Chain</div><div class="net-option-chain">Chain ID: 56 · wOMNI (BEP-20)</div></div>
+          </div>
+          <div class="net-option" data-network="polygon" onclick="selectTo('polygon')">
+            <div class="net-option-icon" style="background:rgba(130,71,229,0.2)">◈</div>
+            <div><div class="net-option-name">Polygon</div><div class="net-option-chain">Chain ID: 137 · wOMNI (ERC-20)</div></div>
+          </div>
+          <div class="net-option" data-network="avax" onclick="selectTo('avax')">
+            <div class="net-option-icon" style="background:rgba(232,65,66,0.2)">▲</div>
+            <div><div class="net-option-name">Avalanche</div><div class="net-option-chain">Chain ID: 43114 · wOMNI</div></div>
+          </div>
+          <div class="net-option" data-network="omni" onclick="selectTo('omni')">
+            <div class="net-option-icon" style="background:rgba(0,210,166,0.15)">⬡</div>
+            <div><div class="net-option-name">Omni Layer-1</div><div class="net-option-chain">Chain ID: 8888 · Native OMNI</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amount -->
+      <div class="amount-box">
+        <div class="amount-row">
+          <span class="amount-label">Send Amount</span>
+          <span class="amount-max" onclick="setMax()">MAX</span>
+        </div>
+        <div class="amount-input-row">
+          <input type="number" class="amount-input" id="bridge-amount" placeholder="0.00" oninput="updateEstimate()" />
+          <div class="amount-token">⬡ OMNI</div>
+        </div>
+        <div class="amount-usd" id="amount-usd">≈ $0.00 USD</div>
+      </div>
+
+      <!-- Fee Grid -->
+      <div class="fee-grid">
+        <div class="fee-row">
+          <span class="fee-key">Omni L1 Bridge Fee</span>
+          <span class="fee-val green">$0.00 (Free)</span>
+        </div>
+        <div class="fee-row">
+          <span class="fee-key">Target Chain Gas</span>
+          <span class="fee-val" id="target-gas">~0.0005 ETH</span>
+        </div>
+        <div class="fee-divider"></div>
+        <div class="fee-row">
+          <span class="fee-key">Bridge Slippage</span>
+          <span class="fee-val">0.1%</span>
+        </div>
+        <div class="fee-row">
+          <span class="fee-key">You Receive</span>
+          <span class="fee-val gold" id="you-receive">0.00 wOMNI</span>
+        </div>
+        <div class="fee-divider"></div>
+        <div class="fee-row">
+          <span class="fee-key">Estimated Time</span>
+          <span class="fee-val" id="est-time">~3 minutes</span>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button class="bridge-submit" id="bridge-btn" onclick="initiateBridge()">
+        🔒 Authorize Lock &amp; Mint
+      </button>
+
+      <!-- Sub-links -->
+      <div style="display:flex;justify-content:center;gap:24px;margin-top:18px;">
+        <a href="/pages/explorer.html" style="color:rgba(255,255,255,0.3);font-size:0.78rem;text-decoration:none;display:flex;align-items:center;gap:5px;">
+          <i data-lucide="activity" style="width:13px;height:13px;"></i> OmniScan
+        </a>
+        <a href="/pages/wallet.html" style="color:rgba(255,255,255,0.3);font-size:0.78rem;text-decoration:none;display:flex;align-items:center;gap:5px;">
+          <i data-lucide="wallet" style="width:13px;height:13px;"></i> My Wallet
+        </a>
+        <a href="/pages/ecosystem.html" style="color:rgba(255,255,255,0.3);font-size:0.78rem;text-decoration:none;display:flex;align-items:center;gap:5px;">
+          <i data-lucide="globe" style="width:13px;height:13px;"></i> Ecosystem
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SIDE PANEL ════════════════════════════════════════════════ -->
+  <div class="bridge-side">
+
+    <!-- Network Stats -->
+    <div class="bcard">
+      <div class="side-title">Bridge Stats</div>
+      <div class="mini-stats">
+        <div class="mini-stat">
+          <div class="mini-stat-label">24h Volume</div>
+          <div class="mini-stat-val green" id="stat-volume">—</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-label">Bridges Today</div>
+          <div class="mini-stat-val gold" id="stat-count">—</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-label">Avg Time</div>
+          <div class="mini-stat-val">~3m</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-label">Success Rate</div>
+          <div class="mini-stat-val green">99.8%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bridge Route -->
+    <div class="bcard">
+      <div class="side-title">Bridge Route</div>
+      <div class="route-card" id="route-visual">
+        <div class="route-step">
+          <div class="route-icon">⬡</div>
+          <div>Lock OMNI on <strong style="color:#fff;">Omni L1</strong></div>
+        </div>
+        <div class="route-step" style="padding-left:14px;color:rgba(255,255,255,0.2);">
+          ↓ Merkle Proof Relay
+        </div>
+        <div class="route-step">
+          <div class="route-icon" id="route-to-icon">Ξ</div>
+          <div>Mint <strong style="color:#fff;">wOMNI</strong> on <span id="route-to-name">Ethereum</span></div>
+        </div>
+        <div class="route-step" style="padding-left:14px;color:rgba(255,255,255,0.2);">
+          ↓ Confirmation
+        </div>
+        <div class="route-step">
+          <div class="route-icon" style="background:rgba(0,210,166,0.15);color:#00d2a6;">✓</div>
+          <div>Tokens arrive in your wallet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supported Networks -->
+    <div class="bcard">
+      <div class="side-title">Supported Networks</div>
+      <div class="net-chips">
+        <div class="net-chip omni">⬡ Omni L1</div>
+        <div class="net-chip">Ξ Ethereum</div>
+        <div class="net-chip">⬡ BNB Chain</div>
+        <div class="net-chip">◈ Polygon</div>
+        <div class="net-chip">▲ Avalanche</div>
+      </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="bcard">
+      <div class="side-title">Recent Transactions</div>
+      <div class="tx-list" id="tx-history">
+        <div style="text-align:center;padding:20px;color:rgba(255,255,255,0.2);font-size:0.82rem;">
+          No bridge transactions yet
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ PROGRESS MODAL ════════════════════════════════════════════ -->
+<div class="progress-modal" id="progress-modal">
+  <div class="progress-panel">
+    <h2 id="prog-title">Initiating Bridge</h2>
+    <p id="prog-subtitle">Please wait while we process your cross-chain transfer</p>
+
+    <!-- Step Track -->
+    <div class="step-track">
+      <div class="step-node">
+        <div class="step-circle active" id="step-1">🔒</div>
+        <div class="step-label active" id="step-1-label">Lock</div>
+      </div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step-node">
+        <div class="step-circle" id="step-2">📡</div>
+        <div class="step-label" id="step-2-label">Relay</div>
+      </div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step-node">
+        <div class="step-circle" id="step-3">⚗️</div>
+        <div class="step-label" id="step-3-label">Mint</div>
+      </div>
+      <div class="step-line" id="line-3"></div>
+      <div class="step-node">
+        <div class="step-circle" id="step-4">✅</div>
+        <div class="step-label" id="step-4-label">Done</div>
+      </div>
+    </div>
+
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="prog-fill"></div>
+    </div>
+
+    <div class="tx-hash-display" id="tx-hash-display"></div>
+
+    <button class="close-progress" onclick="closeProgress()">Close</button>
+  </div>
+</div>
+
+<div class="bridge-toast" id="bridge-toast"></div>
+
+<script type="module" src="/js/main.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   OMNI BRIDGE ENGINE
+   Full cross-chain bridge UI with localStorage history
+═══════════════════════════════════════════════════════════ */
+
+const NETWORKS = {
+  omni:    { name: 'Omni Layer-1',    chain: 'Chain ID: 8888', icon: '⬡', color: 'rgba(0,210,166,0.15)',   gas: '$0.00 (Free)', time: '~1 minute',  token: 'OMNI'  },
+  eth:     { name: 'Ethereum Mainnet',chain: 'Chain ID: 1',    icon: 'Ξ', color: 'rgba(98,126,234,0.15)',  gas: '~0.0005 ETH', time: '~5 minutes', token: 'wOMNI' },
+  bnb:     { name: 'BNB Chain',       chain: 'Chain ID: 56',   icon: '⬡', color: 'rgba(240,185,11,0.15)', gas: '~0.001 BNB',  time: '~3 minutes', token: 'wOMNI' },
+  polygon: { name: 'Polygon',          chain: 'Chain ID: 137',  icon: '◈', color: 'rgba(130,71,229,0.15)', gas: '~0.1 MATIC',  time: '~2 minutes', token: 'wOMNI' },
+  avax:    { name: 'Avalanche',        chain: 'Chain ID: 43114',icon: '▲', color: 'rgba(232,65,66,0.15)',  gas: '~0.002 AVAX', time: '~2 minutes', token: 'wOMNI' },
+};
+
+let fromNet = 'omni';
+let toNet   = 'eth';
+
+// ── Init ────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  loadWalletBalance();
+  loadBridgeHistory();
+  updateBridgeStats();
+  updateEstimate();
+});
+
+function loadWalletBalance() {
+  try {
+    const w = JSON.parse(localStorage.getItem('omni_wallet') || 'null');
+    const chain = JSON.parse(localStorage.getItem('omni_chain') || '[]');
+    if (w) {
+      const earned = chain.filter(b => b.miner === w.address).length * 50;
+      const stored = parseFloat(localStorage.getItem('omni_balance_' + w.address) || '0');
+      const total  = Math.max(earned, stored);
+      document.getElementById('from-balance').textContent = total.toLocaleString() + ' OMNI';
+    } else {
+      document.getElementById('from-balance').textContent = '0 OMNI';
+    }
+  } catch(e) { document.getElementById('from-balance').textContent = '—'; }
+}
+
+// ── Network Selection ────────────────────────────────────────
+function selectFrom(net) {
+  fromNet = net;
+  const n = NETWORKS[net];
+  document.getElementById('from-icon').textContent   = n.icon;
+  document.getElementById('from-icon').style.background = n.color;
+  document.getElementById('from-name').textContent   = n.name;
+  document.getElementById('from-chain').textContent  = n.chain;
+  document.getElementById('from-drop').classList.remove('open');
+  updateEstimate();
+}
+
+function selectTo(net) {
+  toNet = net;
+  const n = NETWORKS[net];
+  document.getElementById('to-icon').textContent     = n.icon;
+  document.getElementById('to-icon').style.background = n.color;
+  document.getElementById('to-name').textContent     = n.name;
+  document.getElementById('to-chain').textContent    = n.chain;
+  document.getElementById('to-drop').classList.remove('open');
+  document.getElementById('route-to-icon').textContent = n.icon;
+  document.getElementById('route-to-name').textContent = n.name;
+  document.getElementById('target-gas').textContent  = n.gas;
+  document.getElementById('est-time').textContent    = n.time;
+  updateEstimate();
+}
+
+function toggleDropdown(id) {
+  const drop = document.getElementById(id);
+  // Close others
+  ['from-drop','to-drop'].forEach(d => {
+    if (d !== id) document.getElementById(d).classList.remove('open');
+  });
+  drop.classList.toggle('open');
+}
+
+// Close dropdowns on outside click
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.net-selector-wrap')) {
+    document.querySelectorAll('.net-dropdown').forEach(d => d.classList.remove('open'));
+  }
+});
+
+function swapNetworks() {
+  const tmp = fromNet;
+  selectFrom(toNet);
+  selectTo(tmp);
+}
+
+// ── Amount Logic ─────────────────────────────────────────────
+function setMax() {
+  try {
+    const bal = document.getElementById('from-balance').textContent.replace(/[^0-9.]/g, '');
+    document.getElementById('bridge-amount').value = bal || '0';
+    updateEstimate();
+  } catch(e) {}
+}
+
+function updateEstimate() {
+  const amt = parseFloat(document.getElementById('bridge-amount').value) || 0;
+  const receiveAmt = (amt * 0.999).toFixed(4); // 0.1% slippage
+  const omniPrice  = 0.0042; // Simulated OMNI price USD
+  const usdVal     = (amt * omniPrice).toFixed(2);
+  const net = NETWORKS[toNet] || NETWORKS.eth;
+
+  document.getElementById('amount-usd').textContent  = `≈ $${usdVal} USD`;
+  document.getElementById('you-receive').textContent = `${receiveAmt} ${net.token}`;
+  document.getElementById('to-receive').textContent  = `${receiveAmt} ${net.token}`;
+
+  const btn = document.getElementById('bridge-btn');
+  btn.disabled = (amt <= 0);
+}
+
+// ── Bridge Initiation ─────────────────────────────────────────
+function initiateBridge() {
+  const amt = parseFloat(document.getElementById('bridge-amount').value) || 0;
+  if (amt <= 0) return;
+
+  const txHash = '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+  showProgressModal(amt, txHash);
+}
+
+// ── Progress Modal ────────────────────────────────────────────
+let progInterval = null;
+
+function showProgressModal(amt, txHash) {
+  const modal = document.getElementById('progress-modal');
+  modal.classList.add('open');
+
+  const fromN = NETWORKS[fromNet];
+  const toN   = NETWORKS[toNet];
+
+  document.getElementById('prog-title').textContent    = `Bridging ${amt.toLocaleString()} OMNI`;
+  document.getElementById('prog-subtitle').textContent = `${fromN.name} → ${toN.name}`;
+  document.getElementById('tx-hash-display').style.display = 'none';
+
+  // Reset steps
+  setStep(1, 'active'); setStep(2, ''); setStep(3, ''); setStep(4, '');
+  setLine(1, ''); setLine(2, ''); setLine(3, '');
+  document.getElementById('prog-fill').style.width = '0%';
+
+  let step = 1;
+  const steps = [
+    { label: 'Signing lock transaction on Omni L1...', pct: 25 },
+    { label: 'Relaying Merkle proof to target chain...', pct: 55 },
+    { label: `Minting ${(amt*0.999).toFixed(4)} ${toN.token} on ${toN.name}...`, pct: 80 },
+    { label: '✅ Bridge complete! Tokens arrived.', pct: 100 },
+  ];
+
+  progInterval = null;
+
+  function runStep(i) {
+    if (i >= steps.length) {
+      // Done — save tx
+      const receiveAmt = (amt * 0.999).toFixed(4);
+      saveTx(amt, receiveAmt, txHash, fromN, toN);
+      document.getElementById('tx-hash-display').style.display = 'block';
+      document.getElementById('tx-hash-display').textContent   = 'TX: ' + txHash;
+      document.getElementById('prog-subtitle').textContent = '✅ Bridge complete! Check your wallet.';
+      showToast('🎉 Bridge complete! ' + receiveAmt + ' ' + toN.token + ' sent.');
+      return;
+    }
+    const s = steps[i];
+    document.getElementById('prog-subtitle').textContent = s.label;
+    document.getElementById('prog-fill').style.width = s.pct + '%';
+
+    if (i === 0) { setStep(1, 'active'); }
+    if (i === 1) { setStep(1, 'done'); setLine(1, 'done'); setStep(2, 'active'); }
+    if (i === 2) { setStep(2, 'done'); setLine(2, 'done'); setStep(3, 'active'); }
+    if (i === 3) { setStep(3, 'done'); setLine(3, 'done'); setStep(4, 'done'); }
+
+    setTimeout(() => runStep(i + 1), i === 0 ? 1800 : i === 1 ? 2500 : i === 2 ? 2000 : 1000);
+  }
+
+  runStep(0);
+}
+
+function setStep(n, state) {
+  const el = document.getElementById('step-' + n);
+  const lbl = document.getElementById('step-' + n + '-label');
+  el.className = 'step-circle' + (state ? ' ' + state : '');
+  lbl.className = 'step-label' + (state ? ' ' + state : '');
+}
+
+function setLine(n, state) {
+  const el = document.getElementById('line-' + n);
+  el.className = 'step-line' + (state ? ' ' + state : '');
+}
+
+function closeProgress() {
+  document.getElementById('progress-modal').classList.remove('open');
+  document.getElementById('bridge-amount').value = '';
+  updateEstimate();
+  loadBridgeHistory();
+}
+
+// ── Transaction History ───────────────────────────────────────
+function saveTx(sentAmt, receiveAmt, txHash, fromN, toN) {
+  const txs = JSON.parse(localStorage.getItem('omni_bridge_txs') || '[]');
+  txs.unshift({
+    sentAmt, receiveAmt, txHash,
+    from: fromN.name, to: toN.name,
+    token: toN.token,
+    ts: Date.now(),
+    status: 'complete'
+  });
+  localStorage.setItem('omni_bridge_txs', JSON.stringify(txs.slice(0, 20)));
+
+  // Update daily stats
+  const today = new Date().toDateString();
+  const stats = JSON.parse(localStorage.getItem('bridge_daily_stats') || '{}');
+  if (!stats[today]) stats[today] = { volume: 0, count: 0 };
+  stats[today].volume += parseFloat(sentAmt);
+  stats[today].count++;
+  localStorage.setItem('bridge_daily_stats', JSON.stringify(stats));
+}
+
+function loadBridgeHistory() {
+  const txs = JSON.parse(localStorage.getItem('omni_bridge_txs') || '[]');
+  const container = document.getElementById('tx-history');
+
+  if (!txs.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.2);font-size:0.82rem;">No bridge transactions yet</div>';
+    return;
+  }
+
+  container.innerHTML = txs.map(tx => `
+    <div class="tx-item">
+      <div class="tx-icon">🌉</div>
+      <div class="tx-info">
+        <div class="tx-pair">${abbrevChain(tx.from)} → ${abbrevChain(tx.to)}</div>
+        <div class="tx-hash">${tx.txHash}</div>
+      </div>
+      <div class="tx-amount">
+        <div class="tx-val">${parseFloat(tx.receiveAmt).toLocaleString()} ${tx.token}</div>
+        <div class="tx-status done">✓ Complete</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function abbrevChain(name) {
+  if (name.includes('Omni')) return 'Omni';
+  if (name.includes('Ethereum')) return 'ETH';
+  if (name.includes('BNB')) return 'BNB';
+  if (name.includes('Polygon')) return 'Polygon';
+  if (name.includes('Avalanche')) return 'AVAX';
+  return name;
+}
+
+function updateBridgeStats() {
+  const stats = JSON.parse(localStorage.getItem('bridge_daily_stats') || '{}');
+  const today = new Date().toDateString();
+  const todayStats = stats[today] || { volume: 0, count: 0 };
+
+  // Simulate some base stats
+  const baseVolume = 4_820_000;
+  const baseCount  = 183;
+
+  document.getElementById('stat-volume').textContent = ((baseVolume + todayStats.volume) / 1e6).toFixed(2) + 'M';
+  document.getElementById('stat-count').textContent  = (baseCount + todayStats.count).toString();
+}
+
+// ── Toast ──────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('bridge-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>

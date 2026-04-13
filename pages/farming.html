@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yield Farming | Omni Chain Ecosystem</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .farming-hero { text-align: center; padding: 100px 20px 40px; }
+    .farming-hero h1 { font-size: 3.5rem; margin-bottom: 20px; background: linear-gradient(135deg, #fff, var(--color-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
+    
+    .stats-grid { 
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+      gap: 20px; max-width: 1100px; margin: 0 auto 40px; padding: 0 20px;
+    }
+    .stat-card {
+      background: var(--color-bg-glass); border: 1px solid var(--color-bg-light);
+      border-radius: 20px; padding: 24px; text-align: center;
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .stat-card:hover { border-color: var(--color-primary); transform: translateY(-3px); }
+    .stat-label { color: var(--color-text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    .stat-val { font-size: 2rem; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace; }
+    
+    .farm-table-card {
+      max-width: 1100px; margin: 0 auto 100px; padding: 0 20px;
+    }
+    .main-table-wrap { background: var(--color-bg-glass); border: 1px solid var(--color-bg-light); border-radius: 24px; overflow: hidden; }
+    .main-table { width: 100%; border-collapse: collapse; }
+    .main-table th { text-align: left; padding: 20px; color: var(--color-text-muted); font-size: 0.8rem; text-transform: uppercase; border-bottom: 1px solid var(--color-bg-light); background: rgba(255,255,255,0.02); }
+    .main-table td { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    
+    .pair-icon-wrap { display: flex; align-items: center; gap: 15px; }
+    .pair-imgs { display: flex; position: relative; width: 50px; height: 36px; }
+    .p-img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #0b0e14; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+    .p-img-2 { position: absolute; left: 16px; top: 0; }
+    
+    .apy-chip { background: rgba(0,210,166,0.12); color: var(--color-primary); padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 1rem; border: 1px solid rgba(0,210,166,0.3); }
+    .reward-val { color: var(--color-primary); font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.1rem; }
+    
+    @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 10px rgba(0,210,166,0.1); } 50% { box-shadow: 0 0 25px rgba(0,210,166,0.3); border-color: var(--color-primary); } }
+    .btn-harvest-active { animation: pulse-glow 2s infinite; border-color: var(--color-primary) !important; color: #fff !important; }
+    
+    .manage-link { color: var(--color-primary); cursor: pointer; font-size: 0.8rem; text-decoration: underline; margin-top: 4px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  
+  <main>
+    <div class="farming-hero">
+      <h1 class="text-gradient">Yield Farming</h1>
+      <p class="text-muted" style="max-width: 650px; margin: 0 auto; line-height: 1.6;">Stake your LP tokens to earn native OMNI rewards directly from the genesis distribution hub. Experience high-frequency yields with zero gas fees on the Omni sovereign layer.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Value Locked</div>
+        <div class="stat-val" id="tvl-total">$24,192,058</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Global APY Average</div>
+        <div class="stat-val" style="color:var(--color-primary);">94.8%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Your Pending Rewards</div>
+        <div class="stat-val reward-val" id="total-pending">0.0000 OMNI</div>
+      </div>
+    </div>
+
+    <div class="farm-table-card">
+      <div class="main-table-wrap">
+        <table class="main-table">
+           <thead>
+             <tr>
+               <th>Liquidity Pair</th>
+               <th>Current APY</th>
+               <th>Pool TVL</th>
+               <th>Your Rewards</th>
+               <th style="text-align:right;">Action</th>
+             </tr>
+           </thead>
+           <tbody id="farming-body">
+             <!-- Injected via JS -->
+           </tbody>
+        </table>
+      </div>
+      <div style="margin-top:24px; text-align:center; padding: 20px; background: rgba(0,210,166,0.05); border-radius: 16px; border: 1px dashed rgba(0,210,166,0.2);">
+        <span style="color:rgba(255,255,255,0.6); font-size:0.9rem;">Need to create LP tokens?</span>
+        <a href="/pages/liquidity.html" style="color:var(--color-primary); text-decoration:none; font-weight:700; margin-left:8px;">Add Liquidity & Fetch LP →</a>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { defi } from '/js/services/DeFiCore.js';
+    
+    // Virtual Pool Data
+    const POOLS = [
+      { id: 'OMNI_USDT', name: 'OMNI/USDT', apy: '112.4', tvl: '$12.1M', color1: '#00d2a6', color2: '#2775ca' },
+      { id: 'OMNI_ETH', name: 'OMNI/ETH', apy: '86.5', tvl: '$8.3M', color1: '#00d2a6', color2: '#627eea' },
+      { id: 'ETH_USDT', name: 'ETH/USDT', apy: '14.2', tvl: '$35.8M', color1: '#627eea', color2: '#2775ca' }
+    ];
+
+    function renderFarms() {
+      const state = defi.loadState();
+      const wallet = JSON.parse(localStorage.getItem('omni_wallet') || '{"liquid":{}}');
+      const body = document.getElementById('farming-body');
+      let totalPending = 0;
+      
+      body.innerHTML = POOLS.map(p => {
+        const farm = state.farming[p.id] || { stakedLP: 0, rewards: 0 };
+        const lpSymbol = `${p.id}-LP`.toUpperCase();
+        const lpBalance = wallet.liquid[lpSymbol] || 0;
+        const hasLP = lpBalance > 0;
+        totalPending += farm.rewards;
+        
+        return `
+          <tr>
+            <td>
+              <div class="pair-icon-wrap">
+                <div class="pair-imgs">
+                  <div class="p-img" style="background:${p.color1}"></div>
+                  <div class="p-img p-img-2" style="background:${p.color2}"></div>
+                </div>
+                <div>
+                  <div style="color:#fff; font-weight:700; font-size:1.1rem;">${p.name}</div>
+                  <div style="color:var(--color-primary); font-size:0.7rem; font-family:monospace; margin-bottom: 2px;">
+                    Wallet: ${lpBalance > 0 ? lpBalance.toFixed(4) : '0.0000'} LP
+                  </div>
+                  <div style="color:rgba(255,255,255,0.4); font-size:0.7rem; font-family:monospace;">
+                    Staked: ${farm.stakedLP > 0 ? farm.stakedLP.toFixed(4) : '0.0000'} LP
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td><span class="apy-chip">${p.apy}%</span></td>
+            <td style="color:rgba(255,255,255,0.6); font-family:'JetBrains Mono';">${p.tvl}</td>
+            <td>
+              <div class="reward-val">${farm.rewards.toFixed(6)} <span style="font-size:0.6rem; color:rgba(255,255,255,0.3);">OMNI</span></div>
+            </td>
+            <td style="text-align:right;">
+              <div style="display:flex; gap:12px; justify-content:flex-end; align-items:center;">
+                <button class="btn btn-outline ${farm.rewards > 0.0001 ? 'btn-harvest-active' : ''}" 
+                  style="border-radius:12px; padding:10px 18px; font-size:0.85rem; border:1px solid rgba(255,255,255,0.1); font-weight:700;" 
+                  onclick="harvest('${p.id}')" ${farm.rewards <= 0.0001 ? 'disabled style="opacity:0.3;"' : ''}>Harvest</button>
+                
+                <button class="btn btn-primary" 
+                   style="border-radius:12px; padding:10px 20px; font-size:0.85rem; font-weight:800; ${!hasLP && farm.stakedLP <= 0 ? 'opacity:0.4; cursor:not-allowed;' : ''}"
+                   onclick="stake('${p.id}')">${hasLP ? `Stake ${lpBalance.toFixed(2)} LP` : (farm.stakedLP > 0 ? 'Manage Stake' : 'Stake LP')}</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('total-pending').innerText = totalPending.toFixed(4) + ' OMNI';
+    }
+
+    window.harvest = (id) => {
+      defi.claimAll();
+      renderFarms();
+    };
+
+    window.stake = (id) => {
+      const wallet = JSON.parse(localStorage.getItem('omni_wallet') || '{"liquid":{}}');
+      const lpSymbol = `${id}-LP`.toUpperCase();
+      const lpBalance = wallet.liquid[lpSymbol] || 0;
+      
+      if (lpBalance <= 0) {
+        const state = defi.loadState();
+        if (state.farming[id]?.stakedLP > 0) {
+           alert("Managing existing stake configuration...");
+        } else {
+           alert("You need to add liquidity first to get LP tokens!");
+           location.href = '/pages/liquidity.html';
+        }
+        return;
+      }
+      
+      const res = defi.stakeLP(id, lpBalance);
+      if (res.success) {
+        alert(`Successfully staked ${lpBalance.toFixed(4)} LP tokens into the ${id.replace('_','/')} farm!`);
+      } else {
+        alert(res.msg);
+      }
+      renderFarms();
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if(window.lucide) lucide.createIcons();
+      defi.subscribe(renderFarms);
+      renderFarms();
+      
+      // Animate TVL
+      let tvlVal = 24192058;
+      setInterval(() => {
+        tvlVal += (Math.random() * 50);
+        document.getElementById('tvl-total').innerText = '$' + tvlVal.toLocaleString(undefined, {maximumFractionDigits:0});
+      }, 3000);
+    });
+  </script>
+</body>
+</html>

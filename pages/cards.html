@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omni Cards | Banking</title>
+  <style>
+    /* 3D Card Hover Effects */
+    .card-3d-wrapper {
+      perspective: 1000px;
+      width: 340px;
+      height: 214px;
+      margin: 0 auto 30px auto;
+    }
+    .card-3d {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+    .card-3d-wrapper:hover .card-3d {
+      transform: rotateY(180deg);
+    }
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+      display:flex; flex-direction:column; justify-content:space-between;
+      padding: 20px;
+    }
+    .card-front {
+      background: linear-gradient(135deg, #111, #222);
+    }
+    .card-back {
+      background: linear-gradient(135deg, #222, #111);
+      transform: rotateY(180deg);
+    }
+    .card-logo {
+      width: 40px; filter: grayscale(1) brightness(2);
+    }
+    .card-chip {
+      width: 45px; height: 35px; background: linear-gradient(135deg, #ffd700, #b8860b);
+      border-radius: 6px; margin-top: 20px;
+    }
+    .tier-crystal { background: linear-gradient(135deg, #00f0ff 0%, #005f9e 100%); }
+    .tier-ruby { background: linear-gradient(135deg, #ff0055 0%, #8b0000 100%); }
+    .tier-jade { background: linear-gradient(135deg, #00ff88 0%, #006400 100%); }
+    .tier-icy { background: linear-gradient(135deg, #e0ffff 0%, #b0c4de 100%); color: #000; }
+    .tier-obsidian { background: linear-gradient(135deg, #111 0%, #000 100%); border: 1px solid #333; }
+  </style>
+</head>
+<body>
+  <div class="galaxy-overlay" style="background: radial-gradient(circle at center, transparent 0%, #05050f 100%);"></div>
+  <div id="navbar-container"></div>
+  
+  <main id="app" class="container" style="padding-top: calc(var(--header-height) + 40px); min-height: 80vh; text-align:center;">
+    <h1 class="text-gradient" style="font-size:3.5rem; margin-bottom: 20px;">The Only Card You Need</h1>
+    <p class="text-muted" style="margin: 0 auto 60px auto; max-width: 700px; font-size:1.2rem;">
+      Choose your metal. Stake OMNI. Earn up to 8% back on everything. Includes Netflix, Spotify, and prime lounge access.
+    </p>
+
+    <!-- Tiers Container -->
+    <div style="display:flex; flex-wrap:wrap; gap: 40px; justify-content:center; align-items:flex-end; margin-bottom: 80px;">
+      
+      <!-- Crystal -->
+      <div class="glass-panel" style="padding: 30px; width: 350px;">
+        <div class="card-3d-wrapper">
+          <div class="card-3d">
+            <div class="card-face card-front tier-crystal">
+              <div style="display:flex; justify-content:space-between;">
+                <img src="/images/omniloop_logo.png" class="card-logo">
+                <span style="font-weight:bold; letter-spacing:2px;">CRYSTAL</span>
+              </div>
+              <div class="card-chip"></div>
+              <div style="text-align:left; font-family:monospace; font-size:1.2rem; letter-spacing:2px; margin-top:20px;">•••• •••• •••• 1234</div>
+            </div>
+            <div class="card-face card-back tier-crystal">
+              <div style="height:40px; background:#000; margin:-20px -20px 20px -20px;"></div>
+              <div style="background:#fff; height:30px; margin-bottom:10px;"></div>
+              <p style="font-size:0.7rem; color:rgba(255,255,255,0.7)">Signature</p>
+            </div>
+          </div>
+        </div>
+        <h2 style="color:var(--color-primary); margin-bottom:10px;">1% Cashback</h2>
+        <p class="text-muted" style="margin-bottom:20px;">No Stake Required</p>
+        <ul style="text-align:left; color:var(--color-text-muted); margin-bottom:30px; line-height:2;">
+          <li>✔ Free ATM Withdrawals</li>
+          <li>✔ Zero Annual Fees</li>
+        </ul>
+        <a href="/pages/card-apply.html?tier=crystal" class="btn btn-primary" style="width:100%;">Choose Crystal</a>
+      </div>
+
+      <!-- Jade -->
+      <div class="glass-panel" style="padding: 30px; width: 350px; transform: scale(1.05); box-shadow: 0 0 30px rgba(0, 255, 136, 0.2); border-color: rgba(0, 255, 136, 0.5);">
+        <div style="position:absolute; top:-15px; left:50%; transform:translateX(-50%); background:var(--color-success); color:#000; padding:5px 15px; border-radius:20px; font-weight:bold; font-size:0.8rem;">MOST POPULAR</div>
+        <div class="card-3d-wrapper">
+          <div class="card-3d">
+            <div class="card-face card-front tier-jade">
+              <div style="display:flex; justify-content:space-between;">
+                <img src="/images/omniloop_logo.png" class="card-logo">
+                <span style="font-weight:bold; letter-spacing:2px;">JADE GREEN</span>
+              </div>
+              <div class="card-chip"></div>
+              <div style="text-align:left; font-family:monospace; font-size:1.2rem; letter-spacing:2px; margin-top:20px;">•••• •••• •••• 5678</div>
+            </div>
+            <div class="card-face card-back tier-jade">
+              <div style="height:40px; background:#000; margin:-20px -20px 20px -20px;"></div>
+              <div style="background:#fff; height:30px; margin-bottom:10px;"></div>
+            </div>
+          </div>
+        </div>
+        <h2 style="color:var(--color-success); margin-bottom:10px;">3% Cashback</h2>
+        <p class="text-muted" style="margin-bottom:20px;">Stake 5,000 OMNI</p>
+        <ul style="text-align:left; color:var(--color-text-muted); margin-bottom:30px; line-height:2;">
+          <li>✔ 100% Netflix Rebate</li>
+          <li>✔ 100% Spotify Rebate</li>
+          <li>✔ Airport Lounge Access</li>
+        </ul>
+        <a href="/pages/card-apply.html?tier=jade" class="btn btn-primary" style="width:100%; background:var(--color-success); color:#000;">Choose Jade</a>
+      </div>
+
+      <!-- Obsidian -->
+      <div class="glass-panel" style="padding: 30px; width: 350px;">
+        <div class="card-3d-wrapper">
+          <div class="card-3d">
+            <div class="card-face card-front tier-obsidian">
+              <div style="display:flex; justify-content:space-between;">
+                <img src="/images/omniloop_logo.png" class="card-logo">
+                <span style="font-weight:bold; letter-spacing:2px; color:var(--color-text-muted)">OBSIDIAN</span>
+              </div>
+              <div class="card-chip"></div>
+              <div style="text-align:left; font-family:monospace; font-size:1.2rem; letter-spacing:2px; margin-top:20px;">•••• •••• •••• 9012</div>
+            </div>
+            <div class="card-face card-back tier-obsidian">
+              <div style="height:40px; background:#222; margin:-20px -20px 20px -20px;"></div>
+              <div style="background:#fff; height:30px; margin-bottom:10px;"></div>
+            </div>
+          </div>
+        </div>
+        <h2 style="color:#fff; margin-bottom:10px; text-shadow: 0 0 10px #fff;">8% Cashback</h2>
+        <p class="text-muted" style="margin-bottom:20px;">Stake 100,000 OMNI</p>
+        <ul style="text-align:left; color:var(--color-text-muted); margin-bottom:30px; line-height:2;">
+          <li>✔ Airbnb & Prime Rebates</li>
+          <li>✔ Private Jet Partnership</li>
+          <li>✔ 24/7 Concierge</li>
+        </ul>
+        <a href="/pages/card-apply.html?tier=obsidian" class="btn btn-outline" style="width:100%; color:#fff; border-color:#fff;">Choose Obsidian</a>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="ticker-container"></div>
+  <div id="footer-container"></div>
+
+  <script type="module">
+    import '../css/global.css';
+    import { renderNavbar } from '../components/Navbar.js';
+    import { renderTicker } from '../components/Ticker.js';
+    import { renderFooter } from '../components/Footer.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNavbar();
+      renderTicker();
+      renderFooter();
+    });
+  </script>
+</body>
+</html>

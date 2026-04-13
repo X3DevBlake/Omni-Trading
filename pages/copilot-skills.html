@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skill Tree | OmniMind</title>
+  <style>
+    /* Very basic visual representation of a sphere grid */
+    .grid-bg {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      background: radial-gradient(circle at center, rgba(0,240,255,0.1) 0%, transparent 70%);
+    }
+    .node {
+      position: absolute;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--color-primary);
+      background: var(--color-bg-deep);
+      display: flex; align-items:center; justify-content:center;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0,240,255,0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .node:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 20px var(--color-primary);
+      z-index: 10;
+    }
+    .node.active {
+      background: var(--color-primary);
+      color: black;
+      box-shadow: 0 0 20px var(--color-primary);
+    }
+    .node.locked {
+      border-color: var(--color-text-muted);
+      color: var(--color-text-muted);
+    }
+    .line {
+      position: absolute;
+      height: 2px;
+      background: var(--color-primary);
+      z-index: 0;
+      transform-origin: left center;
+    }
+    .line.locked { background: var(--color-border); }
+  </style>
+</head>
+<body>
+  <div class="galaxy-overlay" style="background: radial-gradient(circle at center, transparent 0%, #05050f 100%);"></div>
+  <div id="navbar-container"></div>
+  
+  <main id="app" class="container" style="padding-top: calc(var(--header-height) + 40px); min-height: 80vh;">
+    
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 40px;">
+      <div>
+        <h1 class="text-gradient" style="margin-bottom:10px;">OmniMind Sphere Grid</h1>
+        <p class="text-muted">Unlock new agentic capabilities by spending Skill Points (SP) earned by staking OMNI.</p>
+      </div>
+      <div style="text-align:right;">
+        <p class="text-muted" style="margin:0; font-size:0.9rem;">Available SP</p>
+        <h2 class="text-success" style="margin:0;">1,250 SP</h2>
+      </div>
+    </div>
+
+    <div class="grid-bg">
+      
+      <!-- Lines connecting nodes (approx angles) -->
+      <div class="line" style="top:250px; left:400px; width:150px; transform:rotate(0deg);"></div>
+      <div class="line locked" style="top:250px; left:550px; width:150px; transform:rotate(45deg);"></div>
+      <div class="line locked" style="top:250px; left:550px; width:150px; transform:rotate(-45deg);"></div>
+      
+      <!-- Base Node -->
+      <div class="node active" style="top:230px; left:380px;" title="Basic Execution: Allowed to buy/sell">B</div>
+      
+      <!-- Tier 1: Arbitrage & Sentiment -->
+      <div class="node active" style="top:230px; left:530px;" title="Arbitrage Scanner: Agent can scan DEXs for delta">A</div>
+      
+      <!-- Tier 2: Advanced -->
+      <div class="node locked" style="top:124px; left:636px;" title="Social Sentiment: Agent reads Twitter feeds">S</div>
+      <div class="node locked" style="top:336px; left:636px;" title="Whale Tracker: Copy trades known profitable wallets">W</div>
+
+      <!-- Info panel overlay -->
+      <div style="position:absolute; bottom:20px; left:20px; background:rgba(0,0,0,0.8); padding:20px; border:1px solid var(--color-border); border-radius:8px; width:300px; z-index:5;">
+        <h3 style="margin:0 0 10px 0; color:var(--color-primary);">Social Sentiment Scanner</h3>
+        <p class="text-muted" style="font-size:0.85rem; margin-bottom:15px;">Equips the agent with the ability to scrape Twitter API and execute momentum trades based on viral FF keywords.</p>
+        <button class="btn btn-outline" style="width:100%; border-color:var(--color-primary); color:var(--color-primary);">Unlock (500 SP)</button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script type="module">
+    import '../css/global.css';
+    import { renderNavbar } from '../components/Navbar.js';
+    document.addEventListener('DOMContentLoaded', () => { renderNavbar(); });
+  </script>
+</body>
+</html>

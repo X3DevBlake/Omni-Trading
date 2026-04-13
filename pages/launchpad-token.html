@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trade | OmniForge</title>
+</head>
+<body>
+  <div class="galaxy-overlay" style="background: radial-gradient(circle at center, transparent 0%, #05050f 100%);"></div>
+  <div id="navbar-container"></div>
+  
+  <main id="app" class="container" style="padding-top: calc(var(--header-height) + 40px); min-height: 80vh;">
+    
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:20px;">
+      <div style="display:flex; gap:20px; align-items:center;">
+        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Squall" style="width:80px; height:80px; border-radius:12px; border:2px solid var(--color-primary); background:var(--color-bg-deep);" />
+        <div>
+          <h1 style="margin:0; font-family:monospace; font-size:2.5rem; display:flex; align-items:center; gap:15px;">
+            Squall's Gunblade <span class="text-muted" style="font-size:1.2rem;">[GBLADE]</span>
+          </h1>
+          <p class="text-success" style="margin:5px 0 0 0; font-family:monospace; font-weight:bold;">Market Cap: $45,210</p>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <span class="btn btn-outline" style="border-color:var(--color-text-muted); color:var(--color-text-muted); cursor:default;">CA: 0x8f...21A9</span>
+        <a href="#" class="btn btn-primary" style="background:var(--color-primary); color:black;">Twitter</a>
+        <a href="#" class="btn btn-primary" style="background:var(--color-primary); color:black;">Telegram</a>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 350px; gap: 30px;">
+      
+      <!-- Left Column: Chart & Bonding Curve -->
+      <div>
+        
+        <!-- Bonding Curve Status -->
+        <div class="glass-panel" style="padding: 20px; margin-bottom: 20px;">
+          <h3 style="margin-bottom: 10px; font-size:1.1rem; color:var(--color-primary);">Bonding Curve Progress: 65.5%</h3>
+          <p class="text-muted" style="margin-bottom: 15px; font-size:0.9rem;">When the bonding curve reaches 100% ($69k Market Cap), all liquidity from the curve will be deposited into Omni DEX and burned.</p>
+          <div style="height:12px; background:var(--color-bg-deep); border-radius:6px; overflow:hidden;">
+            <div style="height:100%; width:65.5%; background:var(--color-primary); box-shadow:0 0 10px var(--color-primary);"></div>
+          </div>
+        </div>
+
+        <!-- Fake Chart Area -->
+        <div class="glass-panel" style="padding: 0; margin-bottom: 20px; height:450px; display:flex; flex-direction:column; overflow:hidden;">
+          <div style="padding:15px; border-bottom:1px solid var(--color-border); display:flex; justify-content:space-between; background:rgba(0,0,0,0.3);">
+            <span style="font-weight:bold;">GBLADE / OMNI</span>
+            <span class="text-success">+154.2%</span>
+          </div>
+          <div style="flex:1; background: repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255,255,255,0.02) 20px), repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255,255,255,0.02) 20px); position:relative;" id="chart-container">
+            <!-- Candlesticks injected via JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Swap UI -->
+      <div>
+        
+        <div class="glass-panel" style="padding: 20px;">
+          <div style="display:flex; background:rgba(0,0,0,0.5); border-radius:8px; margin-bottom:20px; padding:5px;">
+            <div style="flex:1; text-align:center; padding:10px; background:var(--color-bg-glass); border-radius:6px; font-weight:bold; cursor:pointer; color:var(--color-success);">Buy</div>
+            <div style="flex:1; text-align:center; padding:10px; color:var(--color-text-muted); cursor:pointer;">Sell</div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.8rem;">
+            <span class="text-muted">Balance: 12.5 OMNI</span>
+            <span style="color:var(--color-primary); cursor:pointer;">Max</span>
+          </div>
+
+          <div style="display:flex; align-items:center; background:rgba(0,0,0,0.3); border:1px solid var(--color-border); border-radius:8px; padding:5px 15px; margin-bottom: 20px;">
+            <input type="number" value="1.0" style="flex:1; background:transparent; border:none; color:white; font-size:1.5rem; padding:10px 0; outline:none;" />
+            <span style="font-weight:bold;">OMNI</span>
+          </div>
+
+          <div style="text-align:center; margin-bottom:20px; color:var(--color-text-muted);">↓</div>
+
+          <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.8rem;">
+            <span class="text-muted">Balance: 0 GBLADE</span>
+          </div>
+
+          <div style="display:flex; align-items:center; background:rgba(0,0,0,0.3); border:1px solid var(--color-border); border-radius:8px; padding:5px 15px; margin-bottom: 30px;">
+            <input type="text" value="3,450,210" readonly style="flex:1; background:transparent; border:none; color:white; font-size:1.5rem; padding:10px 0; outline:none;" />
+            <span style="font-weight:bold;">GBLADE</span>
+          </div>
+
+          <button class="btn btn-primary" style="width:100%; padding:15px; background:var(--color-success); color:#000; font-weight:bold; font-size:1.1rem;" onclick="alert('Swap executed!')">Buy GBLADE</button>
+        </div>
+
+        <!-- Recent Trades -->
+        <div class="glass-panel" style="padding: 20px; margin-top:20px;">
+          <h3 style="font-size:1rem; margin-bottom:15px;">Recent Trades</h3>
+          <div id="trades-container" style="font-family:monospace; font-size:0.85rem;"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <script type="module">
+    import '../css/global.css';
+    import { renderNavbar } from '../components/Navbar.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNavbar();
+
+      // Chart
+      const chartContainer = document.getElementById('chart-container');
+      for (let i = 0; i < 60; i++) {
+        const isUp = Math.random() > 0.4;
+        const h = Math.random() * 60 + 10;
+        const wickH = h + Math.random() * 30;
+        const cand = document.createElement('div');
+        cand.className = `candlestick ${isUp ? '' : 'down'}`;
+        cand.style.position = 'absolute';
+        cand.style.width = '6px';
+        cand.style.background = isUp ? 'var(--color-success)' : 'var(--color-danger)';
+        cand.style.height = `${h}px`;
+        cand.style.left = `${i * 14 + 10}px`;
+        cand.style.top = `${200 + (Math.random() * 100 - 50)}px`;
+        
+        const wick = document.createElement('div');
+        wick.style.position = 'absolute';
+        wick.style.width = '2px';
+        wick.style.left = '2px';
+        wick.style.background = 'inherit';
+        wick.style.height = `${wickH}px`;
+        wick.style.top = `-${(wickH - h) / 2}px`;
+        cand.appendChild(wick);
+        
+        chartContainer.appendChild(cand);
+      }
+
+      // Trades
+      const tc = document.getElementById('trades-container');
+      let html = `<div style="display:flex; justify-content:space-between; color:var(--color-text-muted); margin-bottom:10px;"><span>Tokens</span><span>OMNI</span><span>Time</span></div>`;
+      for(let i=0; i<8; i++) {
+        const isBuy = Math.random() > 0.5;
+        const oAmt = (Math.random() * 2).toFixed(2);
+        const tAmt = Math.floor(Math.random() * 5000000).toLocaleString();
+        html += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+          <span class="${isBuy ? 'text-success' : 'text-danger'}">${tAmt}</span>
+          <span>${oAmt}</span>
+          <span class="text-muted">Just now</span>
+        </div>`;
+      }
+      tc.innerHTML = html;
+    });
+  </script>
+</body>
+</html>

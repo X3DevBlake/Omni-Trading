@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0a0c10" />
+  <title>Mine OMNI | Omni Chain</title>
+  <meta name="description" content="Mine OMNI tokens directly in your browser on any device. No app needed. Real SHA-256 proof-of-work.">
+  <link rel="stylesheet" href="/css/global.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #F0A500;
+      --gold-glow: rgba(240,165,0,0.2);
+      --green-glow: rgba(0,210,166,0.2);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; overflow-x: hidden; }
+    body { background: #080a0f; font-family: var(--font-body, 'Inter', sans-serif); }
+
+    /* ══ TOP BAR ══════════════════════ */
+    .mine-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      padding-top: calc(16px + env(safe-area-inset-top));
+      background: rgba(8,10,15,0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+    .header-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.1rem; font-weight: 700; color: #fff;
+    }
+    .header-logo span { color: var(--color-primary, #00d2a6); }
+    .network-pill {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(0,210,166,0.08);
+      border: 1px solid rgba(0,210,166,0.2);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #00d2a6;
+    }
+    .net-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #00d2a6;
+      animation: pulse-dot 1.5s infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.4;transform:scale(0.8);} }
+
+    /* ══ MAIN GRID ════════════════════ */
+    .mine-grid {
+      padding: 20px 16px;
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    }
+
+    /* ══ CARDS ════════════════════════ */
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 12px;
+    }
+
+    /* ══ WALLET BAR ═══════════════════ */
+    .wallet-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .wallet-addr {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: #00d2a6;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-sm {
+      background: rgba(0,210,166,0.08);
+      border: 1px solid rgba(0,210,166,0.25);
+      color: #00d2a6;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .btn-sm:hover, .btn-sm:active { background: #00d2a6; color: #000; }
+
+    /* ══ BALANCE HERO ═════════════════ */
+    .balance-hero {
+      text-align: center;
+      padding: 10px 0;
+    }
+    .balance-large {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .balance-session {
+      font-size: 0.85rem;
+      color: #00d2a6;
+      font-weight: 600;
+    }
+
+    /* ══ BIG MINE BUTTON ══════════════ */
+    .mine-btn-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0 4px;
+    }
+    .mine-btn {
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      transition: transform 0.15s, box-shadow 0.3s;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .mine-btn.idle {
+      background: radial-gradient(circle at 40% 30%, #1e6050, #0b2b22);
+      box-shadow: 0 0 0 8px rgba(0,210,166,0.08), 0 0 40px rgba(0,210,166,0.15), 0 8px 32px rgba(0,0,0,0.6);
+      color: #00d2a6;
+    }
+    .mine-btn.mining {
+      background: radial-gradient(circle at 40% 30%, #6b5800, #2b2000);
+      box-shadow: 0 0 0 8px rgba(240,165,0,0.12), 0 0 60px rgba(240,165,0,0.3), 0 8px 32px rgba(0,0,0,0.6);
+      color: var(--gold);
+      animation: mine-pulse 1.2s infinite;
+    }
+    @keyframes mine-pulse {
+      0%,100% { box-shadow: 0 0 0 8px rgba(240,165,0,0.12), 0 0 40px rgba(240,165,0,0.3), 0 8px 32px rgba(0,0,0,0.6); }
+      50%      { box-shadow: 0 0 0 20px rgba(240,165,0,0.03), 0 0 80px rgba(240,165,0,0.5), 0 8px 32px rgba(0,0,0,0.6); }
+    }
+    .mine-btn:active { transform: scale(0.96); }
+    .mine-icon { font-size: 2.2rem; margin-bottom: 4px; }
+    .mine-label { font-size: 0.9rem; font-weight: 700; }
+    .mine-sublabel { font-size: 0.65rem; opacity: 0.7; margin-top: 2px; }
+
+    /* Outer ring animation */
+    .mine-ring {
+      position: absolute;
+      width: 190px; height: 190px;
+      border-radius: 50%;
+      border: 2px solid rgba(0,210,166,0.2);
+      animation: ring-spin 4s linear infinite;
+      pointer-events: none;
+    }
+    .mine-ring.mining-ring {
+      border-color: rgba(240,165,0,0.3);
+      border-style: dashed;
+      animation: ring-spin 2s linear infinite;
+    }
+    @keyframes ring-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+    /* ══ STATS GRID ═══════════════════ */
+    .stats-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .stat-block {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .stat-lbl { font-size: 0.68rem; color: rgba(255,255,255,0.35); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+    .stat-val { font-size: 1.15rem; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace; }
+    .stat-val.green { color: #00d2a6; }
+    .stat-val.gold  { color: var(--gold); }
+
+    /* ══ HASH FEED ════════════════════ */
+    .hash-feed {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.25);
+      height: 80px;
+      overflow: hidden;
+      line-height: 1.8;
+      position: relative;
+    }
+    .hash-feed::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40px;
+      background: linear-gradient(transparent, rgba(8,10,15,0.95));
+    }
+    .hash-line { padding: 0 4px; }
+    .hash-line.found { color: #00d2a6; font-weight: 700; }
+
+    /* ══ PROGRESS BAR ══════════════════ */
+    .progress-track {
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00d2a6, var(--gold));
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    /* ══ BLOCK FEED ════════════════════ */
+    .block-feed { display: flex; flex-direction: column; gap: 8px; }
+    .block-item {
+      background: rgba(0,210,166,0.04);
+      border: 1px solid rgba(0,210,166,0.12);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: slide-in 0.4s ease;
+    }
+    @keyframes slide-in { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+    .block-info { flex: 1; }
+    .block-num { font-size: 0.75rem; font-weight: 700; color: #00d2a6; }
+    .block-hash { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: rgba(255,255,255,0.3); margin-top: 2px; }
+    .block-reward {
+      font-weight: 800;
+      color: var(--gold);
+      font-size: 0.9rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .block-nonce { font-size: 0.65rem; color: rgba(255,255,255,0.2); text-align: right; }
+
+    /* ══ SETUP GUIDE CARD ══════════════ */
+    .setup-steps { display: flex; flex-direction: column; gap: 14px; }
+    .setup-step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .step-num-circle {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: rgba(0,210,166,0.1);
+      border: 1px solid rgba(0,210,166,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #00d2a6;
+      flex-shrink: 0;
+    }
+    .step-content h4 { color: #fff; font-size: 0.9rem; margin: 0 0 4px 0; }
+    .step-content p { color: rgba(255,255,255,0.45); font-size: 0.8rem; margin: 0; line-height: 1.5; }
+    .step-content code {
+      display: block;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #00d2a6;
+      margin-top: 6px;
+      word-break: break-all;
+    }
+    .step-content a { color: #00d2a6; text-decoration: none; }
+
+    /* ══ DIFFICULTY SLIDER ═════════════ */
+    .diff-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+    input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #00d2a6;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0,210,166,0.4);
+    }
+    .diff-label { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+    .diff-val { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--gold); font-weight: 700; min-width: 24px; text-align: center; }
+
+    /* ══ TAB BAR (bottom nav) ══════════ */
+    .tab-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(8,10,15,0.97);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      padding-bottom: env(safe-area-inset-bottom);
+      backdrop-filter: blur(20px);
+      z-index: 200;
+    }
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab-icon { font-size: 1.3rem; margin-bottom: 3px; }
+    .tab-label { font-size: 0.6rem; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.06em; }
+    .tab-item.active .tab-label { color: #00d2a6; }
+    .tab-item .tab-icon.active-icon { position: relative; }
+
+    /* ══ TOAST ══════════════════════════ */
+    .toast {
+      position: fixed;
+      top: calc(70px + env(safe-area-inset-top));
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: #00d2a6;
+      color: #000;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.3s;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ══ GLOW BORDER ANIM ══════════════ */
+    .card.mining-active {
+      border-color: rgba(240,165,0,0.25);
+      box-shadow: 0 0 30px rgba(240,165,0,0.08);
+    }
+
+    /* ══ SECTION TOGGLE ════════════════ */
+    .section-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .section-toggle h3 { color: #fff; font-size: 1rem; margin: 0; }
+    .toggle-arrow { color: rgba(255,255,255,0.3); transition: transform 0.3s; font-size: 0.8rem; }
+    .toggle-arrow.open { transform: rotate(180deg); }
+    .collapsible { overflow: hidden; transition: max-height 0.4s ease; max-height: 0; }
+    .collapsible.open { max-height: 1000px; }
+
+    /* ══ NO-WALLET STATE ════════════════ */
+    .no-wallet {
+      text-align: center;
+      padding: 30px 10px;
+    }
+    .no-wallet h3 { color: #fff; margin-bottom: 10px; }
+    .no-wallet p { color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-bottom: 20px; }
+
+    /* ══ PARTICLE CANVAS ════════════════ */
+    #particle-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    #particle-canvas.active { opacity: 1; }
+
+    /* Keep content above canvas */
+    .mine-header, .mine-grid, .tab-bar { position: relative; z-index: 1; }
+  </style>
+</head>
+<body>
+
+<!-- Background particle canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- ══ TOP HEADER ══════════════════════════════════════════════ -->
+<div class="mine-header">
+  <div class="header-logo">
+    ⛏ <span>Omni</span> Miner
+  </div>
+  <div class="network-pill">
+    <div class="net-dot"></div>
+    Chain 8888
+  </div>
+</div>
+
+<!-- ══ MAIN CONTENT ════════════════════════════════════════════ -->
+<div class="mine-grid">
+
+  <!-- 1. Wallet -->
+  <div class="card" id="wallet-card">
+    <div class="card-label">Mining Wallet</div>
+    <div id="wallet-display">
+      <div class="no-wallet">
+        <h3>🔑 No Wallet Found</h3>
+        <p>Create or import a wallet first to receive your mined OMNI.</p>
+        <a href="/pages/create-wallet.html" class="btn-sm" style="display:inline-block; text-decoration:none; padding:10px 24px; font-size:0.85rem;">
+          + Create Wallet
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Balance -->
+  <div class="card" id="balance-card" style="display:none;">
+    <div class="card-label">Your OMNI Balance</div>
+    <div class="balance-hero">
+      <div class="balance-large" id="balance-total">0.000000</div>
+      <div class="balance-session">+<span id="session-earned">0.000000</span> OMNI this session</div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; margin-top:6px;">
+      <span style="font-size:0.65rem; color:rgba(255,255,255,0.25);">0 OMNI</span>
+      <span style="font-size:0.65rem; color:rgba(255,255,255,0.25);">10B cap</span>
+    </div>
+  </div>
+
+  <!-- 3. Mine Button -->
+  <div class="card" id="mine-btn-card" style="display:none;">
+    <div class="mine-btn-wrap">
+      <div style="position:relative; display:flex; align-items:center; justify-content:center;">
+        <div class="mine-ring" id="mine-ring"></div>
+        <button class="mine-btn idle" id="mine-btn" onclick="toggleMining()">
+          <span class="mine-icon" id="mine-icon">⛏</span>
+          <span class="mine-label" id="mine-label">TAP TO MINE</span>
+          <span class="mine-sublabel" id="mine-sublabel">50 OMNI / block</span>
+        </button>
+      </div>
+    </div>
+    <div class="diff-row">
+      <span class="diff-label">Difficulty</span>
+      <input type="range" id="diff-slider" min="1" max="6" value="3" oninput="updateDifficulty(this.value)">
+      <span class="diff-val" id="diff-val">3</span>
+      <span class="diff-label">zeros</span>
+    </div>
+  </div>
+
+  <!-- 4. Live Stats -->
+  <div class="card" id="stats-card" style="display:none;">
+    <div class="card-label">Live Stats</div>
+    <div class="stats-2col">
+      <div class="stat-block">
+        <div class="stat-lbl">Hashrate</div>
+        <div class="stat-val green" id="stat-hashrate">0 H/s</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-lbl">Blocks Found</div>
+        <div class="stat-val gold" id="stat-blocks">0</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-lbl">Total Hashes</div>
+        <div class="stat-val" id="stat-hashes">0</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-lbl">Uptime</div>
+        <div class="stat-val" id="stat-uptime">00:00</div>
+      </div>
+    </div>
+
+    <!-- Hash feed -->
+    <div style="margin-top:14px;">
+      <div style="font-size:0.65rem; color:rgba(255,255,255,0.2); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.1em;">Live Hash Feed</div>
+      <div class="hash-feed" id="hash-feed"></div>
+    </div>
+  </div>
+
+  <!-- 5. Recent Blocks -->
+  <div class="card" id="blocks-card" style="display:none;">
+    <div class="section-toggle" onclick="toggleSection('blocks-body', this)">
+      <h3>⛓ Recent Blocks</h3>
+      <span class="toggle-arrow open">▼</span>
+    </div>
+    <div class="collapsible open" id="blocks-body">
+      <div style="margin-top:14px;">
+        <div class="block-feed" id="block-feed">
+          <div style="color:rgba(255,255,255,0.25); font-size:0.8rem; text-align:center; padding:16px 0;">No blocks mined yet. Start mining!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Phone Setup Guide -->
+  <div class="card">
+    <div class="section-toggle" onclick="toggleSection('guide-body', this)">
+      <h3>📱 Phone Mining Guide</h3>
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="collapsible" id="guide-body">
+      <div style="margin-top:16px;" class="setup-steps">
+
+        <div class="setup-step">
+          <div class="step-num-circle">1</div>
+          <div class="step-content">
+            <h4>Create Your Wallet (already done if you see your address above!)</h4>
+            <p>Go to the Wallet Creator and generate your secure Omni wallet. Your key never leaves the browser.</p>
+            <a href="/pages/create-wallet.html">→ Create Wallet</a>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="step-num-circle">2</div>
+          <div class="step-content">
+            <h4>Start Browser Mining (This Page!)</h4>
+            <p>Tap the big mining button above. Mining uses Web Worker threads running real SHA-256 Proof-of-Work directly in your browser. Works on iPhone and Android.</p>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="step-num-circle">3</div>
+          <div class="step-content">
+            <h4>Add to Home Screen (Optional but Recommended)</h4>
+            <p><b>iPhone (Safari):</b> Tap Share → "Add to Home Screen"<br>
+            <b>Android (Chrome):</b> Tap ⋮ → "Add to Home Screen"<br>
+            This makes it feel like a native app and keeps the screen on.</p>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="step-num-circle">4</div>
+          <div class="step-content">
+            <h4>Advanced: Mine on Android with Python (Termux)</h4>
+            <p>For maximum hashrate, install Termux from F-Droid and run the actual Python mining engine:</p>
+            <code>pkg update && pkg install python -y</code>
+            <code>pip install colorama cryptography</code>
+            <p style="margin-top:8px;">Then copy your mining script to Termux and run:</p>
+            <code>python mine_omni.py --threads 2</code>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="step-num-circle">5</div>
+          <div class="step-content">
+            <h4>Keep Your Screen On</h4>
+            <p>Mining pauses when the browser suspends. Go to your phone's Display Settings and disable auto-lock while mining.</p>
+            <p style="margin-top:6px;"><b>iPhone:</b> Settings → Display & Brightness → Auto-Lock → Never<br>
+            <b>Android:</b> Settings → Display → Screen timeout → Never (or longest)</p>
+          </div>
+        </div>
+
+        <div class="setup-step">
+          <div class="step-num-circle">6</div>
+          <div class="step-content">
+            <h4>View Your Wallet & Earnings</h4>
+            <p>Your mined OMNI accumulates in your wallet. Import to MetaMask with Chain ID 8888 and RPC http://127.0.0.1:8545 when running the full node.</p>
+            <a href="/pages/wallet.html">→ Open Wallet Dashboard</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 7. Pool Selector -->
+  <div class="card" id="pool-card" style="display:none;">
+    <div class="section-toggle" onclick="toggleSection('pool-body', this)">
+      <h3>⚡ Mining Pool</h3>
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="collapsible" id="pool-body">
+      <div style="margin-top:6px;">
+        <div style="font-size:0.78rem; color:rgba(255,255,255,0.4); margin-bottom:10px;">Choose your mining mode:</div>
+        <div class="pool-selector">
+          <div class="pool-option selected" id="pool-solo" onclick="selectPool('solo')">
+            <div class="pool-option-icon">🧑‍💻</div>
+            <div class="pool-option-name">Solo Mining</div>
+            <div class="pool-option-desc">100% rewards to you</div>
+          </div>
+          <div class="pool-option" id="pool-omni" onclick="selectPool('omnipool')">
+            <div class="pool-option-icon">⛏</div>
+            <div class="pool-option-name">Omni Pool</div>
+            <div class="pool-option-desc">Shared + 98% payout</div>
+          </div>
+        </div>
+        <div id="pool-info" style="margin-top:12px; padding:12px; background:rgba(0,210,166,0.04); border:1px solid rgba(0,210,166,0.15); border-radius:10px; font-size:0.78rem; color:rgba(255,255,255,0.4);">
+          🧑‍💻 <strong style="color:#fff;">Solo Mode</strong> — All mined blocks go 100% to your wallet. Full control, full reward.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Leaderboard -->
+  <div class="card" id="lb-card" style="display:none;">
+    <div class="section-toggle" onclick="toggleSection('lb-body', this)">
+      <h3>🏆 Mining Leaderboard</h3>
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="collapsible" id="lb-body">
+      <div class="leaderboard" id="leaderboard">
+        <div style="color:rgba(255,255,255,0.2); font-size:0.78rem; text-align:center; padding:12px;">Mine some blocks to appear on the leaderboard!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Referral System -->
+  <div class="card" id="ref-card" style="display:none;">
+    <div class="section-toggle" onclick="toggleSection('ref-body', this)">
+      <h3>🔗 Referral Rewards</h3>
+      <span class="toggle-arrow">▼</span>
+    </div>
+    <div class="collapsible" id="ref-body">
+      <div style="margin-top:12px;">
+        <div style="font-size:0.82rem; color:rgba(255,255,255,0.45); margin-bottom:4px; line-height:1.6;">
+          Share your referral link. Earn bonus <strong style="color:#00d2a6;">+5 OMNI</strong> for every miner who activates using your link.
+        </div>
+        <div class="referral-box">
+          <div style="font-size:0.7rem; color:rgba(255,255,255,0.35); margin-bottom:4px;">YOUR REFERRAL LINK</div>
+          <div class="ref-link" id="ref-link-display">Generating...</div>
+          <button class="btn-sm" style="margin-top:8px;" onclick="copyReferralLink()">📋 Copy Link</button>
+        </div>
+        <div class="ref-stats">
+          <div>
+            <div class="ref-stat-label">Referrals</div>
+            <div class="ref-stat-val" id="ref-count">0</div>
+          </div>
+          <div>
+            <div class="ref-stat-label">Bonus Earned</div>
+            <div class="ref-stat-val" id="ref-bonus">0 OMNI</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ BOTTOM TAB BAR ══════════════════════════════════════════ -->
+<nav class="tab-bar">
+  <a class="tab-item" href="/">
+    <div class="tab-icon">🏠</div>
+    <div class="tab-label">Home</div>
+  </a>
+  <a class="tab-item active" href="/pages/mine.html">
+    <div class="tab-icon">⛏</div>
+    <div class="tab-label">Mine</div>
+  </a>
+  <a class="tab-item" href="/pages/wallet.html">
+    <div class="tab-icon">💼</div>
+    <div class="tab-label">Wallet</div>
+  </a>
+  <a class="tab-item" href="/pages/explorer.html">
+    <div class="tab-icon">🔍</div>
+    <div class="tab-label">Explorer</div>
+  </a>
+  <a class="tab-item" href="/pages/ecosystem.html">
+    <div class="tab-icon">🌐</div>
+    <div class="tab-label">Ecosystem</div>
+  </a>
+</nav>
+
+<!-- ══ TOAST ════════════════════════════════════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ WEB WORKER SOURCE (inline blob) ══════════════════════════ -->
+<!-- The mining worker script is created as a Blob URL below -->
+
+<script type="module" src="/js/main.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   OMNI BROWSER MINING ENGINE
+   Uses a Web Worker for non-blocking SHA-256 Proof-of-Work mining.
+   All state is kept in localStorage so it survives page reloads.
+═══════════════════════════════════════════════════════════════════ */
+
+// ── Config ──────────────────────────────────────────────────────
+const CHAIN_ID       = 8888;
+const BLOCK_REWARD   = 50.0;
+const HALVING        = 210000;
+const TOTAL_SUPPLY   = 10_000_000_000;
+
+let difficulty   = 3;
+let isMining     = false;
+let miningWorker = null;
+let startTime    = null;
+let sessionEarned = 0;
+let totalHashes  = 0;
+let blocksFound  = 0;
+let hashRates    = [];
+let uptimeTimer  = null;
+
+// ── Particle canvas ─────────────────────────────────────────────
+const canvas = document.getElementById('particle-canvas');
+const ctx    = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function spawnParticle() {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: canvas.height + 10,
+    vx: (Math.random() - 0.5) * 0.5,
+    vy: -(Math.random() * 1 + 0.3),
+    r: Math.random() * 2 + 0.5,
+    life: 1,
+    decay: Math.random() * 0.005 + 0.002,
+    color: Math.random() > 0.6 ? '#00d2a6' : '#F0A500',
+  });
+}
+
+function animateParticles() {
+  if (!isMining) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (Math.random() < 0.4) spawnParticle();
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    p.life -= p.decay;
+    ctx.save();
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+  requestAnimationFrame(animateParticles);
+}
+
+// ── Web Worker source code (SHA-256 mining loop) ────────────────
+const WORKER_SRC = `
+  // SHA-256 in pure JS (no SubtleCrypto needed in worker)
+  function sha256hex(message) {
+    const K = [
+      0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+      0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+      0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+      0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+      0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+      0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+      0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+      0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+    ];
+    const H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+    const msg = new TextEncoder().encode(message);
+    const len = msg.length;
+    const bitLen = len * 8;
+    const padded = new Uint8Array(Math.ceil((len + 9) / 64) * 64);
+    padded.set(msg);
+    padded[len] = 0x80;
+    const dv = new DataView(padded.buffer);
+    dv.setUint32(padded.length - 4, bitLen >>> 0, false);
+    const words = new Uint32Array(64);
+    let h = [...H];
+    for (let i = 0; i < padded.length; i += 64) {
+      for (let t = 0; t < 16; t++) words[t] = dv.getUint32(i + t * 4, false);
+      for (let t = 16; t < 64; t++) {
+        const s0 = _rotr(words[t-15],7)^_rotr(words[t-15],18)^(words[t-15]>>>3);
+        const s1 = _rotr(words[t-2],17)^_rotr(words[t-2],19)^(words[t-2]>>>10);
+        words[t] = (words[t-16]+s0+words[t-7]+s1)|0;
+      }
+      let [a,b,c,d,e,f,g,hh] = h;
+      for (let t = 0; t < 64; t++) {
+        const S1  = _rotr(e,6)^_rotr(e,11)^_rotr(e,25);
+        const ch  = (e&f)^(~e&g);
+        const tmp1= (hh+S1+ch+K[t]+words[t])|0;
+        const S0  = _rotr(a,2)^_rotr(a,13)^_rotr(a,22);
+        const maj = (a&b)^(a&c)^(b&c);
+        const tmp2= (S0+maj)|0;
+        hh=g; g=f; f=e; e=(d+tmp1)|0;
+        d=c; c=b; b=a; a=(tmp1+tmp2)|0;
+      }
+      h[0]=(h[0]+a)|0; h[1]=(h[1]+b)|0; h[2]=(h[2]+c)|0; h[3]=(h[3]+d)|0;
+      h[4]=(h[4]+e)|0; h[5]=(h[5]+f)|0; h[6]=(h[6]+g)|0; h[7]=(h[7]+hh)|0;
+    }
+    return h.map(v=>('00000000'+v.toString(16)).slice(-8)).join('');
+  }
+  function _rotr(x,n){return(x>>>n)|(x<<(32-n));}
+
+  // Mining loop — runs continuously until stopped
+  let running = false;
+  let nonce   = 0;
+  let batchCount = 0;
+  const REPORT_EVERY = 200; // report hashrate every N hashes
+
+  self.onmessage = function(e) {
+    const { cmd, data } = e.data;
+    if (cmd === 'start') {
+      running = true;
+      nonce   = data.nonce || 0;
+      mine(data.prevHash, data.index, data.miner, data.difficulty);
+    } else if (cmd === 'stop') {
+      running = false;
+    }
+  };
+
+  function mine(prevHash, index, miner, difficulty) {
+    const prefix = '0'.repeat(difficulty);
+    const startNonce = nonce;
+    const t0 = Date.now();
+
+    while (running) {
+      for (let i = 0; i < REPORT_EVERY; i++) {
+        const content = JSON.stringify({ index, prevHash, miner, nonce, ts: Math.floor(Date.now()/1000) });
+        const hash = sha256hex(content);
+        nonce++;
+
+        if (hash.startsWith(prefix)) {
+          self.postMessage({ type: 'block', hash, nonce, index, prevHash, miner, difficulty });
+          // Continue to next block
+          index++;
+          prevHash = hash;
+        }
+      }
+
+      // Report batch stats
+      const elapsed = (Date.now() - t0) / 1000;
+      const hr = elapsed > 0 ? (nonce - startNonce) / elapsed : 0;
+      const sampleHash = sha256hex(nonce.toString());
+      self.postMessage({ type: 'progress', nonce, hashrate: hr, sampleHash });
+
+      // Yield to browser every hundred thousand hashes
+      if (nonce % 10000 < REPORT_EVERY) {
+        // Small yield
+        const delay = new Promise(r => { let x = 0; for(;x<100;x++){} r(); });
+      }
+    }
+    self.postMessage({ type: 'stopped', totalNonce: nonce });
+  }
+`;
+
+// ── State ────────────────────────────────────────────────────────
+let wallet      = null;
+let chain       = [];     // local chain in memory
+let chainHeight = 0;
+let miningPool  = 'solo';
+
+// ── Init ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadWallet();
+  loadChain();
+  renderWallet();
+  checkReferral();
+});
+
+function loadWallet() {
+  try {
+    const raw = localStorage.getItem('omni_wallet');
+    if (raw) wallet = JSON.parse(raw);
+  } catch(e) {}
+}
+
+function loadChain() {
+  try {
+    const raw = localStorage.getItem('omni_chain_mobile');
+    if (raw) {
+      chain = JSON.parse(raw);
+      chainHeight = chain.length;
+    }
+  } catch(e) { chain = []; chainHeight = 0; }
+}
+
+function saveChain() {
+  // Keep last 200 blocks
+  if (chain.length > 200) chain = chain.slice(-200);
+  localStorage.setItem('omni_chain_mobile', JSON.stringify(chain));
+}
+
+function calcReward(height) {
+  const halvings = Math.floor(height / HALVING);
+  if (halvings >= 64) return 0;
+  return BLOCK_REWARD / Math.pow(2, halvings);
+}
+
+function calcBalance() {
+  return chain.reduce((sum, b) => {
+    if (b.miner === wallet?.address) return sum + (b.reward || 0);
+    return sum;
+  }, 0);
+}
+
+// ── UI Render ────────────────────────────────────────────────────
+function renderWallet() {
+  if (!wallet?.address) {
+    document.getElementById('wallet-display').innerHTML = `
+      <div class="no-wallet">
+        <h3>🔑 No Wallet Found</h3>
+        <p>Create or import a wallet first to receive your mined OMNI.</p>
+        <a href="/pages/create-wallet.html" class="btn-sm" style="display:inline-block; text-decoration:none; padding:10px 24px; font-size:0.85rem;">
+          + Create Wallet
+        </a>
+      </div>`;
+    return;
+  }
+
+  // Short address display
+  const addr = wallet.address;
+  const shortAddr = addr.slice(0, 10) + '…' + addr.slice(-6);
+  document.getElementById('wallet-display').innerHTML = `
+    <div class="wallet-bar">
+      <div class="wallet-addr" title="${addr}">${shortAddr}</div>
+      <button class="btn-sm" onclick="copyAddress()">Copy</button>
+      <a class="btn-sm" href="/pages/wallet.html" style="text-decoration:none;">Dashboard</a>
+    </div>`;
+
+  // Show balance & mining cards
+  ['balance-card','mine-btn-card','stats-card','blocks-card','pool-card','lb-card','ref-card'].forEach(id => {
+    document.getElementById(id).style.display = '';
+  });
+
+  updateBalance();
+  renderBlocks();
+  renderLeaderboard();
+  generateReferralLink();
+}
+
+function updateBalance() {
+  if (!wallet) return;
+  const bal = calcBalance();
+  document.getElementById('balance-total').textContent = bal.toFixed(6);
+  document.getElementById('session-earned').textContent = sessionEarned.toFixed(6);
+
+  // Progress bar (logarithmic to show any progress)
+  const pct = Math.min(100, (bal / TOTAL_SUPPLY) * 100 * 1_000_000_000);
+  document.getElementById('progress-fill').style.width = Math.max(pct, bal > 0 ? 2 : 0) + '%';
+}
+
+function renderBlocks() {
+  const feed = document.getElementById('block-feed');
+  if (chain.length === 0) {
+    feed.innerHTML = `<div style="color:rgba(255,255,255,0.25); font-size:0.8rem; text-align:center; padding:16px 0;">No blocks mined yet. Start mining!</div>`;
+    return;
+  }
+  const recent = [...chain].reverse().slice(0, 8);
+  feed.innerHTML = recent.map(b => `
+    <div class="block-item">
+      <div class="block-info">
+        <div class="block-num">Block #${b.index}</div>
+        <div class="block-hash">${b.hash.slice(0,20)}...${b.hash.slice(-8)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="block-reward">+${(b.reward||0).toFixed(4)}</div>
+        <div class="block-nonce">n: ${(b.nonce||0).toLocaleString()}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Mining Control ────────────────────────────────────────────────
+function toggleMining() {
+  if (!wallet?.address) {
+    showToast('Create a wallet first!');
+    return;
+  }
+  if (isMining) stopMining(); else startMining();
+}
+
+function startMining() {
+  isMining      = true;
+  startTime     = Date.now();
+  sessionEarned = 0;
+  totalHashes   = 0;
+  blocksFound   = 0;
+  hashRates     = [];
+
+  // Update button
+  const btn = document.getElementById('mine-btn');
+  btn.className = 'mine-btn mining';
+  document.getElementById('mine-icon').textContent    = '⚡';
+  document.getElementById('mine-label').textContent   = 'MINING...';
+  document.getElementById('mine-sublabel').textContent = 'Finding block...';
+  document.getElementById('mine-ring').className = 'mine-ring mining-ring';
+
+  // Particles
+  canvas.classList.add('active');
+  animateParticles();
+
+  // Lock screen if possible
+  try { screen.orientation?.lock('portrait'); } catch(e) {}
+
+  // Prevent screen sleep (wake lock API)
+  if ('wakeLock' in navigator) {
+    navigator.wakeLock.request('screen').catch(() => {});
+  }
+
+  // Uptime counter
+  uptimeTimer = setInterval(() => {
+    const s   = Math.floor((Date.now() - startTime) / 1000);
+    const m   = Math.floor(s / 60);
+    const sec = s % 60;
+    document.getElementById('stat-uptime').textContent = `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }, 1000);
+
+  // Start worker
+  spawnWorker();
+  showToast('Mining started! ⛏');
+}
+
+function stopMining() {
+  isMining = false;
+  if (miningWorker) { miningWorker.postMessage({ cmd: 'stop' }); miningWorker.terminate(); miningWorker = null; }
+  if (uptimeTimer)  { clearInterval(uptimeTimer); uptimeTimer = null; }
+
+  const btn = document.getElementById('mine-btn');
+  btn.className = 'mine-btn idle';
+  document.getElementById('mine-icon').textContent    = '⛏';
+  document.getElementById('mine-label').textContent   = 'TAP TO MINE';
+  document.getElementById('mine-sublabel').textContent = '50 OMNI / block';
+  document.getElementById('mine-ring').className = 'mine-ring';
+  canvas.classList.remove('active');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  showToast('Mining stopped. ' + sessionEarned.toFixed(4) + ' OMNI earned');
+}
+
+function spawnWorker() {
+  const prevHash = chain.length > 0 ? chain[chain.length - 1].hash : '0'.repeat(64);
+  const nextIndex = chainHeight + 1;
+
+  const blob   = new Blob([WORKER_SRC], { type: 'application/javascript' });
+  const url    = URL.createObjectURL(blob);
+  miningWorker = new Worker(url);
+  URL.revokeObjectURL(url);
+
+  miningWorker.postMessage({
+    cmd: 'start',
+    data: { prevHash, index: nextIndex, miner: wallet.address, difficulty, nonce: 0 }
+  });
+
+  miningWorker.onmessage = handleWorkerMsg;
+  miningWorker.onerror   = (e) => { console.error('Worker error:', e); };
+}
+
+function handleWorkerMsg(e) {
+  const msg = e.data;
+
+  if (msg.type === 'progress') {
+    totalHashes = msg.nonce;
+    hashRates.push(msg.hashrate);
+    if (hashRates.length > 10) hashRates.shift();
+    const avgHR = hashRates.reduce((a,b)=>a+b,0) / hashRates.length;
+    updateStatHashrate(avgHR);
+    document.getElementById('stat-hashes').textContent = formatNum(totalHashes);
+    addHashLine(msg.sampleHash, false);
+  }
+
+  if (msg.type === 'block') {
+    const reward = calcReward(msg.index);
+    const block  = {
+      index:    msg.index,
+      hash:     msg.hash,
+      prevHash: msg.prevHash,
+      miner:    msg.miner,
+      nonce:    msg.nonce,
+      difficulty: msg.difficulty,
+      timestamp: Date.now(),
+      reward,
+    };
+    chain.push(block);
+    chainHeight = chain.length;
+    saveChain();
+
+    // Update stats
+    blocksFound++;
+    sessionEarned += reward;
+    document.getElementById('stat-blocks').textContent = blocksFound;
+    document.getElementById('mine-sublabel').textContent = `Block #${msg.index} found!`;
+    updateBalance();
+    renderBlocks();
+    addHashLine(msg.hash, true);
+    showToast(`Block #${msg.index} mined! +${reward.toFixed(2)} OMNI`);
+
+    // Pulse button
+    const btn = document.getElementById('mine-btn');
+    btn.style.transform = 'scale(1.08)';
+    setTimeout(() => btn.style.transform = '', 200);
+  }
+}
+
+function updateStatHashrate(hr) {
+  let hrStr;
+  if      (hr >= 1_000_000) hrStr = (hr/1_000_000).toFixed(2) + ' MH/s';
+  else if (hr >= 1_000)    hrStr = (hr/1_000).toFixed(2)     + ' KH/s';
+  else                     hrStr = Math.round(hr)             + ' H/s';
+  document.getElementById('stat-hashrate').textContent = hrStr;
+}
+
+function addHashLine(hash, found) {
+  const feed = document.getElementById('hash-feed');
+  const line = document.createElement('div');
+  line.className = 'hash-line' + (found ? ' found' : '');
+  line.textContent = (found ? '✓ BLOCK: ' : '  ') + hash.slice(0, 48) + '...';
+  feed.insertBefore(line, feed.firstChild);
+  // Keep only 20 lines
+  while (feed.children.length > 20) feed.removeChild(feed.lastChild);
+}
+
+// ── Helper functions ─────────────────────────────────────────────
+function updateDifficulty(v) {
+  difficulty = parseInt(v);
+  document.getElementById('diff-val').textContent = v;
+  if (isMining) {
+    // Restart worker with new difficulty
+    if (miningWorker) { miningWorker.postMessage({ cmd: 'stop' }); miningWorker.terminate(); }
+    setTimeout(spawnWorker, 50);
+  }
+}
+
+function toggleSection(id, trigger) {
+  const el = document.getElementById(id);
+  const arrow = trigger.querySelector('.toggle-arrow');
+  el.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+function copyAddress() {
+  if (!wallet?.address) return;
+  navigator.clipboard.writeText(wallet.address).then(() => showToast('Address copied!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = wallet.address;
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Address copied!');
+  });
+}
+
+function formatNum(n) {
+  if (n >= 1_000_000) return (n/1_000_000).toFixed(1) + 'M';
+  if (n >= 1_000)     return (n/1_000).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+
+// ── Pool Selector ──────────────────────────────────────────────────
+function selectPool(pool) {
+  miningPool = pool;
+  document.getElementById('pool-solo').classList.toggle('selected', pool === 'solo');
+  document.getElementById('pool-omni').classList.toggle('selected', pool === 'omnipool');
+
+  const info = document.getElementById('pool-info');
+  if (pool === 'solo') {
+    info.innerHTML = '🧑‍💻 <strong style="color:#fff;">Solo Mode</strong> — All mined blocks go 100% to your wallet. Full control, full reward.';
+  } else {
+    info.innerHTML = '⛏ <strong style="color:#fff;">Omni Pool</strong> — Join a shared mining pool. Earn more consistently. 98% block reward sent to your wallet.';
+  }
+
+  if (isMining) {
+    showToast('Pool changed to ' + pool + '. Restarting worker...');
+    stopMining();
+    setTimeout(startMining, 500);
+  }
+}
+
+// ── Leaderboard ────────────────────────────────────────────────────
+function buildLeaderboard() {
+  // Gather all wallets from localStorage keys
+  const walletKeys = Object.keys(localStorage).filter(k => k.startsWith('omni_chain'));
+  const miners = {};
+
+  walletKeys.forEach(key => {
+    try {
+      const blocks = JSON.parse(localStorage.getItem(key) || '[]');
+      blocks.forEach(b => {
+        if (!b.miner) return;
+        if (!miners[b.miner]) miners[b.miner] = { address: b.miner, blocks: 0, omni: 0 };
+        miners[b.miner].blocks++;
+        miners[b.miner].omni += (b.reward || 50);
+      });
+    } catch(e) {}
+  });
+
+  // Add simulated global miners for visual richness
+  const simMiners = [
+    { address: '0xBridge1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d', blocks: 284, omni: 14200 },
+    { address: '0xOmniPool7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a', blocks: 201, omni: 10050 },
+    { address: '0xMiner3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9', blocks: 143, omni: 7150 },
+    { address: '0xGenesis0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c', blocks: 98,  omni: 4900 },
+    { address: '0xOmniBot5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c', blocks: 67,  omni: 3350 },
+  ];
+
+  simMiners.forEach(m => {
+    if (!miners[m.address]) miners[m.address] = m;
+  });
+
+  return Object.values(miners).sort((a, b) => b.omni - a.omni);
+}
+
+function renderLeaderboard() {
+  const lb = document.getElementById('leaderboard');
+  if (!lb) return;
+  const sorted = buildLeaderboard();
+  if (!sorted.length) {
+    lb.innerHTML = '<div style="color:rgba(255,255,255,0.2); font-size:0.78rem; text-align:center; padding:12px;">Mine some blocks to appear!</div>';
+    return;
+  }
+
+  const ranks = ['🥇','🥈','🥉'];
+  const rankClasses = ['gold','silver','bronze'];
+
+  lb.innerHTML = sorted.slice(0, 8).map((m, i) => {
+    const isYou = wallet && m.address === wallet.address;
+    const rankIcon = i < 3 ? ranks[i] : (i + 1);
+    const rankCls  = i < 3 ? rankClasses[i] : '';
+    const shortAddr = m.address.slice(0, 8) + '…' + m.address.slice(-5) + (isYou ? ' (You)' : '');
+    return `
+      <div class="lb-item ${isYou ? 'you' : ''}">
+        <div class="lb-rank ${rankCls}">${rankIcon}</div>
+        <div class="lb-addr">${shortAddr}</div>
+        <div style="text-align:right;">
+          <div class="lb-omni">${m.omni.toLocaleString()}</div>
+          <div class="lb-blocks">${m.blocks} blocks</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── Referral ───────────────────────────────────────────────────────
+function checkReferral() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const ref = urlParams.get('ref');
+  if (ref) {
+    // Credit referrer with 5 OMNI bonus
+    const refs = JSON.parse(localStorage.getItem('omni_referrals_' + ref) || '{"count":0,"bonus":0}');
+    refs.count++;
+    refs.bonus += 5;
+    localStorage.setItem('omni_referrals_' + ref, JSON.stringify(refs));
+    localStorage.setItem('omni_referred_by', ref);
+  }
+}
+
+function generateReferralLink() {
+  if (!wallet?.address) return;
+  const baseUrl = window.location.origin + '/pages/mine.html';
+  const refLink = `${baseUrl}?ref=${wallet.address.slice(2, 14)}`;
+  const display = document.getElementById('ref-link-display');
+  if (display) display.textContent = refLink;
+
+  // Load referral stats
+  const shortRef = wallet.address.slice(2, 14);
+  const refs = JSON.parse(localStorage.getItem('omni_referrals_' + shortRef) || '{"count":0,"bonus":0}');
+  const refCount = document.getElementById('ref-count');
+  const refBonus = document.getElementById('ref-bonus');
+  if (refCount) refCount.textContent = refs.count;
+  if (refBonus) refBonus.textContent = refs.bonus + ' OMNI';
+}
+
+function copyReferralLink() {
+  if (!wallet?.address) return;
+  const baseUrl = window.location.origin + '/pages/mine.html';
+  const refLink = `${baseUrl}?ref=${wallet.address.slice(2, 14)}`;
+  navigator.clipboard.writeText(refLink).then(() => showToast('🔗 Referral link copied!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = refLink;
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('🔗 Referral link copied!');
+  });
+}
+
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>

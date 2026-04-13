@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Card Application | Omni Trading</title>
+</head>
+<body>
+  <div class="galaxy-overlay" style="background: radial-gradient(circle at center, transparent 0%, #05050f 100%);"></div>
+  <div id="navbar-container"></div>
+  
+  <main id="app" class="container" style="padding-top: calc(var(--header-height) + 40px); min-height: 80vh;">
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+      <!-- Progress Bar -->
+      <div style="display:flex; justify-content:space-between; margin-bottom: 40px; position:relative;">
+        <div style="position:absolute; top:50%; left:0; width:100%; height:2px; background:var(--color-bg-glass); z-index:1;"></div>
+        <div style="position:absolute; top:50%; left:0; width:50%; height:2px; background:var(--color-primary); z-index:1; box-shadow: 0 0 10px var(--color-primary);"></div>
+        
+        <div style="z-index:2; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:30px; height:30px; border-radius:50%; background:var(--color-primary); color:#000; display:flex; align-items:center; justify-content:center; font-weight:bold;">1</div>
+          <span style="font-size:0.8rem; color:var(--color-primary);">Select</span>
+        </div>
+        <div style="z-index:2; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:30px; height:30px; border-radius:50%; background:var(--color-primary); color:#000; display:flex; align-items:center; justify-content:center; font-weight:bold;">2</div>
+          <span style="font-size:0.8rem; color:var(--color-primary);">Stake</span>
+        </div>
+        <div style="z-index:2; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:30px; height:30px; border-radius:50%; background:var(--color-bg-glass); border:1px solid var(--color-border); display:flex; align-items:center; justify-content:center;">3</div>
+          <span style="font-size:0.8rem; color:var(--color-text-muted);">Address</span>
+        </div>
+        <div style="z-index:2; display:flex; flex-direction:column; align-items:center; gap:10px;">
+          <div style="width:30px; height:30px; border-radius:50%; background:var(--color-bg-glass); border:1px solid var(--color-border); display:flex; align-items:center; justify-content:center;">4</div>
+          <span style="font-size:0.8rem; color:var(--color-text-muted);">Confirm</span>
+        </div>
+      </div>
+
+      <!-- Stake Step Content -->
+      <div class="glass-panel" style="padding: 40px; text-align:center;">
+        <h2 style="margin-bottom: 10px;">Stake OMNI to Unlock Jade Green</h2>
+        <p class="text-muted" style="margin-bottom: 30px;">You need to lock 5,000 OMNI for 180 days to qualify for the Jade Green tier perks.</p>
+
+        <div style="background:rgba(0,255,136,0.1); border:1px solid var(--color-success); padding:20px; border-radius:8px; margin-bottom:30px; display:flex; justify-content:space-between; text-align:left;">
+          <div>
+            <h4 style="color:var(--color-success); margin-bottom:5px;">Required Stake</h4>
+            <p style="font-size:1.5rem; font-weight:bold;">5,000 OMNI</p>
+          </div>
+          <div style="text-align:right;">
+            <h4 class="text-muted" style="margin-bottom:5px;">Your Balance</h4>
+            <p style="font-size:1.5rem; font-weight:bold;">12,500 OMNI</p>
+          </div>
+        </div>
+
+        <ul style="text-align:left; color:var(--color-text-muted); margin-bottom:30px; font-size:0.9rem; line-height:1.8;">
+          <li>• OMNI is locked for 180 days.</li>
+          <li>• You will earn 10% APY on your staked OMNI.</li>
+          <li>• Early unlocking incurs a 10% penalty fee.</li>
+        </ul>
+
+        <div style="display:flex; justify-content:space-between;">
+          <a href="/pages/cards.html" class="btn btn-outline" style="min-width: 150px;">Back</a>
+          <a href="#" class="btn btn-primary" style="min-width: 150px; background:var(--color-success); color:#000;" onclick="alert('Proceeding to Address step...')">Stake & Continue</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-container" style="margin-top:100px;"></div>
+
+  <script type="module">
+    import '../css/global.css';
+    import { renderNavbar } from '../components/Navbar.js';
+    import { renderFooter } from '../components/Footer.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNavbar();
+      renderFooter();
+    });
+  </script>
+</body>
+</html>

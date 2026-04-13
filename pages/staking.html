@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staking | Omni Trading</title>
+</head>
+<body>
+  <div class="galaxy-overlay" style="background: radial-gradient(circle at center, transparent 0%, #05050f 100%);"></div>
+  <div id="navbar-container"></div>
+  
+  <main id="app" class="container" style="padding-top: calc(var(--header-height) + 40px); min-height: 80vh;">
+    <h1 class="text-gradient">Omni Staking Pools</h1>
+    <p class="text-muted" style="margin-bottom: 40px;">Lock your crypto for a fixed term or flex term to earn highest-tier yields.</p>
+
+    <!-- Controls -->
+    <div style="display:flex; gap:15px; margin-bottom: 30px;">
+      <button class="btn btn-primary">Fixed Staking</button>
+      <button class="btn btn-outline" style="color:var(--color-text-muted); border-color:var(--color-border);">Flexible Savings</button>
+      <div style="flex:1"></div>
+      <input type="text" placeholder="Search Token" class="glass-panel" style="padding:10px 20px; color:white; border:1px solid var(--color-border); outline:none; border-radius:var(--border-radius-xl);" />
+    </div>
+
+    <!-- Staking Table -->
+    <div class="glass-panel" style="padding: 20px;" id="staking-container">
+      <p>Loading Pools...</p>
+    </div>
+  </main>
+
+  <div id="ticker-container" style="margin-top: 100px;"></div>
+  <div id="footer-container"></div>
+
+  <script type="module">
+    import '../css/global.css';
+    import { renderNavbar } from '../components/Navbar.js';
+    import { renderTicker } from '../components/Ticker.js';
+    import { renderFooter } from '../components/Footer.js';
+    import { defi } from '../js/services/DeFiCore.js';
+    import { audio } from '../js/services/AudioEngine.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNavbar();
+      renderTicker();
+      renderFooter();
+
+      const container = document.getElementById('staking-container');
+      
+      defi.subscribe((state) => {
+        renderStaking(state);
+      });
+      
+      renderStaking(defi.loadState());
+    });
+
+    function renderStaking(state) {
+      const wallet = JSON.parse(localStorage.getItem('omni_wallet') || '{"liquid":{}}');
+      const staked = state.staking.stakedOMNI;
+      const rate = state.sOMNIExchangeRate || 1.0;
+      const sOMNI = wallet.liquid.sOMNI || 0;
+
+      const pools = [
+        { token: 'OMNI', apy: 25.0, minStake: 10, totalStaked: '45.2M', liquidToken: 'sOMNI' },
+        { token: 'BTC', apy: 5.2, minStake: 0.01, totalStaked: '1,234 BTC', liquidToken: '-' },
+        { token: 'ETH', apy: 7.8, minStake: 0.1, totalStaked: '18,456 ETH', liquidToken: '-' }
+      ];
+
+      const rows = pools.map(pool => {
+        const isOMNI = pool.token === 'OMNI';
+        return `
+          <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;">
+            <td style="padding: 20px; font-weight: bold; display:flex; align-items:center; gap:10px;">
+              <div style="width:30px; height:30px; border-radius:50%; background:var(--gradient-primary); display:flex; align-items:center; justify-content:center; color:#000; font-size:0.8rem;">${pool.token[0]}</div>
+              <div style="display:flex; flex-direction:column;">
+                <span style="color:#fff;">${pool.token}</span>
+                ${isOMNI ? `<span style="font-size:0.75rem; color:var(--color-primary); font-weight:800;">Liquid Holder: ${sOMNI.toFixed(4)} ${pool.liquidToken}</span>` : ''}
+              </div>
+            </td>
+            <td style="padding: 20px; text-align: right;" class="text-success font-weight:bold; font-size:1.1rem;">${pool.apy}%</td>
+            <td style="padding: 20px; text-align: right; color:rgba(255,255,255,0.3); font-size:0.85rem;">Flexible</td>
+            <td style="padding: 20px; text-align: right; font-family:'JetBrains Mono';">
+              ${isOMNI ? `
+                <div style="color:#fff;">1 sOMNI ≈ ${rate.toFixed(6)} OMNI</div>
+                <div style="font-size:0.7rem; color:var(--color-success);">Value Growing Daily ↑</div>
+              ` : '<span style="color:rgba(255,255,255,0.2);">—</span>'}
+            </td>
+            <td style="padding: 20px; text-align: right; color:rgba(255,255,255,0.4); font-size:0.85rem;">${pool.totalStaked}</td>
+            <td style="padding: 20px; text-align: right;">
+              <button class="btn btn-primary" onclick="window.stakeToken('${pool.token}')">Stake ${pool.token}</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); color: var(--color-text-muted); text-align: left; font-size:0.75rem; text-transform:uppercase;">
+              <th style="padding: 15px;">Asset / Position</th>
+              <th style="padding: 15px; text-align: right;">Est. APY</th>
+              <th style="padding: 15px; text-align: right;">Duration</th>
+              <th style="padding: 15px; text-align: right;">Redemption Rate</th>
+              <th style="padding: 15px; text-align: right;">Total Staked</th>
+              <th style="padding: 15px; text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      `;
+    }
+
+    window.stakeToken = function(token) {
+      if (token !== 'OMNI') return alert("Fixed term staking for " + token + " is coming soon. Use Flexible OMNI Staking for now.");
+      
+      const rate = defi.state.sOMNIExchangeRate || 1.0;
+      const amt = prompt(`Liquid Staking Portal\nCurrent Rate: 1 sOMNI = ${rate.toFixed(4)} OMNI\n\nEnter amount of OMNI to stake (receiving yield-bearing sOMNI):`);
+      if (amt && !isNaN(amt)) {
+        const res = defi.stakeOMNI(parseFloat(amt));
+        if (res.success) {
+           alert(`Execution Success! You received ${res.sOMNIGained.toFixed(4)} sOMNI. Its value in OMNI will increase automatically every second.`);
+        }
+      }
+    };
+
+    window.harvest = function() {
+      defi.claimAll();
+    };
+  </script>
+</body>
+</html>

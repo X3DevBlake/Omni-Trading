@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download App | Omni Trading</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 50px;
+    }
+    .platform-card {
+      background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light);
+      border-radius: var(--border-radius-lg);
+      padding: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .platform-card:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 40px rgba(0, 210, 166, 0.15);
+    }
+    .platform-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-primary);
+    }
+    .platform-title {
+      font-size: 1.5rem;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .platform-desc {
+      color: var(--color-text-muted);
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--color-primary);
+      color: #000;
+      padding: 15px 30px;
+      border-radius: var(--border-radius-md);
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-download:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+    .qr-box {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main id="app" class="container" style="padding: 120px 20px; text-align: center;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/OMNI_Logo.png" width="80" height="80" style="filter: drop-shadow(0 0 20px rgba(0, 210, 166, 0.4)); margin-bottom: 20px;"/>
+    <h1 style="font-size: 3.5rem; color: #fff; margin-bottom: 20px;">Trade Anywhere.</h1>
+    <p style="font-size: 1.2rem; color: var(--color-text-muted); max-width: 600px; margin: 0 auto;">
+      Download the official Omni Trading mobile and desktop clients to experience seamless execution, real-time market data, and AI-assisted trading on the go.
+    </p>
+
+    <div class="download-grid">
+      
+      <!-- Android -->
+      <div class="platform-card">
+        <div class="platform-icon"><i data-lucide="smartphone" style="width: 40px; height: 40px;"></i></div>
+        <h2 class="platform-title">Android APK</h2>
+        <p class="platform-desc">Direct install package for Android 10+ devices.</p>
+        <a href="https://drive.google.com/uc?export=download&id=13F_iMq4Zz-5ulG3HIQzu0vTb-C8Z9DRE" class="btn-download" download>
+          <i data-lucide="download"></i> Download APK
+        </a>
+        <div class="qr-box">
+           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${window.location.origin}/downloads/omni-trading.apk" alt="QR Code" width="100" id="qr-android"/>
+        </div>
+      </div>
+
+      <!-- iOS -->
+      <div class="platform-card">
+        <div class="platform-icon"><i data-lucide="apple" style="width: 40px; height: 40px;"></i></div>
+        <h2 class="platform-title">iOS TestFlight</h2>
+        <p class="platform-desc">Join the beta testing pool for iPhone & iPad.</p>
+        <a href="#" class="btn-download" style="background:#fff;">
+          <i data-lucide="external-link"></i> Open TestFlight
+        </a>
+        <div class="qr-box">
+           <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://testflight.apple.com/join" alt="QR Code" width="100"/>
+        </div>
+      </div>
+
+      <!-- macOS -->
+      <div class="platform-card">
+        <div class="platform-icon"><i data-lucide="monitor" style="width: 40px; height: 40px;"></i></div>
+        <h2 class="platform-title">Desktop DMG</h2>
+        <p class="platform-desc">Native desktop client for macOS (Intel & Apple Silicon).</p>
+        <a href="/builds/omni-desktop-mac.dmg" class="btn-download" download>
+          <i data-lucide="download"></i> Download DMG
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const qr = document.getElementById('qr-android');
+      if (qr) {
+        const url = 'https://drive.google.com/uc?export=download&id=13F_iMq4Zz-5ulG3HIQzu0vTb-C8Z9DRE';
+        qr.src = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(url)}`;
+      }
+    });
+  </script>
+</body>
+</html>

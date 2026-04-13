@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>USDT-M Futures | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <style>
+    /* Trading Interface Layout */
+    .trading-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: auto 1fr 300px;
+      gap: 5px;
+      height: calc(100vh - var(--header-height));
+      background: #000;
+      padding: 5px;
+    }
+    .panel {
+      background: var(--color-bg-deep);
+      border: 1px solid var(--color-bg-light);
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-header {
+      padding: 10px 15px;
+      border-bottom: 1px solid var(--color-bg-light);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+    }
+    /* Grid Areas */
+    .ticker-header { grid-column: 1 / -1; display:flex; gap: 30px; align-items:center; padding: 10px 20px;}
+    .chart-area { grid-column: 1 / 2; grid-row: 2 / 3; }
+    .orderbook-area { grid-column: 2 / 3; grid-row: 2 / 3; }
+    .order-entry-area { grid-column: 3 / 4; grid-row: 2 / 4; padding-bottom:20px; overflow-y:auto; }
+    .position-area { grid-column: 1 / 3; grid-row: 3 / 4; }
+    
+    /* Common Elements */
+    .price-lg { font-size: 1.5rem; color: var(--color-success); font-family: var(--font-heading); font-weight: 700; }
+    .stat { display:flex; flex-direction:column; gap:4px; font-size:0.8rem; color:var(--color-text-muted); }
+    .stat span:last-child { color: #fff; font-weight:600; }
+    
+    /* Order Entry */
+    .input-group {
+      background: var(--color-bg-light);
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    .input-group input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      flex: 1;
+      text-align: right;
+      outline: none;
+    }
+    .buy-btn { background: var(--color-success); color: #fff; width: 100%; border-radius: 4px; padding: 12px; border:none; font-weight:700; cursor:pointer;}
+    .sell-btn { background: var(--color-danger); color: #fff; width: 100%; border-radius: 4px; padding: 12px; border:none; font-weight:700; cursor:pointer;}
+    .leverage-slider { padding: 15px; }
+  </style>
+</head>
+<body style="overflow: hidden;">
+  <div id="navbar-container"></div>
+  
+  <main class="trading-layout">
+    <!-- Header -->
+    <div class="panel ticker-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.5rem; font-weight:bold; color:#fff;">BTCUSDT</span>
+        <span style="background:var(--color-bg-light); padding:2px 6px; border-radius:4px; font-size:0.8rem; color:var(--color-text-muted);">Perp</span>
+      </div>
+      <div class="price-lg" data-symbol-price="BTCUSDT" id="active-ticker-price">64,230.50</div>
+      <div class="stat"><span>24h Change</span><span class="text-success" data-symbol-change="BTCUSDT">+2.45%</span></div>
+      <div class="stat"><span>24h High</span><span>65,100.00</span></div>
+      <div class="stat"><span>24h Low</span><span>62,050.00</span></div>
+      <div class="stat"><span>Funding / Countdown</span><span style="color:var(--color-primary)">0.0100% / 03:45:12</span></div>
+    </div>
+    
+    <!-- Chart -->
+    <div class="panel chart-area">
+      <div class="panel-header">Chart</div>
+      <div id="tv-chart" style="width: 100%; height: 100%; min-height: 350px;"></div>
+    </div>
+    
+    <!-- Orderbook -->
+    <div class="panel orderbook-area">
+      <div class="panel-header">Order Book</div>
+      <div style="padding:10px;">
+        <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--color-text-muted); margin-bottom:10px;">
+          <span>Price(USDT)</span><span>Size(BTC)</span>
+        </div>
+        <!-- Asks -->
+        <div style="color:var(--color-danger); font-family:monospace; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; justify-content:space-between;"><span>64,235.00</span><span style="color:#fff">1.250</span></div>
+          <div style="display:flex; justify-content:space-between;"><span>64,234.50</span><span style="color:#fff">0.500</span></div>
+          <div style="display:flex; justify-content:space-between;"><span>64,231.00</span><span style="color:#fff">2.000</span></div>
+        </div>
+        
+        <div style="padding:10px 0; font-size:1.2rem; color:var(--color-success); font-weight:bold; text-align:center;">64,230.50</div>
+        
+        <!-- Bids -->
+        <div style="color:var(--color-success); font-family:monospace; display:flex; flex-direction:column; gap:5px;">
+          <div style="display:flex; justify-content:space-between;"><span>64,230.00</span><span style="color:#fff">5.100</span></div>
+          <div style="display:flex; justify-content:space-between;"><span>64,228.50</span><span style="color:#fff">0.800</span></div>
+          <div style="display:flex; justify-content:space-between;"><span>64,225.00</span><span style="color:#fff">3.400</span></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Order Entry -->
+    <div class="panel order-entry-area">
+      <div class="panel-header" style="justify-content:space-between; display:flex;">
+        <span>Place Order</span>
+        <span>Cross <span style="color:var(--color-primary)">400x</span></span>
+      </div>
+      <div style="padding:15px;">
+        <div style="display:flex; gap:10px; margin-bottom:15px; font-size:0.9rem;">
+          <span style="color:#fff; border-bottom:2px solid var(--color-primary); padding-bottom:5px; cursor:pointer;">Limit</span>
+          <span style="color:var(--color-text-muted); cursor:pointer;">Market</span>
+          <span style="color:var(--color-text-muted); cursor:pointer;">Stop Limit</span>
+        </div>
+        
+        <div class="input-group">
+          <span style="color:var(--color-text-muted); font-size:0.9rem;">Price</span>
+          <input type="text" value="64230.50" />
+          <span style="color:#fff; font-size:0.9rem; margin-left:10px;">USDT</span>
+        </div>
+        <div class="input-group">
+          <span style="color:var(--color-text-muted); font-size:0.9rem;">Size</span>
+          <input type="text" placeholder="0.00" />
+          <span style="color:#fff; font-size:0.9rem; margin-left:10px;">BTC</span>
+        </div>
+        
+        <div style="margin-top:20px; display:flex; gap:10px;">
+          <button class="buy-btn">Buy / Long</button>
+          <button class="sell-btn">Sell / Short</button>
+        </div>
+        
+        <div style="margin-top:20px; background:var(--color-bg-deep); padding:15px; border-radius:4px; border:1px solid var(--color-bg-light);">
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--color-text-muted); margin-bottom:5px;">
+            <span>Avail</span><span style="color:#fff;">10,050.00 USDT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Positions -->
+    <div class="panel position-area">
+      <div class="panel-header" style="display:flex; gap:20px;">
+        <span style="color:#fff; border-bottom:2px solid var(--color-primary); padding-bottom:10px; margin-bottom:-11px;">Positions (1)</span>
+        <span>Open Orders (0)</span>
+        <span>Order History</span>
+      </div>
+      <div style="padding:15px; font-size:0.9rem;">
+        <table style="width:100%; text-align:left; border-collapse:collapse; color:var(--color-text-muted);">
+          <tr style="border-bottom:1px solid var(--color-bg-light);">
+            <th style="padding:10px 0; font-weight:normal;">Symbol</th>
+            <th style="padding:10px 0; font-weight:normal;">Size</th>
+            <th style="padding:10px 0; font-weight:normal;">Entry Price</th>
+            <th style="padding:10px 0; font-weight:normal;">Mark Price</th>
+            <th style="padding:10px 0; font-weight:normal;">Margin Ratio</th>
+            <th style="padding:10px 0; font-weight:normal; text-align:right;">Unrealized PNL</th>
+          </tr>
+          <tr>
+            <td style="padding:15px 0;">
+              <span style="color:#fff; font-weight:600;">BTCUSDT</span><br/>
+              <span style="color:var(--color-success); font-size:0.8rem;">Long 400x</span>
+            </td>
+            <td>0.500</td>
+            <td>62,100.00</td>
+            <td>64,230.50</td>
+            <td>0.25%</td>
+            <td style="text-align:right; color:var(--color-success); font-weight:bold;">+1,065.25 USDT</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

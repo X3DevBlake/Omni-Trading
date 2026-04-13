@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omni Decentralized Autonomous Organization</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .dao-header {
+      text-align: center;
+      padding: 60px 0;
+      border-bottom: 1px solid var(--color-bg-light);
+    }
+    .dao-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .proposal-card {
+      background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light);
+      border-radius: var(--border-radius-lg);
+      padding: 25px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+    .proposal-card:hover {
+      border-color: var(--color-primary);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .status-active { background: rgba(0, 210, 166, 0.1); color: var(--color-primary); border: 1px solid var(--color-primary); }
+    .status-passed { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid #ccc; }
+
+    .voting-bar-container { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; margin-top: 15px; display:flex; }
+    .vote-yes { background: var(--color-primary); }
+    .vote-no { background: var(--color-danger); }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main class="container" style="padding-top: 80px;">
+    
+    <div class="dao-header">
+       <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/OMNI_Logo.png" width="60" height="60" style="margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(0,210,166,0.5));" />
+       <h1 style="color:#fff; font-size:3rem; margin:0 0 10px 0;">Omni DAO Governance</h1>
+       <p style="color:var(--color-text-muted); font-size:1.1rem; max-width:600px; margin:0 auto;">
+          The sovereign Omni Ecosystem is governed entirely by token holders. 1 OMNI = 1 Vote. Propose upgrades, manage the bridge treasury, and shape the Layer 1 protocol.
+       </p>
+    </div>
+
+    <div class="dao-grid">
+       
+       <div>
+          <h2 style="color:#fff; margin-bottom:20px; font-size:1.5rem;">Active Proposals</h2>
+          
+          <div class="proposal-card">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                  <span class="status-badge status-active">Active</span>
+                  <span style="color:var(--color-text-muted); font-size:0.9rem;">Ends in 2 days</span>
+              </div>
+              <h3 style="color:#fff; margin:0 0 10px 0;">OIP-1: Architect Ecosystem Bridge to Ethereum L1</h3>
+              <p style="color:var(--color-text-muted); margin:0 0 20px 0; font-size:0.95rem;">
+                Authorize the instantiation of an EVM lock-and-mint multisig smart contract to allow Omni holders to bridge native supply directly to Ethereum Mainnet as ERC-20s.
+              </p>
+              <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                  <span style="color:var(--color-primary); font-weight:bold;">Yes: 8.5B OMNI</span>
+                  <span style="color:var(--color-danger); font-weight:bold;">No: 0 OMNI</span>
+              </div>
+              <div class="voting-bar-container">
+                  <div class="vote-yes" style="width:100%;"></div>
+                  <div class="vote-no" style="width:0%;"></div>
+              </div>
+              <div style="margin-top:20px; display:flex; gap:10px;">
+                  <button class="btn btn-primary" onclick="alert('Connect Omni Wallet to Vote.')" style="flex:1;">Vote YES</button>
+                  <button class="btn btn-outline" style="border-color:var(--color-danger); color:var(--color-danger); flex:1;" onclick="alert('Connect Omni Wallet to Vote.')">Vote NO</button>
+              </div>
+          </div>
+
+          <div class="proposal-card" style="opacity:0.7;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                  <span class="status-badge status-passed">Passed</span>
+                  <span style="color:var(--color-text-muted); font-size:0.9rem;">Ended</span>
+              </div>
+              <h3 style="color:#fff; margin:0 0 10px 0;">OIP-0: Genesis Network Initialization & Gas Zero Execution</h3>
+              <p style="color:var(--color-text-muted); margin:0 0 20px 0; font-size:0.95rem;">
+                Proposal to officially bootstrap the Omni Mainnet via Proof of Authority and abolish protocol gas fees globally.
+              </p>
+              <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                  <span style="color:var(--color-primary); font-weight:bold;">Yes: 10B OMNI</span>
+              </div>
+              <div class="voting-bar-container">
+                  <div class="vote-yes" style="width:100%;"></div>
+              </div>
+          </div>
+       </div>
+
+       <div>
+          <div style="background:var(--color-bg-glass); border:1px solid var(--color-bg-light); border-radius:var(--border-radius-md); padding:20px; text-align:center;">
+             <h3 style="color:#fff; margin:0 0 10px 0;">My Voting Power</h3>
+             <strong style="font-size:2rem; color:var(--color-primary); display:block; margin-bottom:5px;">0 OMNI</strong>
+             <p style="color:var(--color-text-muted); font-size:0.9rem; margin-bottom:20px;">Connect your wallet to the Omni Network RPC to scan your balance.</p>
+             <button class="btn btn-outline" style="width:100%;"><i data-lucide="link"></i> Connect Ledger</button>
+             
+             <div style="margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.05);">
+                <button class="btn btn-primary" style="width:100%;"><i data-lucide="plus"></i> Create Proposal</button>
+             </div>
+          </div>
+       </div>
+
+    </div>
+
+  </main>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

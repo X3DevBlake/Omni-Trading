@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markets | Omni</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <style>
+    .market-header { padding: 40px 0 20px 0; border-bottom: 1px solid var(--color-bg-light); margin-bottom: 20px; }
+    .tabs { display: flex; gap: 30px; margin-bottom: 20px; }
+    .tab { font-size: 1.1rem; color: var(--color-text-muted); cursor: pointer; padding-bottom: 10px; font-weight: 600; }
+    .tab.active { color: #fff; border-bottom: 2px solid var(--color-primary); }
+    
+    table { width: 100%; border-collapse: collapse; margin-bottom: 50px; }
+    th, td { padding: 15px 10px; text-align: left; }
+    th { color: var(--color-text-muted); font-weight: normal; font-size: 0.9rem; padding-bottom: 20px; }
+    tr { border-bottom: 1px solid var(--color-bg-light); transition: background var(--transition-fast); }
+    tr:hover { background: rgba(255, 255, 255, 0.02); }
+    td { font-weight: 600; color: #fff; }
+    .action-btn { background: var(--color-bg-light); color: #fff; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; border: none; cursor: pointer; }
+    .action-btn:hover { background: var(--color-primary); color: #000; }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+  
+  <main class="container" style="min-height: 80vh;">
+    <div class="market-header">
+      <h1 style="font-size: 2.5rem; color:#fff;">Markets</h1>
+    </div>
+    
+    <div class="tabs">
+      <span class="tab">Favorites</span>
+      <span class="tab active">USDT-M Futures</span>
+      <span class="tab">Spot</span>
+      <span class="tab">New Listings</span>
+    </div>
+
+    <!-- Market Table -->
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 25%;">Trading Pair</th>
+          <th style="width: 15%;">Support</th>
+          <th style="width: 15%;">Price</th>
+          <th style="width: 15%;">24h Change</th>
+          <th style="width: 15%;">24h Volume</th>
+          <th style="width: 15%; text-align:right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tbody id="markets-tbody">
+      </tbody>
+    </table>
+  </main>
+
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+     import { TOP_100_ASSETS } from '../data/CryptoDatabase.js';
+
+     document.addEventListener('DOMContentLoaded', () => {
+         const tbody = document.getElementById('markets-tbody');
+         let html = '';
+         TOP_100_ASSETS.forEach((coin, i) => {
+             const changeColor = coin.change >= 0 ? 'var(--color-success)' : 'var(--color-danger)';
+             const sign = coin.change >= 0 ? '+' : '';
+             html += `<tr>
+                <td><div style="display:flex; align-items:center; gap:10px;">
+                    <span style="color:var(--color-text-muted);">★</span>
+                    <img src="${coin.image}" width="24" height="24" style="border-radius:12px;"/>
+                    <span style="font-size:1.1rem;">${coin.symbol}USDT <span style="font-size:0.7rem; color:var(--color-text-muted); font-weight:normal; margin-left:5px;">${coin.name}</span></span>
+                </div></td>
+                <td><span style="background:var(--color-bg-light); padding:2px 6px; border-radius:4px; font-size:0.7rem; color:var(--color-text-muted);">${Math.max(50, 400 - (i*5))}x</span></td>
+                <td><span style="color:#fff;">$${coin.price.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:6})}</span></td>
+                <td><span style="color:${changeColor};">${sign}${coin.change ? coin.change.toFixed(2) : 0.00}%</span></td>
+                <td><span class="text-muted">${(coin.volume / 1000000).toFixed(1)}M</span></td>
+                <td style="text-align:right;"><button class="action-btn" onclick="window.location.href='/pages/spot.html?pair=${coin.symbol}USDT'">Trade</button></td>
+             </tr>`;
+         });
+         tbody.innerHTML = html;
+     });
+  </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+:root {
+  /* Colors - Weex Theme */
+  --color-bg-deep: #0b0e11;
+  --color-bg-glass: #181a20;
+  --color-bg-light: #2b3139;
+  
+  --color-primary: #00D2A6; /* Weex often uses a green/cyan accent or yellow, let's use a standard vibrant cyan/green */
+  --color-accent: #3375FF;
+  
+  --color-text-main: #EAECEF;
+  --color-text-muted: #848E9C;
+  
+  --color-success: #0ECB81;
+  --color-danger: #F6465D;
+  --color-warning: #FCD535;
+
+  /* Typography */
+  --font-heading: 'Inter', 'Roboto', sans-serif;
+  --font-body: 'Inter', 'Roboto', sans-serif;
+
+  /* Structure */
+  --header-height: 64px;
+  --max-width: 1200px;
+  
+  /* Utils */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 24px;
+  
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  
+  /* Shadows */
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+}

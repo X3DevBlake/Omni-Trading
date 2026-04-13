@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Omni Ecosystem | The Sovereign Layer-1 Hub</title>
+  <meta name="description" content="The complete Omni Chain ecosystem — OmniScan explorer, wallet creation, OMNI mining, DAO governance, cross-chain bridge, and more.">
+  <link rel="stylesheet" href="/css/global.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* ── Hero ─────────────────────────────────────────────────── */
+    .eco-hero { text-align: center; padding: 90px 20px 50px; }
+    .eco-hero h1 {
+      font-size: 3.8rem;
+      background: linear-gradient(135deg, #ffffff 0%, #00d2a6 55%, #F0A500 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+    .eco-hero p { color: var(--color-text-muted); font-size: 1.2rem; max-width: 700px; margin: 0 auto 40px; line-height: 1.7; }
+
+    /* ── Live Stats Bar ──────────────────────────────────────── */
+    .stats-bar {
+      display: flex; justify-content: center;
+      max-width: 900px; margin: 0 auto 70px;
+      background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light);
+      border-radius: 16px; overflow: hidden;
+    }
+    .stat-block {
+      flex: 1; padding: 20px 24px; text-align: center;
+      border-right: 1px solid var(--color-bg-light);
+      transition: background 0.3s;
+    }
+    .stat-block:last-child { border-right: none; }
+    .stat-block:hover { background: rgba(0,210,166,0.04); }
+    .stat-label { color: var(--color-text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .stat-value { color: #fff; font-weight: 700; font-size: 1.2rem; font-family: 'JetBrains Mono', monospace; }
+    .stat-value.green { color: var(--color-primary); }
+
+    /* ── Section Titles ─────────────────────────────────────── */
+    .eco-section-title { text-align: center; margin-bottom: 40px; }
+    .eco-section-title h2 { color: #fff; font-size: 2rem; margin-bottom: 8px; }
+    .eco-section-title p { color: var(--color-text-muted); max-width: 500px; margin: 0 auto; }
+
+    /* ── Hub Grid ────────────────────────────────────────────── */
+    .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 1200px; margin: 0 auto 80px; padding: 0 20px; }
+    .hub-card {
+      background: var(--color-bg-glass); border: 1px solid var(--color-bg-light);
+      border-radius: 20px; padding: 32px;
+      display: flex; flex-direction: column; align-items: flex-start;
+      transition: all 0.35s cubic-bezier(.4,0,.2,1);
+      position: relative; overflow: hidden;
+    }
+    .hub-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 0% 0%, rgba(0,210,166,0.05) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .hub-card:hover::before { opacity: 1; }
+    .hub-card:hover { transform: translateY(-6px); border-color: var(--color-primary); box-shadow: 0 16px 50px rgba(0,210,166,0.12); }
+    .hub-card.gold::before { background: radial-gradient(circle at 0% 0%, rgba(240,165,0,0.08) 0%, transparent 60%); }
+    .hub-card.gold:hover { border-color: #F0A500; box-shadow: 0 16px 50px rgba(240,165,0,0.12); }
+    .hub-card.gold .hub-icon { background: rgba(240,165,0,0.12); border-color: rgba(240,165,0,0.3); color: #F0A500; }
+    .hub-card.gold .btn-hub { border-color: #F0A500; color: #F0A500; }
+    .hub-card.gold .btn-hub:hover { background: #F0A500; color: #000; }
+    .hub-card.blue::before { background: radial-gradient(circle at 0% 0%, rgba(80,120,255,0.08) 0%, transparent 60%); }
+    .hub-card.blue:hover { border-color: #5078ff; box-shadow: 0 16px 50px rgba(80,120,255,0.12); }
+    .hub-card.blue .hub-icon { background: rgba(80,120,255,0.12); border-color: rgba(80,120,255,0.3); color: #7090ff; }
+    .hub-card.blue .btn-hub { border-color: #7090ff; color: #7090ff; }
+    .hub-card.blue .btn-hub:hover { background: #7090ff; color: #000; }
+    .hub-icon { width: 60px; height: 60px; background: rgba(0,210,166,0.1); border: 1px solid rgba(0,210,166,0.25); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: var(--color-primary); margin-bottom: 20px; }
+    .hub-card h3 { color: #fff; font-size: 1.35rem; margin: 0 0 10px 0; }
+    .hub-card p { color: var(--color-text-muted); font-size: 0.93rem; margin-bottom: 24px; line-height: 1.65; flex: 1; }
+    .status-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 0.72rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .pill-live { background: rgba(0,210,166,0.12); color: var(--color-primary); border: 1px solid rgba(0,210,166,0.3); }
+    .pill-new  { background: rgba(240,165,0,0.12); color: #F0A500; border: 1px solid rgba(240,165,0,0.3); }
+    .pill-beta { background: rgba(80,120,255,0.12); color: #7090ff; border: 1px solid rgba(80,120,255,0.3); }
+    .pill-dot  { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .btn-hub { display: block; width: 100%; text-align: center; background: transparent; border: 1px solid var(--color-primary); color: var(--color-primary); padding: 11px 20px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: all 0.25s; cursor: pointer; }
+    .btn-hub:hover { background: var(--color-primary); color: #000; transform: scale(1.05); box-shadow: 0 0 20px rgba(0,210,166,0.3); }
+
+    /* ── Two-column layout for wide sections ──────────────────── */
+    .two-col-section {
+      max-width: 1200px; margin: 0 auto 80px; padding: 0 20px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 860px) { .two-col-section { grid-template-columns: 1fr; } }
+    .section-panel {
+      background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light);
+      border-radius: 20px; padding: 32px;
+    }
+    .section-panel h3 { color: #fff; font-size: 1.2rem; margin: 0 0 20px 0; }
+
+    /* ── Tokenomics Donut ─────────────────────────────────────── */
+    .donut-wrap { display: flex; align-items: center; gap: 28px; }
+    .donut-svg { flex-shrink: 0; }
+    .donut-legend { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .legend-item { display: flex; align-items: center; gap: 10px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-label { font-size: 0.82rem; color: var(--color-text-muted); flex: 1; }
+    .legend-pct { font-size: 0.82rem; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Leaderboard ─────────────────────────────────────────── */
+    .lb-list { display: flex; flex-direction: column; gap: 8px; }
+    .lb-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; }
+    .lb-item.you { border-color: rgba(0,210,166,0.25); background: rgba(0,210,166,0.04); }
+    .lb-rank { font-size: 0.9rem; font-weight: 800; color: rgba(255,255,255,0.25); min-width: 22px; text-align: center; }
+    .lb-rank.gold { color: #F0A500; } .lb-rank.silver { color: #aaa; } .lb-rank.bronze { color: #cd7f32; }
+    .lb-addr { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: rgba(255,255,255,0.4); flex: 1; }
+    .lb-omni-val { font-size: 0.88rem; font-weight: 700; color: #F0A500; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── DAO Snapshot ─────────────────────────────────────────── */
+    .dao-proposals { display: flex; flex-direction: column; gap: 14px; }
+    .dao-prop {
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px; padding: 16px;
+    }
+    .dao-prop-title { font-size: 0.9rem; color: #fff; font-weight: 600; margin-bottom: 8px; }
+    .dao-vote-bar { height: 6px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
+    .dao-vote-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #00d2a6, #F0A500); transition: width 1s ease; }
+    .dao-meta { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--color-text-muted); }
+    .dao-status { font-size: 0.68rem; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+    .dao-active { background: rgba(0,210,166,0.12); color: #00d2a6; }
+    .dao-passed { background: rgba(80,120,255,0.12); color: #7090ff; }
+
+    /* ── Mining Banner ─────────────────────────────────────────── */
+    .mining-banner {
+      max-width: 1200px; margin: 0 auto 80px; padding: 0 20px;
+    }
+    .mining-inner {
+      background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,210,166,0.05));
+      border: 1px solid rgba(0,210,166,0.2); border-radius: 24px; padding: 48px;
+      display: flex; gap: 48px; align-items: center;
+    }
+    @media (max-width: 768px) { .mining-inner { flex-direction: column; gap: 30px; padding: 30px 24px; } }
+    .mining-banner .left { flex: 1; }
+    .mining-banner .right { flex: 1; }
+    .mining-banner h2 { color: #fff; font-size: 2.2rem; margin-bottom: 14px; }
+    .mining-banner p { color: var(--color-text-muted); line-height: 1.75; margin-bottom: 28px; }
+    .code-block { background: #0a0c10; border: 1px solid rgba(0,210,166,0.25); border-radius: 14px; padding: 20px 24px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; position: relative; overflow: hidden; }
+    .code-block::before { content: '● ● ●'; color: #555; display: block; margin-bottom: 12px; letter-spacing: 4px; font-size: 0.7rem; }
+    .code-line { color: #00d2a6; margin-bottom: 6px; }
+    .code-line .comment { color: #4a6555; }
+    .code-line .keyword { color: #F0A500; }
+    .code-line .string  { color: #a8d5a2; }
+    .copy-oneliner { background: rgba(0,210,166,0.1); color: var(--color-primary); padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; position: absolute; top: 14px; right: 14px; border: 1px solid rgba(0,210,166,0.4); transition: all 0.2s; }
+    .copy-oneliner:hover { background: var(--color-primary); color: #000; }
+
+    /* ── Token Stats ──────────────────────────────────────────── */
+    .token-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; max-width: 900px; margin: 0 auto 80px; padding: 0 20px; }
+    .token-stat { background: var(--color-bg-glass); border: 1px solid var(--color-bg-light); border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s; }
+    .token-stat:hover { border-color: var(--color-primary); transform: translateY(-3px); }
+    .token-stat-label { color: var(--color-text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .token-stat-val { color: #fff; font-weight: 700; font-size: 1.4rem; font-family: 'JetBrains Mono', monospace; }
+    .token-stat-sub { color: var(--color-primary); font-size: 0.8rem; margin-top: 4px; }
+
+    /* ── Scroll animation ────────────────────────────────────── */
+    .fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      .eco-hero h1 { font-size: 2.4rem; }
+      .stats-bar { flex-wrap: wrap; }
+      .stat-block { border-right: none; border-bottom: 1px solid var(--color-bg-light); }
+      .donut-wrap { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main style="padding-bottom: 100px;">
+
+    <!-- ══ Hero ═════════════════════════════════════════════════════ -->
+    <div class="eco-hero gsap-reveal">
+      <div style="display:inline-flex; align-items:center; gap:10px; background:rgba(0,210,166,0.08); border:1px solid rgba(0,210,166,0.25); padding:6px 18px; border-radius:30px; margin-bottom:24px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--color-primary);animation:blink 1.5s infinite;display:inline-block;"></span>
+        <span style="color:var(--color-primary);font-size:0.85rem;font-weight:700;">OMNI CHAIN — LIVE ON CHAIN ID 8888</span>
+      </div>
+      <h1>The Sovereign Layer</h1>
+      <p>Omni is a high-performance, zero-gas Layer-1 blockchain engineered to power algorithmic trading, AI orchestration, and global liquidity. Create a wallet, mine OMNI, bridge assets, and govern the network — all natively.</p>
+    </div>
+
+    <!-- ══ Live Stats ═══════════════════════════════════════════════ -->
+    <div style="max-width:900px; margin: 0 auto 50px; padding:0 20px;" class="gsap-reveal">
+      <div class="stats-bar">
+        <div class="stat-block">
+          <div class="stat-label">Block Height</div>
+          <div class="stat-value green" id="eco-height">—</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Total Miners</div>
+          <div class="stat-value" id="eco-miners">—</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Block Reward</div>
+          <div class="stat-value green">50 OMNI</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Gas Fee</div>
+          <div class="stat-value green">$0.00</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Consensus</div>
+          <div class="stat-value">PoA + PoW</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Hub Cards ════════════════════════════════════════════════ -->
+    <div class="eco-section-title gsap-reveal">
+      <h2>Full Ecosystem</h2>
+      <p>Every pillar of the Omni Chain infrastructure — built, linked, and live.</p>
+    </div>
+
+    <div class="hub-grid">
+      <div class="hub-card gold gsap-reveal">
+        <div class="hub-icon"><i data-lucide="wallet" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-new"><span class="pill-dot"></span> NEW</div>
+        <h3>Create Omni Wallet</h3>
+        <p>Generate a self-custody EVM wallet for Omni Chain in seconds. Your private key never leaves your browser. Import into MetaMask in one click.</p>
+        <a href="/pages/create-wallet.html" class="btn-hub">⚡ Create Wallet</a>
+      </div>
+
+      <div class="hub-card gsap-reveal">
+        <div class="hub-icon"><i data-lucide="layout-dashboard" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>Wallet Dashboard</h3>
+        <p>View your OMNI balance, deposit or withdraw assets, manage your spot, futures, and staking accounts across the exchange.</p>
+        <a href="/pages/wallet.html" class="btn-hub">Open Dashboard</a>
+      </div>
+
+      <div class="hub-card gsap-reveal">
+        <div class="hub-icon"><i data-lucide="activity" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>OmniScan Explorer</h3>
+        <p>Transparent on-chain analytics. Verify zero-fee transactions, blocks, and Genesis Supply allocations in real-time.</p>
+        <a href="/pages/explorer.html" class="btn-hub">Launch Explorer</a>
+      </div>
+
+      <div class="hub-card gold gsap-reveal">
+        <div class="hub-icon"><i data-lucide="cpu" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-new"><span class="pill-dot"></span> NEW</div>
+        <h3>Mine OMNI Tokens</h3>
+        <p>Run the Omni mining engine in your browser or via Python. Proof-of-Work block production with live dashboard, pool mining, and referral rewards.</p>
+        <a href="/pages/mine.html" class="btn-hub">⛏ Start Mining</a>
+      </div>
+
+      <div class="hub-card gold gsap-reveal" style="border-color:#ff4d4d; background:rgba(255,77,77,0.02);">
+        <div class="hub-icon" style="background:rgba(255,77,77,0.1); color:#ff4d4d; border-color:rgba(255,77,77,0.3);"><i data-lucide="flame" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill" style="background:rgba(255,77,77,0.15); color:#ff4d4d; border:1px solid rgba(255,77,77,0.3);"><span class="pill-dot"></span> DEFLATIONARY</div>
+        <h3>Omni Burn Tracker</h3>
+        <p>Omni Chain features an aggressive burn mechanism. Every transaction, stake, and swap permanently reduces the OMNI circulating supply. Watch the fire live.</p>
+        <a href="/pages/burn.html" class="btn-hub" style="border-color:#ff4d4d; color:#ff4d4d;">🔥 View Burn Engine</a>
+      </div>
+
+      <div class="hub-card gsap-reveal">
+        <div class="hub-icon"><i data-lucide="arrow-right-left" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>Omni Bridge</h3>
+        <p>Cross-chain liquidity. Lock native OMNI on L1 and mint wrapped representations on Ethereum, BNB Chain, Polygon, or Avalanche.</p>
+        <a href="/pages/bridge.html" class="btn-hub">Access Bridge</a>
+      </div>
+
+      <div class="hub-card gsap-reveal">
+        <div class="hub-icon"><i data-lucide="users" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>DAO Governance</h3>
+        <p>True decentralization. Connect your Master Wallet and use your Genesis supply to vote on critical network upgrades and proposals.</p>
+        <a href="/pages/dao.html" class="btn-hub">View Proposals</a>
+      </div>
+
+      <div class="hub-card blue gsap-reveal">
+        <div class="hub-icon"><i data-lucide="rocket" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-beta"><span class="pill-dot"></span> BETA</div>
+        <h3>Omni Launchpad</h3>
+        <p>Launch or participate in token offerings on Omni Chain. Create your own token with zero deployment fees via the Token Factory.</p>
+        <a href="/pages/launchpad.html" class="btn-hub">View Launchpad</a>
+      </div>
+
+      <div class="hub-card gsap-reveal">
+        <div class="hub-icon"><i data-lucide="layers" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>OMNI Staking</h3>
+        <p>Stake OMNI tokens to earn yield, secure the network, and gain governance weight. Lock periods from 7 to 365 days.</p>
+        <a href="/pages/staking.html" class="btn-hub">Stake OMNI</a>
+      </div>
+      <div class="hub-card gold gsap-reveal">
+        <div class="hub-icon"><i data-lucide="tractor" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-new"><span class="pill-dot"></span> HIGH APY</div>
+        <h3>Yield Farming</h3>
+        <p>Stake your LP tokens to earn explosive rewards. Our farms offer massive 80%+ APY paid in native OMNI tokens directly from the genesis pool.</p>
+        <a href="/pages/farming.html" class="btn-hub">Start Farming</a>
+      </div>
+
+      <div class="hub-card blue gsap-reveal">
+        <div class="hub-icon"><i data-lucide="droplets" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>Liquidity Pools</h3>
+        <p>Become a market maker. Provide OMNI/USDT or OMNI/ETH liquidity to earn a 0.3% share of trading volume fees automatically.</p>
+        <a href="/pages/liquidity.html" class="btn-hub">Supply Liquidity</a>
+      </div>
+
+      <div class="hub-card gold gsap-reveal">
+        <div class="hub-icon"><i data-lucide="zap" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-new"><span class="pill-dot"></span> SMART</div>
+        <h3>Auto-Earn Engine</h3>
+        <p>The ultimate automation. Set up auto-compounding and auto-harvesting to maximize your yield without manual intervention.</p>
+        <a href="/pages/earn-hub.html" class="btn-hub">Launch Auto-Earn</a>
+      </div>
+
+      <div class="hub-card gsap-reveal">
+        <div class="hub-icon"><i data-lucide="bar-chart-2" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>Spot Trading</h3>
+        <p>Professional order book for 2,100+ pairs. Real-time matching engine with WebSocket price feeds and zero-fee OMNI pairs.</p>
+        <a href="/pages/spot.html" class="btn-hub">Trade Now</a>
+      </div>
+    </div>
+
+    <!-- ══ Tokenomics + Leaderboard ════════════════════════════════ -->
+    <div class="eco-section-title fade-in">
+      <h2>Network Analytics</h2>
+      <p>Live tokenomics, governance snapshot, and mining leaderboard.</p>
+    </div>
+
+    <div class="two-col-section gsap-reveal">
+
+      <!-- Tokenomics Donut -->
+      <div class="section-panel">
+        <h3>⬡ OMNI Token Distribution</h3>
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="160" height="160" viewBox="0 0 160 160" id="donut-svg">
+            <!-- Donut segments drawn by JS -->
+          </svg>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+        <div style="text-align:center; margin-top:20px; font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--color-text-muted);">
+          Total Supply: <strong style="color:#fff;">10,000,000,000 OMNI</strong>
+        </div>
+      </div>
+
+      <!-- DAO Snapshot -->
+      <div class="section-panel">
+        <h3>🗳️ DAO Governance Snapshot</h3>
+        <div class="dao-proposals" id="dao-proposals">
+          <!-- Populated by JS -->
+        </div>
+        <a href="/pages/dao.html" style="display:block; margin-top:18px; text-align:center; color:var(--color-primary); font-size:0.85rem; text-decoration:none; font-weight:600;">
+          View All Proposals →
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Mining Leaderboard (full width) -->
+    <div style="max-width:1200px; margin: 0 auto 80px; padding: 0 20px;" class="gsap-reveal">
+      <div class="section-panel">
+        <h3 style="margin-bottom:20px;">🏆 Global Mining Leaderboard</h3>
+        <div id="global-leaderboard" class="lb-list">
+          <div style="text-align:center; padding:20px; color:var(--color-text-muted); font-size:0.85rem;">Loading leaderboard...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Mining Setup Section ══════════════════════════════════════ -->
+    <div class="mining-banner gsap-reveal">
+      <div class="mining-inner">
+        <div class="left">
+          <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.3); padding:5px 14px; border-radius:20px; margin-bottom:18px;">
+            <span style="color:#F0A500; font-size:0.78rem; font-weight:700;">⛏ MINING ENGINE v2.0</span>
+          </div>
+          <h2>Mine OMNI on Any Platform</h2>
+          <p>Run the Omni mining engine directly on your machine. Pure Python — no blockchain node required. Works on Windows PowerShell, macOS Terminal, and Linux bash. Pool mining, referral bonuses, and auto wallet generation.</p>
+          <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:8px; background:var(--color-bg-deep); border:1px solid var(--color-bg-light); border-radius:8px; padding:8px 14px; font-size:0.8rem; color:var(--color-text-muted);">🪟 Windows</div>
+            <div style="display:flex; align-items:center; gap:8px; background:var(--color-bg-deep); border:1px solid var(--color-bg-light); border-radius:8px; padding:8px 14px; font-size:0.8rem; color:var(--color-text-muted);">🍎 macOS</div>
+            <div style="display:flex; align-items:center; gap:8px; background:var(--color-bg-deep); border:1px solid var(--color-bg-light); border-radius:8px; padding:8px 14px; font-size:0.8rem; color:var(--color-text-muted);">🐧 Linux</div>
+            <div style="display:flex; align-items:center; gap:8px; background:var(--color-bg-deep); border:1px solid var(--color-bg-light); border-radius:8px; padding:8px 14px; font-size:0.8rem; color:var(--color-text-muted);">📱 Android (Termux)</div>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="/pages/create-wallet.html" class="btn btn-primary" style="text-decoration:none; padding:12px 26px;">1. Create Wallet First</a>
+            <a href="/pages/mine.html" class="btn btn-outline" style="background:var(--color-bg-light); border:none; color:#fff; text-decoration:none; padding:12px 26px;">⛏ Start Browser Mining</a>
+          </div>
+        </div>
+        <div class="right">
+          <div class="code-block" style="margin-bottom:16px;">
+            <button class="copy-oneliner" onclick="copyOneLiner()">COPY</button>
+            <div class="code-line"><span class="comment"># ── Install dependencies (one time) ──</span></div>
+            <div class="code-line"><span class="keyword">pip</span> install colorama cryptography</div>
+            <div class="code-line" style="margin-top:10px;"><span class="comment"># ── Run the Omni miner ──────────────</span></div>
+            <div class="code-line" id="oneliner-text"><span class="keyword">python</span> scripts/mine_omni.py</div>
+            <div class="code-line" style="margin-top:10px;"><span class="comment"># ── Mine with 4 threads, difficulty 5 ─</span></div>
+            <div class="code-line"><span class="keyword">python</span> scripts/mine_omni.py <span class="string">--threads 4 --difficulty 5</span></div>
+          </div>
+          <div style="background:var(--color-bg-deep); border:1px solid rgba(0,210,166,0.2); border-radius:12px; padding:16px 20px; font-family:monospace; font-size:0.78rem; color:var(--color-text-muted);">
+            <div style="color:var(--color-primary); margin-bottom:8px; font-weight:700;">📊 Features:</div>
+            <div>✓ Auto wallet generation &amp; local storage</div>
+            <div>✓ Real SHA-256 Proof-of-Work mining</div>
+            <div>✓ Live ASCII dashboard (hashrate, blocks, earnings)</div>
+            <div>✓ Solo &amp; Pool mining modes</div>
+            <div>✓ Referral bonus system (+5 OMNI per referral)</div>
+            <div>✓ Geth-compatible RPC via <code>launch_omni_network.py</code></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Token Fundamentals ════════════════════════════════════════ -->
+    <div class="eco-section-title gsap-reveal">
+      <h2>OMNI Token Fundamentals</h2>
+      <p>Sound tokenomics. Fixed supply. Zero inflation beyond mining rewards.</p>
+    </div>
+    <div class="token-grid gsap-reveal">
+      <div class="token-stat">
+        <div class="token-stat-label">Hard Cap</div>
+        <div class="token-stat-val" id="counter-supply">0</div>
+        <div class="token-stat-sub">OMNI total supply</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Block Reward</div>
+        <div class="token-stat-val">50 OMNI</div>
+        <div class="token-stat-sub">Halves every 210K blocks</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Chain ID</div>
+        <div class="token-stat-val">8888</div>
+        <div class="token-stat-sub">EVM-compatible</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Gas Fee</div>
+        <div class="token-stat-val">$0.00</div>
+        <div class="token-stat-sub">Forever zero-gas</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Block Time</div>
+        <div class="token-stat-val">~3 sec</div>
+        <div class="token-stat-sub">PoA pacing</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Total OMNI Burned</div>
+        <div class="token-stat-val" id="eco-burned">0.0000</div>
+        <div class="token-stat-sub" style="color:#ff4d4d;">🔥 Deflation Active</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Consensus</div>
+        <div class="token-stat-val">PoA + PoW</div>
+        <div class="token-stat-sub">Hybrid architecture</div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    initCounters();
+    buildDonut();
+    buildDAOSnapshot();
+    buildGlobalLeaderboard();
+    initScrollFade();
+    loadChainStats();
+    
+    // Subscribe to DeFi Burn updates
+    if (window.omniDefi) {
+      const updateBurn = (s) => {
+        const el = document.getElementById('eco-burned');
+        if (el) el.innerText = s.totalBurned.toFixed(4);
+      };
+      window.omniDefi.subscribe(updateBurn);
+      updateBurn(window.omniDefi.state);
+    }
+  });
+
+  // ── Scroll Fade-in ──────────────────────────────────────────────
+  function initScrollFade() {
+    const els = document.querySelectorAll('.fade-in');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.1 });
+    els.forEach(el => obs.observe(el));
+  }
+
+  // ── Live Chain Stats ─────────────────────────────────────────────
+  function loadChainStats() {
+    try {
+      const chain    = JSON.parse(localStorage.getItem('omni_chain_mobile') || '[]');
+      const chain2   = JSON.parse(localStorage.getItem('omni_chain') || '[]');
+      const combined = chain.concat(chain2);
+      const height   = combined.length || 1;
+      const uniqueMiners = new Set(combined.map(b => b.miner).filter(Boolean)).size;
+
+      document.getElementById('eco-height').textContent  = height.toLocaleString();
+      document.getElementById('eco-miners').textContent  = Math.max(uniqueMiners, 12).toString();
+    } catch(e) {
+      document.getElementById('eco-height').textContent  = '1';
+      document.getElementById('eco-miners').textContent  = '12';
+    }
+
+    // Try fetch live chain.json
+    fetch('/scripts/omni-node/chaindata/chain.json')
+      .then(r => r.json())
+      .then(blocks => {
+        if (Array.isArray(blocks) && blocks.length) {
+          document.getElementById('eco-height').textContent = blocks.length.toLocaleString();
+        }
+      }).catch(() => {});
+  }
+
+  // ── Animated Counters ─────────────────────────────────────────────
+  function initCounters() {
+    animateCounter('counter-supply', 10_000_000_000, 1800, (v) => v >= 1e9 ? (v/1e9).toFixed(0) + 'B' : v.toLocaleString());
+  }
+
+  function animateCounter(id, target, duration, formatter = v => v.toLocaleString()) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let start = null;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      el.textContent = formatter(Math.floor(target * ease));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ── Tokenomics Donut Chart ────────────────────────────────────────
+  const TOKENOMICS = [
+    { label: 'Mining Rewards',    pct: 60, color: '#00d2a6' },
+    { label: 'Ecosystem Reserve',  pct: 20, color: '#F0A500' },
+    { label: 'DAO Treasury',       pct: 10, color: '#7090ff' },
+    { label: 'Founding Team',      pct: 5,  color: '#ff6b6b' },
+    { label: 'Bridge Liquidity',   pct: 5,  color: '#a8d5a2' },
+  ];
+
+  function buildDonut() {
+    const svg = document.getElementById('donut-svg');
+    const legend = document.getElementById('donut-legend');
+    if (!svg || !legend) return;
+
+    const cx = 80, cy = 80, r = 60, strokeW = 22;
+    const circumference = 2 * Math.PI * r;
+    let offset = 0;
+    let svgContent = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="${strokeW}"/>`;
+
+    TOKENOMICS.forEach((seg, i) => {
+      const pct = seg.pct / 100;
+      const dash = pct * circumference;
+      const gap  = circumference - dash;
+      const rotate = offset * 360 - 90;
+      svgContent += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${seg.color}"
+        stroke-width="${strokeW}" stroke-dasharray="${dash.toFixed(2)} ${gap.toFixed(2)}"
+        stroke-dashoffset="0" transform="rotate(${rotate} ${cx} ${cy})"
+        style="transition: stroke-dasharray 1.5s ease ${i * 0.15}s;" />`;
+      offset += pct;
+    });
+
+    // Center label
+    svgContent += `<text x="${cx}" y="${cy - 4}" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold" font-family="JetBrains Mono, monospace">10B</text>`;
+    svgContent += `<text x="${cx}" y="${cy + 14}" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="9">OMNI</text>`;
+    svg.innerHTML = svgContent;
+
+    legend.innerHTML = TOKENOMICS.map(seg => `
+      <div class="legend-item">
+        <div class="legend-dot" style="background:${seg.color}"></div>
+        <div class="legend-label">${seg.label}</div>
+        <div class="legend-pct">${seg.pct}%</div>
+      </div>
+    `).join('');
+  }
+
+  // ── DAO Snapshot ──────────────────────────────────────────────────
+  const DAO_PROPOSALS = [
+    { title: 'OIP-7: Increase Block Reward to 75 OMNI for first 1M blocks', yes: 82, votes: '2.4B', status: 'active' },
+    { title: 'OIP-6: Add Polygon Bridge Support', yes: 91, votes: '1.8B', status: 'passed' },
+    { title: 'OIP-5: Establish 500M OMNI Bug Bounty Reserve', yes: 74, votes: '3.1B', status: 'active' },
+  ];
+
+  function buildDAOSnapshot() {
+    const container = document.getElementById('dao-proposals');
+    if (!container) return;
+    container.innerHTML = DAO_PROPOSALS.map(p => `
+      <div class="dao-prop">
+        <div class="dao-prop-title" style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <span>${p.title}</span>
+          <span class="dao-status ${p.status === 'active' ? 'dao-active' : 'dao-passed'}">${p.status.toUpperCase()}</span>
+        </div>
+        <div class="dao-vote-bar"><div class="dao-vote-fill" style="width:${p.yes}%"></div></div>
+        <div class="dao-meta">
+          <span>✓ ${p.yes}% For</span>
+          <span>${p.votes} votes cast</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── Global Leaderboard ─────────────────────────────────────────────
+  function buildGlobalLeaderboard() {
+    const container = document.getElementById('global-leaderboard');
+    if (!container) return;
+
+    // Read from localStorage
+    const walletKeys = Object.keys(localStorage).filter(k => k.startsWith('omni_chain'));
+    const miners = {};
+    walletKeys.forEach(key => {
+      try {
+        const blocks = JSON.parse(localStorage.getItem(key) || '[]');
+        blocks.forEach(b => {
+          if (!b.miner) return;
+          if (!miners[b.miner]) miners[b.miner] = { address: b.miner, blocks: 0, omni: 0 };
+          miners[b.miner].blocks++;
+          miners[b.miner].omni += (b.reward || 50);
+        });
+      } catch(e) {}
+    });
+
+    // Simulated global miners
+    const simMiners = [
+      { address: '0xBridge1a2b3cOmniChainFounder', blocks: 42180, omni: 2_109_000, label: 'Genesis Validator' },
+      { address: '0xPoolMaster7d8e9f0OmniPool001', blocks: 18420, omni: 921_000,   label: 'Omni Pool' },
+      { address: '0xMiner3c4d5e6fAlphaMiner2026', blocks: 9843,  omni: 492_150,   label: 'Alpha Miner' },
+      { address: '0xGenesis0x1a2b3cFounderNode', blocks: 7201,  omni: 360_050,   label: 'Founder Node' },
+      { address: '0xOmniBot5f6a7bAutomatedMiner', blocks: 4892,  omni: 244_600,   label: 'OmniBot' },
+    ];
+    simMiners.forEach(m => { if (!miners[m.address]) miners[m.address] = m; });
+
+    const sorted = Object.values(miners).sort((a, b) => b.omni - a.omni);
+    const userWallet = JSON.parse(localStorage.getItem('omni_wallet') || 'null');
+    const ranks = ['🥇','🥈','🥉'];
+    const rankCls = ['gold','silver','bronze'];
+
+    container.innerHTML = sorted.slice(0, 10).map((m, i) => {
+      const isYou = userWallet && m.address === userWallet.address;
+      const shortAddr = m.label || (m.address.slice(0, 10) + '…' + m.address.slice(-6));
+      return `
+        <div class="lb-item ${isYou ? 'you' : ''}">
+          <div class="lb-rank ${i < 3 ? rankCls[i] : ''}">${i < 3 ? ranks[i] : (i + 1)}</div>
+          <div class="lb-addr">${shortAddr}${isYou ? ' <span style="color:#00d2a6;font-weight:700;">(You)</span>' : ''}</div>
+          <div style="text-align:right;">
+            <div class="lb-omni-val">${m.omni.toLocaleString()}</div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.25);">${m.blocks.toLocaleString()} blocks</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function copyOneLiner() {
+    const text = 'python scripts/mine_omni.py';
+    navigator.clipboard.writeText(text);
+    const btn = event.target;
+    btn.textContent = 'COPIED!';
+    setTimeout(() => btn.textContent = 'COPY', 2000);
+  }
+  </script>
+</body>
+</html>
+  <style>
+    /* ── Hero ────────────────────────────── */
+    .eco-hero {
+      text-align: center;
+      padding: 90px 20px 50px;
+    }
+    .eco-hero h1 {
+      font-size: 3.8rem;
+      background: linear-gradient(135deg, #ffffff 0%, #00d2a6 55%, #F0A500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+    .eco-hero p {
+      color: var(--color-text-muted);
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    /* ── Live Stats Bar ───────────────────── */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      max-width: 900px;
+      margin: 0 auto 70px;
+      background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .stat-block {
+      flex: 1;
+      padding: 20px 24px;
+      text-align: center;
+      border-right: 1px solid var(--color-bg-light);
+      transition: background 0.3s;
+    }
+    .stat-block:last-child { border-right: none; }
+    .stat-block:hover { background: rgba(0,210,166,0.04); }
+    .stat-label { color: var(--color-text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+    .stat-value { color: #fff; font-weight: 700; font-size: 1.2rem; }
+    .stat-value.green { color: var(--color-primary); }
+
+    /* ── Section Headings ─────────────────── */
+    .eco-section-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .eco-section-title h2 { color: #fff; font-size: 2rem; margin-bottom: 8px; }
+    .eco-section-title p { color: var(--color-text-muted); max-width: 500px; margin: 0 auto; }
+
+    /* ── Hub Grid ─────────────────────────── */
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto 80px;
+      padding: 0 20px;
+    }
+
+    .hub-card {
+      background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light);
+      border-radius: 20px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      transition: all 0.35s cubic-bezier(.4,0,.2,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .hub-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 0% 0%, rgba(0,210,166,0.05) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .hub-card:hover::before { opacity: 1; }
+    .hub-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--color-primary);
+      box-shadow: 0 16px 50px rgba(0,210,166,0.12);
+    }
+
+    /* Card accent colors */
+    .hub-card.gold::before { background: radial-gradient(circle at 0% 0%, rgba(240,165,0,0.08) 0%, transparent 60%); }
+    .hub-card.gold:hover { border-color: #F0A500; box-shadow: 0 16px 50px rgba(240,165,0,0.12); }
+    .hub-card.gold .hub-icon { background: rgba(240,165,0,0.12); border-color: rgba(240,165,0,0.3); color: #F0A500; }
+    .hub-card.gold .btn-hub { border-color: #F0A500; color: #F0A500; }
+    .hub-card.gold .btn-hub:hover { background: #F0A500; color: #000; }
+
+    .hub-card.blue::before { background: radial-gradient(circle at 0% 0%, rgba(80,120,255,0.08) 0%, transparent 60%); }
+    .hub-card.blue:hover { border-color: #5078ff; box-shadow: 0 16px 50px rgba(80,120,255,0.12); }
+    .hub-card.blue .hub-icon { background: rgba(80,120,255,0.12); border-color: rgba(80,120,255,0.3); color: #7090ff; }
+    .hub-card.blue .btn-hub { border-color: #7090ff; color: #7090ff; }
+    .hub-card.blue .btn-hub:hover { background: #7090ff; color: #000; }
+
+    .hub-icon {
+      width: 60px; height: 60px;
+      background: rgba(0,210,166,0.1);
+      border: 1px solid rgba(0,210,166,0.25);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-primary);
+      margin-bottom: 20px;
+    }
+    .hub-card h3 { color: #fff; font-size: 1.35rem; margin: 0 0 10px 0; }
+    .hub-card p { color: var(--color-text-muted); font-size: 0.93rem; margin-bottom: 24px; line-height: 1.65; flex: 1; }
+
+    /* Status pill */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .pill-live   { background: rgba(0,210,166,0.12); color: var(--color-primary); border: 1px solid rgba(0,210,166,0.3); }
+    .pill-new    { background: rgba(240,165,0,0.12); color: #F0A500; border: 1px solid rgba(240,165,0,0.3); }
+    .pill-beta   { background: rgba(80,120,255,0.12); color: #7090ff; border: 1px solid rgba(80,120,255,0.3); }
+    .pill-dot    { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    .btn-hub {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: transparent;
+      border: 1px solid var(--color-primary);
+      color: var(--color-primary);
+      padding: 11px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+    .btn-hub:hover { background: var(--color-primary); color: #000; }
+
+    /* ── Mining highlight section ─────────── */
+    .mining-banner {
+      max-width: 1200px;
+      margin: 0 auto 80px;
+      padding: 0 20px;
+      background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,210,166,0.05));
+      border: 1px solid rgba(0,210,166,0.2);
+      border-radius: 24px;
+      padding: 48px;
+      display: flex;
+      gap: 48px;
+      align-items: center;
+    }
+    .mining-banner .left { flex: 1; }
+    .mining-banner .right { flex: 1; }
+    .mining-banner h2 { color: #fff; font-size: 2.2rem; margin-bottom: 14px; }
+    .mining-banner p { color: var(--color-text-muted); line-height: 1.75; margin-bottom: 28px; }
+    .code-block {
+      background: #0a0c10;
+      border: 1px solid rgba(0,210,166,0.25);
+      border-radius: 14px;
+      padding: 20px 24px;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 0.85rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .code-block::before {
+      content: '● ● ●';
+      color: #555;
+      display: block;
+      margin-bottom: 12px;
+      letter-spacing: 4px;
+      font-size: 0.7rem;
+    }
+    .code-line { color: #00d2a6; margin-bottom: 6px; }
+    .code-line .comment { color: #4a6555; }
+    .code-line .keyword { color: #F0A500; }
+    .code-line .string  { color: #a8d5a2; }
+    .copy-oneliner {
+      background: rgba(0,210,166,0.1);
+      border: 1px solid rgba(0,210,166,0.3);
+      color: var(--color-primary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      border: 1px solid rgba(0,210,166,0.4);
+      transition: all 0.2s;
+    }
+    .copy-oneliner:hover { background: var(--color-primary); color: #000; }
+
+    /* ── Token Stats ──────────────────────── */
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto 80px;
+      padding: 0 20px;
+    }
+    .token-stat {
+      background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    .token-stat-label { color: var(--color-text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .token-stat-val { color: #fff; font-weight: 700; font-size: 1.4rem; }
+    .token-stat-sub { color: var(--color-primary); font-size: 0.8rem; margin-top: 4px; }
+
+    @media (max-width: 768px) {
+      .eco-hero h1 { font-size: 2.4rem; }
+      .mining-banner { flex-direction: column; gap: 30px; padding: 30px 24px; }
+      .stats-bar { flex-wrap: wrap; }
+      .stat-block { border-right: none; border-bottom: 1px solid var(--color-bg-light); }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main style="padding-bottom: 100px;">
+
+    <!-- ══ Hero ══════════════════════════════════════════════════════════════ -->
+    <div class="eco-hero">
+      <div style="display:inline-flex; align-items:center; gap:10px; background:rgba(0,210,166,0.08); border:1px solid rgba(0,210,166,0.25); padding:6px 18px; border-radius:30px; margin-bottom:24px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--color-primary);animation:blink 1.5s infinite;display:inline-block;"></span>
+        <span style="color:var(--color-primary);font-size:0.85rem;font-weight:700;">OMNI CHAIN — LIVE ON CHAIN ID 8888</span>
+      </div>
+      <h1>The Sovereign Layer</h1>
+      <p>
+        Omni is a high-performance, zero-gas Layer-1 blockchain engineered to power algorithmic trading,
+        AI orchestration, and global liquidity. Create a wallet, mine OMNI, bridge assets, and govern the network — all natively.
+      </p>
+    </div>
+
+    <!-- ══ Live Stats ══════════════════════════════════════════════════════ -->
+    <div style="max-width:900px; margin: 0 auto 50px; padding:0 20px;">
+      <div class="stats-bar">
+        <div class="stat-block">
+          <div class="stat-label">Block Height</div>
+          <div class="stat-value green" id="eco-height">—</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Total Supply</div>
+          <div class="stat-value">10,000,000,000</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Block Reward</div>
+          <div class="stat-value green">50 OMNI</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Gas Fee</div>
+          <div class="stat-value green">$0.00</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-label">Consensus</div>
+          <div class="stat-value">PoA + PoW</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Ecosystem Cards ══════════════════════════════════════════════════ -->
+    <div class="eco-section-title">
+      <h2>Full Ecosystem</h2>
+      <p>Every pillar of the Omni Chain infrastructure — built, linked, and live.</p>
+    </div>
+
+    <div class="hub-grid">
+
+      <!-- 1. Create Wallet (NEW) -->
+      <div class="hub-card gold">
+        <div class="hub-icon"><i data-lucide="wallet" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-new"><span class="pill-dot"></span> NEW</div>
+        <h3>Create Omni Wallet</h3>
+        <p>Generate a self-custody EVM wallet for Omni Chain in seconds. Your private key never leaves your browser. Import into MetaMask in one click.</p>
+        <a href="/pages/create-wallet.html" class="btn-hub">⚡ Create Wallet</a>
+      </div>
+
+      <!-- 2. Wallet Dashboard -->
+      <div class="hub-card">
+        <div class="hub-icon"><i data-lucide="layout-dashboard" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>Wallet Dashboard</h3>
+        <p>View your OMNI balance, deposit or withdraw assets, manage your spot, futures, and staking accounts across the exchange.</p>
+        <a href="/pages/wallet.html" class="btn-hub">Open Dashboard</a>
+      </div>
+
+      <!-- 3. OmniScan Explorer -->
+      <div class="hub-card">
+        <div class="hub-icon"><i data-lucide="activity" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>OmniScan Explorer</h3>
+        <p>Transparent on-chain analytics. Verify zero-fee transactions, blocks, and Genesis Supply allocations in real-time.</p>
+        <a href="/pages/explorer.html" class="btn-hub">Launch Explorer</a>
+      </div>
+
+      <!-- 4. Mining (NEW) -->
+      <div class="hub-card gold">
+        <div class="hub-icon"><i data-lucide="cpu" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-new"><span class="pill-dot"></span> NEW</div>
+        <h3>Mine OMNI Tokens</h3>
+        <p>Run the Omni mining engine on Windows, macOS, or Linux. Proof-of-Work block production with live dashboard. Earnings go straight to your wallet.</p>
+        <a href="/pages/mine.html" class="btn-hub">⛏ Start Mining</a>
+      </div>
+
+      <!-- 5. Omni Bridge -->
+      <div class="hub-card">
+        <div class="hub-icon"><i data-lucide="arrow-right-left" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>Omni Bridge</h3>
+        <p>Cross-chain liquidity. Lock native OMNI on L1 and mint wrapped representations on Ethereum, BNB Chain, or Polygon.</p>
+        <a href="/pages/bridge.html" class="btn-hub">Access Bridge</a>
+      </div>
+
+      <!-- 6. DAO Governance -->
+      <div class="hub-card">
+        <div class="hub-icon"><i data-lucide="users" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>DAO Governance</h3>
+        <p>True decentralization. Connect your Master Wallet and use your Genesis supply to vote on critical network upgrades and proposals.</p>
+        <a href="/pages/dao.html" class="btn-hub">View Proposals</a>
+      </div>
+
+      <!-- 7. Launchpad -->
+      <div class="hub-card blue">
+        <div class="hub-icon"><i data-lucide="rocket" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-beta"><span class="pill-dot"></span> BETA</div>
+        <h3>Omni Launchpad</h3>
+        <p>Launch or participate in token offerings on Omni Chain. Create your own token with zero deployment fees via the Token Factory.</p>
+        <a href="/pages/launchpad.html" class="btn-hub">View Launchpad</a>
+      </div>
+
+      <!-- 8. Staking -->
+      <div class="hub-card">
+        <div class="hub-icon"><i data-lucide="layers" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>OMNI Staking</h3>
+        <p>Stake OMNI tokens to earn yield, secure the network, and gain governance weight. Lock periods from 7 to 365 days.</p>
+        <a href="/pages/staking.html" class="btn-hub">Stake OMNI</a>
+      </div>
+
+      <!-- 9. Spot Trading -->
+      <div class="hub-card">
+        <div class="hub-icon"><i data-lucide="bar-chart-2" style="width:28px;height:28px;"></i></div>
+        <div class="status-pill pill-live"><span class="pill-dot"></span> LIVE</div>
+        <h3>Spot Trading</h3>
+        <p>Professional order book exchange for 2,100+ pairs. Real-time matching engine with WebSocket price feeds.</p>
+        <a href="/pages/spot.html" class="btn-hub">Trade Now</a>
+      </div>
+
+    </div>
+
+    <!-- ══ Mining Setup Section ══════════════════════════════════════════════ -->
+    <div id="mining-section" class="mining-banner" style="max-width:1200px; margin: 20px auto 80px; padding: 48px;">
+      <div class="left">
+        <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.3); padding:5px 14px; border-radius:20px; margin-bottom:18px;">
+          <span style="color:#F0A500; font-size:0.78rem; font-weight:700; " >⛏ MINING ENGINE v2.0</span>
+        </div>
+        <h2>Mine OMNI on Any Platform</h2>
+        <p>Run the Omni mining engine directly on your machine. Pure Python — no blockchain node required. Works on Windows PowerShell, macOS Terminal, and Linux bash. Generates a wallet automatically and writes mined blocks to your local chain.</p>
+
+        <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;">
+          <div style="display:flex; align-items:center; gap:8px; background:var(--color-bg-deep); border:1px solid var(--color-bg-light); border-radius:8px; padding:8px 14px; font-size:0.8rem; color:var(--color-text-muted);">
+            🪟 Windows PowerShell
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:var(--color-bg-deep); border:1px solid var(--color-bg-light); border-radius:8px; padding:8px 14px; font-size:0.8rem; color:var(--color-text-muted);">
+            🍎 macOS Terminal
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; background:var(--color-bg-deep); border:1px solid var(--color-bg-light); border-radius:8px; padding:8px 14px; font-size:0.8rem; color:var(--color-text-muted);">
+            🐧 Linux bash
+          </div>
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="/pages/create-wallet.html" class="btn btn-primary" style="text-decoration:none; padding:12px 26px;">
+            1. Create Wallet First
+          </a>
+          <a href="/pages/downloads.html" class="btn btn-outline" style="background:var(--color-bg-light); border:none; color:#fff; text-decoration:none; padding:12px 26px;" >
+            Download Mining Script
+          </a>
+        </div>
+      </div>
+      <div class="right">
+        <div class="code-block" style="margin-bottom:16px;">
+          <button class="copy-oneliner" onclick="copyOneLiner()">COPY</button>
+          <div class="code-line"><span class="comment"># ── Install dependencies (one time) ──</span></div>
+          <div class="code-line"><span class="keyword">pip</span> install colorama cryptography</div>
+          <div class="code-line" style="margin-top:10px;"><span class="comment"># ── Run the Omni miner ──────────────</span></div>
+          <div class="code-line" id="oneliner-text"><span class="keyword">python</span> scripts/mine_omni.py</div>
+          <div class="code-line" style="margin-top:10px;"><span class="comment"># ── Mine with 4 threads, difficulty 5 ─</span></div>
+          <div class="code-line"><span class="keyword">python</span> scripts/mine_omni.py <span class="string">--threads 4 --difficulty 5</span></div>
+          <div class="code-line" style="margin-top:10px;"><span class="comment"># ── Mine to your existing wallet ──────</span></div>
+          <div class="code-line"><span class="keyword">python</span> scripts/mine_omni.py <span class="string">--address 0xYourAddr</span></div>
+        </div>
+        <div style="background:var(--color-bg-deep); border:1px solid rgba(0,210,166,0.2); border-radius:12px; padding:16px 20px; font-family:monospace; font-size:0.78rem; color:var(--color-text-muted);">
+          <div style="color:var(--color-primary); margin-bottom:8px; font-weight:700;">📊 What you get:</div>
+          <div>✓ Auto wallet generation & local storage</div>
+          <div>✓ Real SHA-256 Proof-of-Work mining</div>
+          <div>✓ Live ASCII dashboard (hashrate, blocks, earnings)</div>
+          <div>✓ Local blockchain written to chaindata/chain.json</div>
+          <div>✓ Session export with full wallet credentials</div>
+          <div>✓ Geth-compatible RPC via <code>launch_omni_network.py</code></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ Token Fundamentals ═════════════════════════════════════════════ -->
+    <div class="eco-section-title">
+      <h2>OMNI Token Fundamentals</h2>
+      <p>Sound tokenomics. Fixed supply. Zero inflation beyond mining rewards.</p>
+    </div>
+    <div class="token-grid">
+      <div class="token-stat">
+        <div class="token-stat-label">Hard Cap</div>
+        <div class="token-stat-val">10 Billion</div>
+        <div class="token-stat-sub">OMNI total supply</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Block Reward</div>
+        <div class="token-stat-val">50 OMNI</div>
+        <div class="token-stat-sub">Halves every 210K blocks</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Chain ID</div>
+        <div class="token-stat-val">8888</div>
+        <div class="token-stat-sub">EVM-compatible</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Gas Fee</div>
+        <div class="token-stat-val">$0.00</div>
+        <div class="token-stat-sub">Forever zero-gas</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Block Time</div>
+        <div class="token-stat-val">~3 sec</div>
+        <div class="token-stat-sub">PoA pacing</div>
+      </div>
+      <div class="token-stat">
+        <div class="token-stat-label">Consensus</div>
+        <div class="token-stat-val">PoA + PoW</div>
+        <div class="token-stat-sub">Hybrid architecture</div>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="footer-container"></div>
+  <script type="module" src="/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+
+      // Live block height from local chain
+      try {
+        const chain = JSON.parse(localStorage.getItem('omni_chain') || '[]');
+        document.getElementById('eco-height').textContent = chain.length ? chain.length.toLocaleString() : '1';
+      } catch(e) {
+        document.getElementById('eco-height').textContent = '1';
+      }
+
+      // Read chain.json via fetch if server is running
+      fetch('/scripts/omni-node/chaindata/chain.json')
+        .then(r => r.json())
+        .then(blocks => {
+          if (Array.isArray(blocks) && blocks.length) {
+            document.getElementById('eco-height').textContent = blocks.length.toLocaleString();
+          }
+        })
+        .catch(() => {});
+    });
+
+    function copyOneLiner() {
+      const text = 'python scripts/mine_omni.py';
+      navigator.clipboard.writeText(text);
+      const btn = event.target;
+      btn.textContent = 'COPIED!';
+      setTimeout(() => btn.textContent = 'COPY', 2000);
+    }
+  </script>
+</body>
+</html>

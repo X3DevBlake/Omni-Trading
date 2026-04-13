@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provision Liquidity | Omni Chain DEX</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .liquidity-wrap { max-width: 520px; margin: 120px auto 40px; padding: 32px; position: relative; }
+    
+    .input-box {
+      background: rgba(0,0,0,0.3); border: 1px solid var(--color-bg-light);
+      border-radius: 20px; padding: 20px; margin-bottom: 12px;
+      transition: border-color 0.3s;
+    }
+    .input-box:focus-within { border-color: var(--color-primary); }
+    .input-upper { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 10px; }
+    .input-main { display: flex; align-items: center; gap: 15px; }
+    .input-main input {
+      background: transparent; border: none; outline: none;
+      color: #fff; font-size: 1.8rem; font-family: 'JetBrains Mono', monospace; font-weight: 700;
+      width: 100%;
+    }
+    .token-pill {
+      background: rgba(255,255,255,0.06); padding: 8px 14px; border-radius: 12px;
+      display: flex; align-items: center; gap: 8px; font-weight: 700; border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer; white-space: nowrap;
+    }
+    
+    .plus-icon { display: flex; justify-content: center; margin: -6px 0; color: var(--color-primary); font-size: 1.5rem; opacity: 0.5; }
+    
+    .pool-preview {
+      background: rgba(0,210,166,0.03); border: 1px solid rgba(0,210,166,0.15);
+      border-radius: 16px; padding: 18px; margin-top: 20px;
+    }
+    .preview-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; }
+    .preview-row span { color: var(--color-text-muted); }
+    .preview-row strong { color: #fff; font-family: 'JetBrains Mono', monospace; }
+
+    .btn-supply {
+      width:100%; padding:18px; border-radius:18px; font-weight:800; font-size:1.1rem;
+      margin-top:24px; box-shadow: 0 0 20px rgba(0,210,166,0.2);
+    }
+    
+    .apy-promo {
+      text-align: center; margin-top: 24px; background: var(--color-bg-glass);
+      border: 1px solid var(--color-bg-light); border-radius: 20px; padding: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-container"></div>
+
+  <main class="container">
+    <div class="glass-panel liquidity-wrap">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <div>
+          <h2 style="margin:0; font-size:1.6rem;">Add Liquidity</h2>
+          <p style="margin:4px 0 0; color:var(--color-text-muted); font-size:0.85rem;">Receive LP tokens and earn 0.3% fee share.</p>
+        </div>
+        <div class="hub-icon" style="margin:0; width:48px; height:48px; border-radius:12px;"><i data-lucide="droplet"></i></div>
+      </div>
+
+      <!-- Token A -->
+      <div class="input-box">
+        <div class="input-upper">
+          <span>Amount to Supply</span>
+          <span id="bal-a">Balance: 0.00</span>
+        </div>
+        <div class="input-main">
+          <input type="number" id="amt-a" placeholder="0.0" oninput="syncInputs('a')">
+          <div class="token-pill">
+            <div style="width:24px; height:24px; background:var(--color-primary); border-radius:50%; box-shadow:0 0 10px rgba(0,210,166,0.4);"></div>
+            OMNI
+          </div>
+        </div>
+      </div>
+
+      <div class="plus-icon"><i data-lucide="plus-circle" style="width:24px; height:24px;"></i></div>
+
+      <!-- Token B -->
+      <div class="input-box">
+        <div class="input-upper">
+          <span>Amount to Supply</span>
+          <span id="bal-b">Balance: 0.00</span>
+        </div>
+        <div class="input-main">
+          <input type="number" id="amt-b" placeholder="0.0" oninput="syncInputs('b')">
+          <div class="token-pill">
+            <div style="width:24px; height:24px; background:#2775ca; border-radius:50%; box-shadow:0 0 10px rgba(39,117,202,0.4);"></div>
+            USDT
+          </div>
+        </div>
+      </div>
+
+      <div class="pool-preview" id="lp-output" style="display:none;">
+        <div class="preview-row">
+          <span>Reward Rate</span>
+          <strong style="color:var(--color-primary);">92.4% APY</strong>
+        </div>
+        <div class="preview-row">
+          <span>LP Tokens Mined</span>
+          <strong id="lp-receive">0.0000</strong>
+        </div>
+        <div class="preview-row">
+          <span>Pool Share</span>
+          <strong id="share-pct">0.00%</strong>
+        </div>
+      </div>
+
+      <button id="add-lp-btn" class="btn btn-primary btn-supply" onclick="addLiquidity()">
+        Supply & Earn Rewards
+      </button>
+    </div>
+
+    <!-- Farming Redir -->
+    <div class="apy-promo" style="max-width:520px; margin: 0 auto 100px;">
+      <div style="display:flex; align-items:center; gap:12px; justify-content:center; margin-bottom:12px;">
+         <i data-lucide="tractor" style="color:var(--color-primary);"></i>
+         <span style="color:var(--color-primary); font-weight:800; text-transform:uppercase; letter-spacing:1px; font-size:0.8rem;">Yield Farm Integrated</span>
+      </div>
+      <p style="color:var(--color-text-muted); font-size:0.9rem; line-height:1.5;">Supplying liquidity gives you LP tokens. For maximum returns, stake these tokens in the <strong>Omni Farm</strong> to earn bonus OMNI emissions.</p>
+      <a href="/pages/farming.html" class="btn btn-outline" style="width:100%; border-radius:12px; margin-top:10px;">Go to Yield Farming →</a>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script type="module" src="/js/main.js"></script>
+  <script type="module">
+    import { defi } from '/js/services/DeFiCore.js';
+    
+    const PRICE_OMNI = 2.47;
+
+    window.syncInputs = function(side) {
+      const a = document.getElementById('amt-a');
+      const b = document.getElementById('amt-b');
+      const out = document.getElementById('lp-output');
+      
+      const valA = parseFloat(a.value) || 0;
+      const valB = parseFloat(b.value) || 0;
+
+      if (side === 'a') {
+        b.value = valA > 0 ? (valA * PRICE_OMNI).toFixed(2) : '';
+      } else {
+        a.value = valB > 0 ? (valB / PRICE_OMNI).toFixed(2) : '';
+      }
+
+      if (a.value > 0) {
+        out.style.display = 'block';
+        document.getElementById('lp-receive').innerText = Math.sqrt(parseFloat(a.value) * (parseFloat(b.value)||0)).toFixed(4);
+        document.getElementById('share-pct').innerText = '0.0018%';
+      } else {
+        out.style.display = 'none';
+      }
+    };
+
+    window.addLiquidity = function() {
+      const valA = parseFloat(document.getElementById('amt-a').value);
+      const valB = parseFloat(document.getElementById('amt-b').value);
+
+      if (!valA || valA <= 0) {
+          alert("Please enter a valid amount to supply.");
+          return;
+      }
+
+      const res = defi.addLiquidity('OMNI_USDT', valA, valB);
+      if (res.success) {
+        alert(`Liquidity Provision Successful!\n\nYou earned ${res.lpGained.toFixed(4)} LP tokens.\nNow stake them in the Farm to start earning OMNI!`);
+        location.href = '/pages/farming.html';
+      } else {
+          alert("Error adding liquidity: " + (res.msg || "Unknown error"));
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      
+      // Load balances from local storage
+      const auth = localStorage.getItem('omni_custom_auth');
+      const walletStr = localStorage.getItem(`omni_wallet_${auth}`) || localStorage.getItem('omni_wallet');
+      try {
+          const wallet = JSON.parse(walletStr || '{"liquid":{"OMNI":1000000,"USDT":500000}}');
+          document.getElementById('bal-a').innerText = `Balance: ${(wallet.liquid.OMNI || 0).toLocaleString()}`;
+          document.getElementById('bal-b').innerText = `Balance: ${(wallet.liquid.USDT || 0).toLocaleString()}`;
+      } catch(e) {
+          document.getElementById('bal-a').innerText = 'Balance: 1,000,000';
+          document.getElementById('bal-b').innerText = 'Balance: 500,000';
+      }
+    });
+  </script>
+</body>
+</html>
