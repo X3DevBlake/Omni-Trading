@@ -18,27 +18,25 @@ import { getActiveNode, startMiningTicker, fmtOMNI } from './cloud-mining-engine
 import { defi } from './services/DeFiCore.js';
 import { audio } from './services/AudioEngine.js';
 
-  // 1. Show Cinematic Loader Immediately
-  renderLoader();
-
-  // Global Haptic Feedback Listener
-  document.addEventListener('click', (e) => {
-    const target = e.target.closest('button, a, .nav-item, .market-item, [onclick]');
-    if (target) {
-        import('../services/HapticService.js').then(({ haptics }) => haptics.lightTap());
-    }
-  }, { passive: true });
-
-  // Restore saved Theme State immediately
-  const savedTheme = localStorage.getItem('omni_theme_color');
-  if (savedTheme) {
-      document.documentElement.style.setProperty('--color-primary', savedTheme);
+  // 1. Show Cinematic Loader (ONLY ONCE PER SESSION)
+  const loaderShown = sessionStorage.getItem('omni_loader_shown');
+  
+  if (!loaderShown) {
+      renderLoader();
+      sessionStorage.setItem('omni_loader_shown', 'true');
+      
+      // Monitor for Loaded Event to launch sequence
+      window.addEventListener('omni_loaded', () => {
+        launchSequence();
+      });
+  } else {
+      // If already shown, hide the loader overlay immediately if it exists
+      document.body.classList.add('app-ready');
+      // Dispatch event to show app content
+      setTimeout(() => window.dispatchEvent(new Event('omni_loaded')), 100);
   }
 
-  // Monitor for Loaded Event
-  window.addEventListener('omni_loaded', () => {
-    launchSequence();
-  });
+  // Global Haptic Feedback Listener
 
   // Render components
   renderNavbar();
@@ -232,7 +230,6 @@ import { audio } from './services/AudioEngine.js';
           });
       }
   });
-});
 
 function initGlobalMining() {
   const node = getActiveNode();
